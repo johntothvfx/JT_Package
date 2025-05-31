@@ -1,0 +1,1138 @@
+Group {
+ name AOVRamp1
+ help "Generates a ramp matte based on the incoming channel information."
+ tile_color 0x119911ff
+ selected true
+ addUserKnob {20 AOVMatte}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION AOVRamp
+ addUserKnob {1 operation l INVISIBLE +INVISIBLE}
+ operation "\[expr \{\[numvalue replace] ? \"\" : \"\[value operations]\" \}]"
+ addUserKnob {1 mix l INVISIBLE +INVISIBLE}
+ mix "\[value opacity]"
+ addUserKnob {41 channels t "The ramp is generated from the channel selected.\n\nThis is usually Position/Normal channels." T Shuffle1.in}
+ addUserKnob {6 unpremultiply t "Divides the selected channel layer by the incoming alpha if any.\n\nThis is highly adviced as it can cause every pixel to be correctly calculated and causes less artefacts around edges." +STARTLINE}
+ addUserKnob {41 visualizeOutput_1 l "visualize output" t "When enabled the generated matte will overlay the image based on the settings in the Visualize tab." -STARTLINE T visual.visualizeOutput}
+ addUserKnob {41 visualizeIn3D l "visualize in 3D" t "When enabled the generated matte will be represented in 3D space as a point cloud with the AOVMatte shape based on the settings in the Visualize tab." -STARTLINE T visual.visualizeIn3D}
+ addUserKnob {26 ""}
+ addUserKnob {4 operations l operation t "B is the incoming alpha layer.\nA is the generated matte.\n\n<b>• absminus abs(A-B) </b>- how much the pixels differ. \n\n<b>• b if not a A?A:B </b>- shows A wherever A exists; otherwise shows B. \n\n<b>• divide A/B, 0 if A<0 and B<0 </b>- divides the values but stops two negative values from becoming a positive number. \n\n<b>• from (B-A) </b>- subtracts A from B. \n\n<b>• in Ab </b>- only shows the areas of image A that overlap with the alpha of B. \n\n<b>• max (max(A,B)) </b>- selects the lighter of the two colors as the resulting color. Only areas darker than B are replaced, while areas lighter than B do not change. \n\n<b>• min (min(A,B)) </b>- selects the darker of the two colors as the resulting color. Any parts that are lighter than B are substituted. Any parts of the image that are darker than B don’t change. \n\n<b>• minus (A-B) </b>- subtracts B from A. \n\n<b>• multiply (AB, A if A<0 and B<0)</b> - multiplies A by B. The result is always darker. Blending with black gives black and with white returns the color unchanged. \n\n<b>• out A(1-b) </b>- only shows the areas of image A that do not overlap with the alpha of B. \n\n<b>• plus A+B </b>- the sum of the two colors. Increases brightness to lighten A and reflect B. \n\n<b>• stencil B(1-a) </b>- this is the reverse of the out operation. Only shows the areas of image B that do not overlap with the alpha of A. \n\n<b>• union A+B-AB </b>- shows both image A and B. \n\n<b>• xor A+B-2AB </b>- shows both image A and B where the images do not overlap." +DISABLED M {absminus "b if not a " "divide " from in max min minus multiply out plus stencil union xor "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+ operations plus
+ addUserKnob {41 replace t "When enabled, existing alpha channel is replaced with generated matte from this node.\n\nIf this is disabled you can use the operations to combine the generated matte and the previous coming alpha." -STARTLINE T menu.replace}
+ addUserKnob {4 sampling t "The generated matte will be scaled up 2x in scale and reformated back down which may cause a softer edge." M {none "2x sampling" "" "" "" "" "" ""}}
+ addUserKnob {7 opacity t "Dissolves between the effect from 0 to 1, The full effect at 1.\n\nThis is mostly useful with the replace feature. To stack Mattes together"}
+ opacity 1
+ addUserKnob {26 ""}
+ addUserKnob {4 direction t "The axis direction that the ramp will be generated on:\n\n<b>• start to end:</b> ramp along the vector that goes from start to end points\n<b>• X:</b> ramp along the X axis\n<b>• Y:</b> ramp along the Y axis\n<b>• Z:</b> ramp along the Z axis\n" M {"start to end" X Y Z "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+ addUserKnob {6 invert t "Inverts the start and end selection position with eachother." -STARTLINE}
+ addUserKnob {41 start t "Used to select the start point of the ramp." T Picker.start}
+ addUserKnob {41 end t "Used to select the end point of the ramp." T Picker.end}
+ addUserKnob {6 color_rgb_panelDropped l "panel dropped state" +HIDDEN +STARTLINE}
+ addUserKnob {6 color_rgb_1_panelDropped l "panel dropped state" +HIDDEN +STARTLINE}
+ addUserKnob {26 ""}
+ addUserKnob {4 order l "rotation order" t "Specifies the order to apply Euler angles to the rotation." M {XYZ XZY YXZ YZX ZXY ZYX "" "" "" "" "" "" ""}}
+ addUserKnob {4 rotatePivot l "rotation pivot" t "Pivot point of where the rotation till take place." M {"start\t" center end "" "" "" "" "" "" "" ""}}
+ rotatePivot center
+ addUserKnob {13 rotate t "Rotates the ramp on a certain axis based on the order and pivot selected."}
+ addUserKnob {26 ""}
+ addUserKnob {4 falloff_type l fallloff t "Applies a mathematic falloff to each pixel" M {linear smooth quadratic cubic exponential "" "" "" "" "" "" ""}}
+ addUserKnob {7 gain t "Clamp at 0 to 1. 1 being the softest with the value going down making darker values go white."}
+ gain 1
+ addUserKnob {7 gamma t "Applies a constant gamma value to the result of the generated matte. This lightens or darkens the midtones." R 0 5}
+ gamma 1
+ addUserKnob {20 noise l Noise}
+ addUserKnob {6 addNoise l "add noise" t "add noise inside the generated matte" +STARTLINE}
+ addUserKnob {26 space001 l "" +STARTLINE +INVISIBLE T "\t"}
+ addUserKnob {4 type t "noise type" M {fBm turbulence "" "" "" ""}}
+ addUserKnob {6 invertNoise l invert t "Invert noise pattern. Whatever is 0 will become 1 and anything 1 will become 0." -STARTLINE}
+ addUserKnob {4 fractalBlur l "fractal blur" t "Noise is applied to more transparent values and the white is kept intact.\n" M {none nonlinear linear "" "" "" "" "" "" ""}}
+ addUserKnob {26 ""}
+ addUserKnob {13 translateNoise l translate t "Translate the noise in xyz"}
+ addUserKnob {13 rotateNoise l rotate t "Rotate the noise in xyz"}
+ addUserKnob {13 scaleNoise l scale t "Scale noise independently in xyz\n"}
+ scaleNoise {1 1 1}
+ addUserKnob {7 uniform_scaleNoise l "uniform scale" t "Scale noise uniformly in xyz." R 0.001 10}
+ uniform_scaleNoise 1
+ addUserKnob {26 ""}
+ addUserKnob {3 octaves t "Number of perlin noise functions to add"}
+ octaves 10
+ addUserKnob {7 lacunarity t "Each octave is mutlpies frequency by this amount" R 1 10}
+ lacunarity 2
+ addUserKnob {7 gainNoise l gain t "Each octave is mutlpies amplitude by this amount" R 0.1 1}
+ gainNoise 0.5
+ addUserKnob {7 gammaNoise l gamma t "Applies a constant gamma value to the result of the noise. This lightens or darkens the midtones." R 0.1 1}
+ gammaNoise 0.5
+ addUserKnob {26 ""}
+ addUserKnob {7 mixNoise l mix t "Dissolves between the original image at 0 and the full effect (noise) at 1."}
+ mixNoise 1
+ addUserKnob {20 visualize l Visualize}
+ addUserKnob {41 visualizeOutput l "visualize output" t "When enabled the generated matte will overlay the image based on the settings in the Visualize tab." T visual.visualizeOutput}
+ addUserKnob {6 newMatte_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 aovMatte_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 selectedMatte_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {18 newMatte l "new matte" t "Generated matte respresentation overlay in the viewport."}
+ newMatte {1 0 0}
+ addUserKnob {6 newMatte_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {18 oldMatte l "old matte" t "Incoming alpha respresentation overlay in the viewport.\n\nThis is only visible if \"replace\" is disbaled."}
+ oldMatte {0 1 0}
+ addUserKnob {6 oldMatte_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 inputMatte_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 visualizeColor_panelDropped l "panel dropped state" +HIDDEN +STARTLINE}
+ addUserKnob {7 visualizeMix l mix t "Dissolves between no visualize colour overlay on the image from 0 and 1 when visualize output is enabled.\n\n1 Being full effect"}
+ visualizeMix 0.5
+ addUserKnob {26 ""}
+ addUserKnob {41 visualizeIn3D_1 l "visualize in 3D" t "When enabled the generated matte will be represented in 3D space as a point cloud with the AOVMatte shape based on the settings in the Visualize tab." T visual.visualizeIn3D}
+ addUserKnob {41 detail l "point detail" t "Controls the number of available points in the viewer.\n0 = No points, 1 = All available points" T PositionToPoints1.detail}
+ addUserKnob {41 pointSize l "point size" t "Controls the display size of the points to display in the viewer." T PositionToPoints1.pointSize}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>AOV Ramp</font><font color=#119911> v1.2"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>AOVRamp</b> using the incoming channel information<br>to generate a matte based on a ramp.\n\n<br><br>\n<i>\n• This node is usually for Normals and position layers.\n\n\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#119911;\">John Toth <b>© 2020 <br>\n\n"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#119911\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#119911\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\n# Constants\nversion_number = \"1.2.1\"\ncontext = \"AOV\"\nmodified_date = \"30st January 2025\"\ndeveloper = \"John Toth © 2020\"\nsite = \"<a href='website linke here'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- generates a ramp/matte based on a selection\n<br></i><b> v 1.1 </b><i>\n- 2D visual overlay was added\n- noise was added\n- visualize 3D now will display the ramp in 3D space\n<br></i><b> v 1.2 </b><i>\n- user interface updated\n- information tab was re-written\n- ramp can be inverted\n- start to end option was added\n- rotation on certain pivot has been added (start,center or end)\n- merging incoming alpha and generated \n- replace button was added\n- gamma slider was added\n- visualize now displayed old matte\n- noise can be invert\n- fractal blur has been added to the noise\n- noise uniform scale,translate,rotate,scale now work independently\n- mix for the noise was added\n\"\"\"\nthank_you = \"- This node is based of N Depth Slice as a learning curve of how to create a robust PRamp and I would like to thanks Daniel Velikov and Ben Dickson\"\n\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"</i>\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n\n# Display the message\nnuke.message(message)\n\n"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode1
+  tile_color 0x23232301
+  label "<center>Don't Touch\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  note_font_color 0xee453cff
+  xpos 618
+  ypos 580
+  bdwidth 730
+  bdheight 759
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0xff9900ff
+  label "<center>Visualize Output\n<i><font size=1>(bottom section is to mimic ChannelMerge operations)\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 24
+  note_font_color 0xee453cff
+  xpos 430
+  ypos 3640
+  bdwidth 468
+  bdheight 1020
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode3
+  tile_color 0xff9900ff
+  label "<center>Visualize Output 3D\n\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 24
+  note_font_color 0xee453cff
+  xpos 974
+  ypos 5173
+  bdwidth 473
+  bdheight 315
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 110
+  ypos 679
+ }
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 144
+  ypos 785
+ }
+set N84f63200 [stack 0]
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 544
+  ypos 785
+ }
+ Unpremult {
+  channels all
+  name Unpremult1
+  xpos 510
+  ypos 830
+  disable {{!parent.unpremultiply}}
+ }
+ Shuffle {
+  in none
+  in2 rgba
+  out rgb
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 510
+  ypos 868
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 544
+  ypos 977
+ }
+set N84d2ea00 [stack 0]
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 544
+  ypos 1458
+ }
+set N84c06200 [stack 0]
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1088
+  ypos 1461
+ }
+set N84a99600 [stack 0]
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1308
+  ypos 1461
+ }
+ Remove {
+  operation keep
+  channels rgba
+  name Remove2
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 1274
+  ypos 5278
+ }
+push $N84c06200
+ Dot {
+  name Dot19
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 544
+  ypos 1554
+ }
+set N8488d600 [stack 0]
+ Dot {
+  name Dot18
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 978
+  ypos 1554
+ }
+ Reformat {
+  type scale
+  scale 2
+  filter impulse
+  name Reformat3
+  label "x2 over sampling"
+  xpos 944
+  ypos 2561
+  disable {{!parent.sampling}}
+ }
+ Dot {
+  name Dot17
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 978
+  ypos 2792
+ }
+push $N8488d600
+ Expression {
+  expr0 "r == 0 && g == 0 && b == 0 ? 0 : rotatePivot == 0 ? r - parent.Picker.start.r : rotatePivot == 1 ? r -(parent.Picker.start.r+parent.Picker.end.r)/2 : r - parent.Picker.end.r"
+  expr1 "r == 0 && g == 0 && b == 0 ? 0 :rotatePivot == 0 ? g - parent.Picker.start.g : rotatePivot == 1 ? g -(parent.Picker.start.g+parent.Picker.end.g)/2 : g- parent.Picker.end.g"
+  expr2 "r == 0 && g == 0 && b == 0 ? 0 : rotatePivot == 0 ? b - parent.Picker.start.b : rotatePivot == 1 ? b -(parent.Picker.start.b+parent.Picker.end.b)/2 : b - parent.Picker.end.b"
+  name Expression6
+  xpos 510
+  ypos 1647
+ }
+ Dot {
+  name Dot27
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 544
+  ypos 1722
+ }
+set N7f144800 [stack 0]
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 621
+  ypos 1722
+ }
+set N7f100a00 [stack 0]
+ Dot {
+  name Dot24
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 731
+  ypos 1722
+ }
+set N7f12da00 [stack 0]
+ Dot {
+  name Dot26
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 841
+  ypos 1722
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix7
+  label Z
+  xpos 807
+  ypos 1795
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.z}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+    }
+  name ColorMatrix8
+  label Y
+  xpos 807
+  ypos 1843
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.y}}
+ }
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name ColorMatrix9
+  label X
+  xpos 807
+  ypos 1891
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.x}}
+ }
+push $N7f12da00
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix22
+  label Z
+  xpos 697
+  ypos 1795
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.z}}
+ }
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name ColorMatrix23
+  label X
+  xpos 697
+  ypos 1843
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.x}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+    }
+  name ColorMatrix24
+  label Y
+  xpos 697
+  ypos 1891
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.y}}
+ }
+push $N7f100a00
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+    }
+  name ColorMatrix25
+  label Y
+  xpos 587
+  ypos 1795
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.y}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix26
+  label Z
+  xpos 587
+  ypos 1843
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.z}}
+ }
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name ColorMatrix27
+  label X
+  xpos 587
+  ypos 1891
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.x}}
+ }
+push $N7f144800
+ Dot {
+  name Dot28
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 469
+  ypos 1722
+ }
+set N7ac62400 [stack 0]
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+    }
+  name ColorMatrix28
+  label Y
+  xpos 435
+  ypos 1795
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.y}}
+ }
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name ColorMatrix29
+  label X
+  xpos 435
+  ypos 1843
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.x}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix30
+  label Z
+  xpos 435
+  ypos 1891
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.z}}
+ }
+push $N7ac62400
+ Dot {
+  name Dot29
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 359
+  ypos 1722
+ }
+set N4c1e0a00 [stack 0]
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name ColorMatrix31
+  label X
+  xpos 325
+  ypos 1795
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.x}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix32
+  label Z
+  xpos 325
+  ypos 1843
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.z}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+    }
+  name ColorMatrix33
+  label Y
+  xpos 325
+  ypos 1891
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.y}}
+ }
+push $N4c1e0a00
+ Dot {
+  name Dot30
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 260
+  ypos 1722
+ }
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name ColorMatrix34
+  label X
+  xpos 226
+  ypos 1795
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.x}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+    }
+  name ColorMatrix35
+  label Y
+  xpos 226
+  ypos 1843
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.y}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix36
+  label Z
+  xpos 226
+  ypos 1891
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.z}}
+ }
+ Switch {
+  inputs 6
+  which {{parent.order}}
+  name Switch1
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  xpos 510
+  ypos 2027
+ }
+ Expression {
+  expr0 "r == 0 && g == 0 && b == 0 ? 0 : rotatePivot == 0 ? r + parent.Picker.start.r : rotatePivot == 1 ? r + (parent.Picker.start.r+parent.Picker.end.r)/2 : r + parent.Picker.end.r"
+  expr1 "r == 0 && g == 0 && b == 0 ? 0 :rotatePivot == 0 ? g + parent.Picker.start.g : rotatePivot == 1 ? g + (parent.Picker.start.g+parent.Picker.end.g)/2 : g + parent.Picker.end.g"
+  expr2 "r == 0 && g == 0 && b == 0 ? 0 : rotatePivot == 0 ? b + parent.Picker.start.b : rotatePivot == 1 ? b + (parent.Picker.start.b+parent.Picker.end.b)/2 : b + parent.Picker.end.b"
+  name Expression7
+  xpos 510
+  ypos 2127
+ }
+ Dot {
+  name Dot31
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 544
+  ypos 2250
+ }
+set N7a911800 [stack 0]
+ Dot {
+  name Dot32
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 654
+  ypos 2250
+ }
+ Expression {
+  expr0 "r == 0 && g == 0 && b == 0 ? 0 : r - parent.Picker.start.r"
+  expr1 "r == 0 && g == 0 && b == 0 ? 0 : g - parent.Picker.start.g"
+  expr2 "r == 0 && g == 0 && b == 0 ? 0 : b - parent.Picker.start.b"
+  name Expression4
+  xpos 620
+  ypos 2295
+ }
+ ColorMatrix {
+  matrix {
+      {{tt*wnorm.x**2+d} {tt*wnorm.x*wnorm.y-s*wnorm.z} {"tt*wnorm.x*wnorm.z + s*wnorm.y"}}
+      {{"tt*wnorm.x*wnorm.y + s*wnorm.z"} {tt*wnorm.y**2+d} {"tt*wnorm.y*wnorm.z - wnorm.x*s"}}
+      {{"tt*wnorm.x*wnorm.z - s*wnorm.y"} {tt*wnorm.y*wnorm.z+s*wnorm.x} {"tt*wnorm.z**2 + d"}}
+    }
+  name Rotate_Scale_Skew4
+  xpos 620
+  ypos 2342
+  addUserKnob {20 User}
+  addUserKnob {7 length}
+  length {{"sqrt ( ( (parent.end.r - parent.start.r) ** 2 )  + ( (parent.end.g - parent.start.g) ** 2 )  +  ( (parent.end.b - parent.start.b) ** 2 ))"}}
+  addUserKnob {13 u}
+  u {0 1 0}
+  addUserKnob {13 v}
+  v {{"(parent.end.r - parent.start.r) / length"} {"(parent.end.g - parent.start.g) / length"} {"(parent.end.b - parent.start.b) / length"}}
+  addUserKnob {13 w}
+  w {{"u.y * v.z - u.z * v.y"} {"u.z * v.x - u.x * v.z"} {"u.x * v.y - u.y * v.x"}}
+  addUserKnob {13 wnorm}
+  wnorm {{"w.x / sqrt(w.x**2+w.y**2+w.z**2)"} {"w.y / sqrt(w.x**2+w.y**2+w.z**2)"} {"w.z / sqrt(w.x**2+w.y**2+w.z**2)"}}
+  addUserKnob {7 phi}
+  phi {{acos(u.x*v.x+u.y*v.y+u.z*v.z)}}
+  addUserKnob {7 tt}
+  tt {{1-cos(phi)}}
+  addUserKnob {7 s}
+  s {{-sin(phi)}}
+  addUserKnob {7 d}
+  d {{cos(phi)}}
+ }
+ Multiply {
+  channels rgb
+  value {{1/Rotate_Scale_Skew4.length}}
+  name Multiply1
+  xpos 620
+  ypos 2391
+ }
+ Dot {
+  name Dot33
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 654
+  ypos 2466
+ }
+push $N7a911800
+ Switch {
+  inputs 2
+  which {{"parent.direction == 0 ? 1 : 0"}}
+  name Switch5
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  xpos 510
+  ypos 2459
+ }
+ Reformat {
+  type scale
+  scale 2
+  filter impulse
+  name Reformat1
+  label "x2 over sampling"
+  xpos 510
+  ypos 2554
+  disable {{!parent.sampling}}
+ }
+ Expression {
+  temp_name0 x_direction
+  temp_expr0 clamp((r-parent.Picker.start.r)/(parent.Picker.end.r-parent.Picker.start.r),0,1)
+  temp_name1 y_direction
+  temp_expr1 clamp((g-parent.Picker.start.g)/(parent.Picker.end.g-parent.Picker.start.g),0,1)
+  temp_name2 z_direction
+  temp_expr2 clamp((b-parent.Picker.start.b)/(parent.Picker.end.b-parent.Picker.start.b),0,1)
+  temp_name3 direction
+  temp_expr3 "clamp( parent.direction == 0 ? y_direction : parent.direction == 1 ? x_direction : parent.direction == 2 ? y_direction : z_direction)"
+  expr3 "r == 0 && g == 0 && b == 0 ? 0 : parent.invert == 0 ? direction : 1 - direction"
+  name Ramp
+  xpos 510
+  ypos 2654
+ }
+ Expression {
+  temp_name0 falloff_math
+  temp_expr0 "alpha * (1/ clamp( parent.gain ,0.00001,1) )"
+  expr3 "parent.falloff_type == 0 ? falloff_math : parent.falloff_type == 1 ? smoothstep( 0 , 1 , falloff_math ) : parent.falloff_type == 2 ? clamp( pow2 ( falloff_math ) ) : parent.falloff_type == 3 ? clamp( falloff_math ** 3 ) : pow( 1 - pow( 1 - falloff_math , 1 ) , 1 )"
+  name falloff1
+  xpos 510
+  ypos 2678
+ }
+ Grade {
+  channels alpha
+  gamma {{max(parent.gamma,0.2)}}
+  white_clamp true
+  name Grade3
+  xpos 510
+  ypos 2699
+ }
+ Copy {
+  inputs 2
+  from0 rgba.red
+  to0 rgba.red
+  from1 rgba.green
+  to1 rgba.green
+  from2 rgba.blue
+  to2 rgba.blue
+  name Copy1
+  xpos 510
+  ypos 2775
+ }
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name X2
+  label "rotate noise x"
+  xpos 510
+  ypos 2942
+  disable {{"parent.rotateNoise.x== 0 ? parent.rotateNoise.y == 0 ? parent.rotateNoise.z == 0 ? 1 : 0 : 0 : 0"}}
+  addUserKnob {20 User}
+  addUserKnob {7 angle R -180 180}
+  angle {{parent.rotateNoise.x}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle))}}
+    }
+  name Y2
+  label "rotate noise y"
+  xpos 510
+  ypos 2974
+  disable {{"parent.rotateNoise.x== 0 ? parent.rotateNoise.y == 0 ? parent.rotateNoise.z == 0 ? 1 : 0 : 0 : 0"}}
+  addUserKnob {20 User}
+  addUserKnob {7 angle R -180 180}
+  angle {{parent.rotateNoise.y}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name Z2
+  label "rotate noise z"
+  selected true
+  xpos 510
+  ypos 3006
+  disable {{"parent.rotateNoise.x== 0 ? parent.rotateNoise.y == 0 ? parent.rotateNoise.z == 0 ? 1 : 0 : 0 : 0"}}
+  addUserKnob {20 User}
+  addUserKnob {7 angle R -180 180}
+  angle {{parent.rotateNoise.z}}
+ }
+ Expression {
+  temp_name0 fBmNoise
+  temp_expr0 "fBm((r+parent.translateNoise.x)*1/((1 - parent.scaleNoise.x) + parent.uniform_scaleNoise),(g+parent.translateNoise.y)*1/((1 - parent.scaleNoise.y) + parent.uniform_scaleNoise),(b+parent.translateNoise.z)*1/((1 - parent.scaleNoise.z) + parent.uniform_scaleNoise),parent.octaves,parent.lacunarity,parent.gainNoise)*.5+0.5"
+  temp_name1 turbNoise
+  temp_expr1 "turbulence((r + parent.translateNoise.x) * 1 / ((1 - parent.scaleNoise.x) + parent.uniform_scaleNoise), (g + parent.translateNoise.y) * 1 / ((1 - parent.scaleNoise.y) + parent.uniform_scaleNoise), (b + parent.translateNoise.z) * 1 / ((1 - parent.scaleNoise.z) + parent.uniform_scaleNoise), parent.octaves, parent.lacunarity, parent.gainNoise)"
+  temp_name2 type
+  temp_expr2 "parent.invertNoise == 0 ? (parent.type== 0 ? fBmNoise : parent.type == 1 ? turbNoise:0) : (parent.type== 0 ? 1 - fBmNoise : parent.type == 1 ?1 - turbNoise:0) "
+  temp_name3 operation
+  temp_expr3 "parent.fractalBlur == 0 ? (a < 1.1 ? (a * type) : a) : parent.fractalBlur == 1 ? pow(max(a, 0.000001), 1.0 / max(type, 0.000001)) : parent.fractalBlur == 2 ? (a < 1.1 ? (a + (a * type) * a) * a : a) : a\n"
+  channel0 rgba
+  expr3 operation
+  mix {{parent.mixNoise}}
+  name Noise
+  xpos 510
+  ypos 3090
+  disable {{!parent.addNoise}}
+ }
+ Gamma {
+  channels alpha
+  value {{parent.gammaNoise}}
+  mix {{parent.mixNoise}}
+  name Gamma2
+  xpos 510
+  ypos 3134
+  disable {{!parent.addNoise}}
+ }
+ Reformat {
+  type scale
+  scale 0.5
+  name Reformat2
+  label "revert over sampling to origin\nx0.5"
+  xpos 510
+  ypos 3196
+  disable {{!parent.sampling}}
+ }
+ Expression {
+  expr0 isnan(r)?0:r
+  expr1 isnan(g)?0:g
+  expr2 isnan(b)?0:b
+  expr3 isnan(a)?0:a
+  name Expression25
+  label "nan to black (0)"
+  xpos 510
+  ypos 3299
+ }
+ Expression {
+  expr0 isinf(r)?0:r
+  expr1 isinf(g)?0:g
+  expr2 isinf(b)?0:b
+  expr3 isinf(a)?0:a
+  name Expression5
+  label "inf to black (0)"
+  xpos 510
+  ypos 3337
+ }
+ Clamp {
+  channels alpha
+  name Clamp1
+  label "\[expr \{\[value minimum_enable]? \"\[value minimum] min\" : \"\"\}]\[expr \{\[value minimum_enable] && \[value maximum_enable]? \"\n\" : \"\"\}]\[expr \{\[value maximum_enable]? \"\[value maximum] max\" : \"\"\}]"
+  xpos 510
+  ypos 3408
+ }
+ Dot {
+  name Dot10
+  xpos 544
+  ypos 3510
+ }
+set Nf4c76000 [stack 0]
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle2
+  tile_color 0xffffffff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 510
+  ypos 3760
+ }
+ Grade {
+  multiply {{parent.newMatte} {parent.newMatte} {parent.newMatte} 1}
+  white_clamp true
+  name Grade4
+  label "position matte"
+  xpos 510
+  ypos 3860
+ }
+ Dot {
+  name Dot20
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 544
+  ypos 4134
+ }
+set N7fc60a00 [stack 0]
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 544
+  ypos 4494
+ }
+set N38b67a00 [stack 0]
+ Dot {
+  name Dot25
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 544
+  ypos 4560
+ }
+push $N38b67a00
+push $N7fc60a00
+ Dot {
+  name Dot23
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 978
+  ypos 4137
+ }
+ Expression {
+  channel0 none
+  channel1 none
+  channel2 none
+  channel3 alpha
+  expr3 "a>0.0000001? 1:0"
+  name Hard_Alpha1
+  tile_color 0xffffffff
+  xpos 944
+  ypos 4175
+  disable {{"parent.operations == 1 ? 0 : 1"}}
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle9
+  tile_color 0xbbbbbbff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 944
+  ypos 4219
+  disable {{"parent.operations == 0 ? 0 : parent.operations == 3 ? 0 : parent.operations == 6 ? 0 : parent.operations == 7 ? 0 : 1"}}
+ }
+ Grade {
+  multiply {{parent.oldMatte} {parent.oldMatte} {parent.oldMatte} 1}
+  white_clamp true
+  name Grade1
+  label "input matte"
+  xpos 944
+  ypos 4295
+  disable {{"parent.operations == 0 ? 0 : parent.operations == 3 ? 0 : parent.operations == 6 ? 0 : parent.operations == 7 ? 0 : 1"}}
+ }
+ Dot {
+  name Dot22
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 978
+  ypos 4425
+ }
+push $N84a99600
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle3
+  tile_color 0xffffffff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 1054
+  ypos 3763
+ }
+ Grade {
+  multiply {{parent.oldMatte} {parent.oldMatte} {parent.oldMatte} 1}
+  white_clamp true
+  name Grade2
+  label "input matte"
+  xpos 1054
+  ypos 3863
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle8
+  tile_color 0xbbbbbbff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 1054
+  ypos 4219
+  disable {{"parent.operations == 8 ? 0 : 1"}}
+ }
+ Grade {
+  multiply {{parent.newMatte} {parent.newMatte} {parent.newMatte} 1}
+  white_clamp true
+  name Grade5
+  label "position matte"
+  xpos 1054
+  ypos 4295
+  disable {{"parent.operations == 8 ? 0 : 1"}}
+ }
+ Merge2 {
+  inputs 2
+  operation {{"parent.operations == 0 ? 6 : parent.operations == 1 ? 27 : parent.operations == 2 ? 8 : parent.operations == 3 ? 10 : parent.operations == 4 ? 14 : parent.operations == 5 ? 17 : parent.operations == 6 ? 18 : parent.operations == 7 ? 19 : parent.operations == 8 ? 20 : parent.operations == 9? 21 : parent.operations == 10? 24 : parent.operations == 11? 27 : parent.operations == 12? 22 : parent.operations == 13? 29 : 22"}}
+  name Merge3
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 1054
+  ypos 4415
+ }
+ Merge2 {
+  inputs 2
+  name Merge4
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 1054
+  ypos 4487
+  disable {{"parent.operations == 1 ? 0 : 1"}}
+ }
+ Switch {
+  inputs 2
+  which {{parent.replace}}
+  name Switch3
+  label replace
+  xpos 1054
+  ypos 4553
+ }
+ Clamp {
+  channels rgb
+  maximum_enable false
+  name Clamp2
+  label "\[expr \{\[value minimum_enable]? \"\[value minimum] min\" : \"\"\}]\[expr \{\[value minimum_enable] && \[value maximum_enable]? \"\n\" : \"\"\}]\[expr \{\[value maximum_enable]? \"\[value maximum] max\" : \"\"\}]"
+  xpos 1054
+  ypos 4619
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1088
+  ypos 5000
+ }
+push $Nf4c76000
+push $N84f63200
+ Shuffle {
+  in none
+  alpha black
+  out alpha
+  name Shuffle4
+  tile_color 0x111111ff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 110
+  ypos 867
+  disable {{!parent.replace}}
+ }
+ ChannelMerge {
+  inputs 2
+  operation {{"parent.replace == 1 ? 10 : parent.operations"}}
+  mix {{parent.opacity}}
+  name ChannelMerge1
+  xpos 110
+  ypos 3498
+ }
+ Clamp {
+  channels alpha
+  name Clamp3
+  label "\[expr \{\[value minimum_enable]? \"\[value minimum] min\" : \"\"\}]\[expr \{\[value minimum_enable] && \[value maximum_enable]? \"\n\" : \"\"\}]\[expr \{\[value maximum_enable]? \"\[value maximum] max\" : \"\"\}]"
+  xpos 110
+  ypos 3625
+ }
+ Dot {
+  name Dot21
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 144
+  ypos 4829
+ }
+set Nf58f8e00 [stack 0]
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 302
+  ypos 4829
+ }
+ Merge2 {
+  inputs 2
+  output rgb
+  mix {{parent.visualizeMix}}
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 268
+  ypos 4993
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 302
+  ypos 5141
+ }
+push $Nf58f8e00
+ Switch {
+  inputs 2
+  which {{parent.visualizeOutput}}
+  name Switch4
+  xpos 110
+  ypos 5137
+ }
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 144
+  ypos 5285
+ }
+set N49576400 [stack 0]
+ Shuffle {
+  alpha white
+  name Shuffle5
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 1054
+  ypos 5274
+ }
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1088
+  ypos 5408
+ }
+ PositionToPoints2 {
+  inputs 2
+  display textured
+  selectable false
+  render_mode textured
+  cast_shadow false
+  receive_shadow false
+  P_channel {{{N_channel}}}
+  pointSize 0.1
+  name PositionToPoints1
+  xpos 1274
+  ypos 5404
+  disable {{!parent.visual.visualizeIn3D}}
+ }
+ NoOp {
+  inputs 0
+  name visual
+  xpos 950
+  ypos 1119
+  addUserKnob {20 User}
+  addUserKnob {6 visualizeOutput l "visualize output" +STARTLINE}
+  visualizeOutput true
+  addUserKnob {6 visualizeIn3D l "visualize in 3D" +STARTLINE}
+ }
+ NoOp {
+  inputs 0
+  name menu
+  knobChanged "grp = nuke.thisGroup()\ntk = nuke.thisKnob()\n\nif tk.name() == \"replace\" and tk.value() == True:\n    grp.knob('operations').setEnabled(False)\n#    grp.knob('oldMatte').setEnabled(False)\n#    grp.knob('disable_inputMatte').setEnabled(False)\n\nelse:\n    grp.knob('operations').setEnabled(True)\n#    grp.knob('oldMatte').setEnabled(True)\n#    grp.knob('disable_inputMatte').setEnabled(True)\n"
+  xpos 840
+  ypos 1119
+  addUserKnob {20 User}
+  addUserKnob {6 replace +STARTLINE}
+  replace true
+ }
+push $N49576400
+ Output {
+  name Output1
+  xpos 110
+  ypos 5607
+ }
+push $N84d2ea00
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 764
+  ypos 977
+ }
+ NoOp {
+  name Picker
+  xpos 730
+  ypos 1119
+  addUserKnob {20 picker l Picker}
+  addUserKnob {18 start}
+  start {0 0 0}
+  addUserKnob {6 start_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {6 color_rgb_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {18 end}
+  end {0 0 0}
+  addUserKnob {6 end_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {6 color_rgb_1_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ }
+end_group

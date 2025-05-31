@@ -1,0 +1,85 @@
+Group {
+ name DepthFromAxis1
+ help "Calculates the depth between 2 points in 3D space (camera and axis node).\n\nThis value is then put into a constant ready to be used as pleased.\n"
+ onCreate "n = nuke.thisNode()\nk = 'depth'\nt = nuke.thisKnob()\nflag = nuke.NO_ANIMATION\n\nn.knob(k).setFlag(flag)\n\n"
+ tile_color 0x802380ff
+ selected true
+ addUserKnob {20 depthFromAxis l "Depth From Axis"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION DepthFromAxis
+ addUserKnob {1 operation l INVISIBLE +INVISIBLE}
+ operation "\[expr \{\[numvalue scale] ? \"Z\" : \"1/z\" \}]"
+ addUserKnob {1 output l INVISIBLE +INVISIBLE}
+ output "\[expr \{!\[value useInput]? \"\[value channels])\\n(\[value cameraName]\" : \"\[value channels]\"\}]"
+ addUserKnob {41 channels t "The depth output value be placed into the channel selected.\n\nThis is usually set to depth.\n" T Constant1.channels}
+ addUserKnob {4 scale t "Output calculation will be done to either:\n\n<b>• (1/z) Normalize depth</b> -\nvalues between 0-1, it is Nuke's default format.\n<br>\n<b>• (Z) Real World Units</b> -  is distance from camera<br> (e.g CG renders)." M {"normalized (1/z)" "real world units (Z)" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+ scale "real world units (Z)"
+ addUserKnob {7 offset t "Offset the calculated value between the 2 points\n\nNote:\nThe offset is done after the calculation" R -100 100}
+ addUserKnob {26 ""}
+ addUserKnob {7 depth t "Output calculation of two points (Camera and axis).\n\nThis will also include the offset if value is changes from 0.\n\n\n" R 0 1000}
+ depth {{"useInput ?\n(scale ? sqrt(pow (input0.translate.x - input1.translate.x, 2) + pow(input0.translate.y - input1.translate.y, 2) + pow(input0.translate.z-input1.translate.z, 2)) : 1/ (sqrt(pow(input0.translate.x-input1.translate.x, 2) + pow(input0.translate.y-input1.translate.y, 2) + pow(input0.translate.z-input1.translate.z, 2)))) + offset :\n\n\n(scale ? sqrt(pow (input0.translate.x - \[value cameraName].translate.x, 2) + pow(input0.translate.y-\[value cameraName].translate.y, 2) + pow(input0.translate.z-\[value cameraName].translate.z, 2)) : 1/ (sqrt(pow(input0.translate.x-\[value cameraName].translate.x, 2) + pow(input0.translate.y-\[value cameraName].translate.y, 2) + pow(input0.translate.z-\[value cameraName].translate.z, 2)))) + offset "}}
+ addUserKnob {20 parent l Parent}
+ addUserKnob {41 useInput l "use input camera" t "when enabled a \"camera\" input will be created and the calculation will be done based on that camera/axis inputs.\n\nIf disabled the calculations will be gotten from the camera name (written below) and the axis input." T menu.useInput}
+ addUserKnob {1 cameraName l camera t "Write down the name of the camera you want to read the information from.\n\n\"use input camera\" must be disabled for this feature to work." +DISABLED}
+ cameraName Camera1
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Depth From Axis </font><font color=#943794> v1.1"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br> \n<b>Depth From Axis</b> will calculate the<br>distance of an axis from the camera.\n\n<br></b><i>\n<br><strong>•</br> This node will put that calculated value<br>into the selected channel.\n<br><br>\n<b>• (1/z) Normalize depth</b> -\nvalues between 0-1, <br>it is Nuke's default format.\n\n<br>\n\n<b>• (Z) Real World Units</b> -  is distance from camera<br> (e.g CG renders).\n\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#943794;\">John Toth <b>© 2018 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#943794\">Tool Demo" +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#943794\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.1.0\"\ncontext = \"AOV\"\n\n\ndate = \"29th January\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2018\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- calculates distance of an axis from the camera\n<br></i><b> v 1.1 </b><i>\n- parent tab was added to use external camera data\n- offset feature was added\n- export button was added\n\"\"\"\n\n\n\nthankyou = \"\"\"- Ben Dickson for the help of the calculation of the depth\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + \"<b>Thankyou:</b><br>\" + thankyou + \"<br>\" + UPPER + site + developer + ENTER + \"</a>\") \n\n\n"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x23232301
+  label "<center>Don't Touch\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 24
+  note_font_color 0xee453cff
+  xpos -417
+  ypos 103
+  bdwidth 171
+  bdheight 160
+ }
+ Constant {
+  inputs 0
+  channels depth
+  color {{parent.depth}}
+  name Constant1
+  xpos -150
+  ypos 105
+ }
+ Output {
+  name Output1
+  xpos -150
+  ypos 254
+ }
+ NoOp {
+  inputs 0
+  name menu
+  knobChanged "knob = nuke.thisKnob()\nknob_name = knob.name()\n\nif knob_name == \"useInput\":\n\n\n#list of knobs to disable\n    knobs = \['cameraName']\n\n    #disabling undo   \n    nuke.Undo.disable()\n\n    #safety making sure input 2 is disconnected before being deleted\n    nuke.thisGroup().setInput(1, None)\n\n\n    # Loop through all Input nodes and delete those not named 'axis'\n    parent_group = nuke.thisNode().parent()\n    for node in parent_group.nodes():\n        if node.Class() == 'Input' and node.name() != 'axis':\n            nuke.delete(node)\n    \n\n   \n    if knob.value() == 1:\n\n\n#enabling knobs\n        for x in knobs:\n            nuke.thisGroup().knob(x).setEnabled(True)\n\n\n        try:\n            nuke.thisGroup().setInput(2, input1)\n        except: pass\n\n        # create input\n        input_node = nuke.nodes.Input()\n        input_node.setName(\"camera\")\n        input_node\['number'].setValue(1)\n\n\n        input_node.knob(\"xpos\").setValue(70)\n        input_node.knob(\"ypos\").setValue(8)\n        input_node.knob(\"label\").setValue(\"\[value number]\")\n\n        nuke.thisGroup().knob(x).setEnabled(False)\n\n    else:\n\n#list of knobs to disable\n        for x in knobs:\n            nuke.thisGroup().knob(x).setEnabled(True)\n\n        # delete input\n        try:\n            input2 = nuke.thisGroup().input(2)\n            nuke.thisGroup().setInput(1, None)\n            nuke.thisGroup().setInput(2, None)\n        except: pass\n\n\n\n\n    nuke.Undo.enable()"
+  selected true
+  xpos -370
+  ypos 182
+  addUserKnob {20 bin}
+  addUserKnob {6 useInput l "use input camera" +STARTLINE}
+  useInput true
+ }
+ Input {
+  inputs 0
+  name axis
+  label 0
+  xpos -150
+  ypos 8
+ }
+ Input {
+  inputs 0
+  name camera
+  label "\[value number]"
+  xpos 70
+  ypos 8
+  number 1
+ }
+end_group
