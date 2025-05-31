@@ -1,0 +1,27 @@
+NoOp {
+ name VIEWER_INPUT
+ help "Can help quickly set the input Process of the viewer."
+ note_font "Bitstream Vera Sans"
+ selected true
+ xpos -40
+ ypos -159
+ hide_input true
+ addUserKnob {20 setInputProcessTab l "Set Input Process"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION SetInputProcess
+ addUserKnob {1 output l INVISIBLE +INVISIBLE}
+ output "\[value nodeName]"
+ addUserKnob {22 parentMessage l INVISIBLE t "code for  the find button for message if no nodes are connected  and zooming into the nodes position in node graph" -STARTLINE +INVISIBLE T "def FindParent(parentName):\n    \"\"\"\n    Jump to node in the nodegraph \n    \"\"\"\n    \n    if not parentName:\n        nuke.message('No name in string')\n        return\n        \n    parentNode = nuke.toNode(parentName)\n    if not parentNode:\n        nuke.message('No node named \{\}'.format(parentName))\n        return\n        \n    nuke.zoom( 2, \[parentNode.xpos(), parentNode.ypos()])"}
+ addUserKnob {1 nodeName l "    " t "When the Set Input Process is clicked it looks for a node names to be registered as the viewer input.\n\nThis is the string path where you put the name of the node.\n\nYou can either do this by copying the name or typing it manually or using the grab button."}
+ addUserKnob {22 grabName l "Grab Name" t "Grab button simple grabs the selected nodes name and pastes it into the string." -STARTLINE T "node = nuke.thisNode()\nparentKnob = node.knob('nodeName')\n\n\nselection = nuke.selectedNodes()\nif selection:\n    selection = selection\[0]\n    if selection != node:\n        parentKnob.setValue(selection.name())\nelse:\n    nuke.message('No node selected')\n\n\n\n"}
+ addUserKnob {22 findNode l find t "Zooms in the node that is in the string path.\n\n<b><i>Example:</b><i> If the string path has Grade1 in it when this button is pressed it will find Grade1 in the nodegraph and zoom into it." -STARTLINE T "def findParent(knobName):\n    \n    n = nuke.thisNode()\n    \n    # make functions available\n    n.knob(\"parentMessage\").execute()\n    \n    parentName = nuke.thisNode().knob(knobName).value()\n    FindParent(parentName)\n    \nfindParent(\"nodeName\")"}
+ addUserKnob {22 setInputProcess l "set input process" t "This button sets the viewer input Process.\nThis node connects to another node based on it's name which is in the name string knob.\n\nEvery time the string name is updated or changed this button must be pressed for it to activate it." T "def setInputProcess():\n\n    knobvalue = nuke.toNode(nuke.thisNode().knob(\"nodeName\").value())\n    if not knobvalue:\n        nuke.message('No node name in string')\n        return\n    viewerNode = nuke.activeViewer().node()\n\n\n    viewerNode.knob(\"input_process_node\").setValue(knobvalue.name())\n    \nsetInputProcess()\n" +STARTLINE}
+ addUserKnob {6 color_rgb_panelDropped l "panel dropped state" +HIDDEN +STARTLINE}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Set Input Process </font><font color=#747474> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br> \n<b> Set Input Process</b> is used to quickly<br>allow the user to set the viewer Input<br>to a particular node.\n<br></b><i>\n<br><strong>•</br> Simply put the name of the node<br> you want to be the input process in<br>the string and click the Set Input<br>Process button.\n</i>\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#777;\">John Toth <b>© 2022 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#747474\">Tool Demo" t "Opens a web page that will take you to a demo video about this nuke tool." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#747474\">Version Log</a>\n" t "Log that keeps the changed of each iteration version of this nuke tool." -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.0.2\"\ncontext = \"Utility/Input Process\"\n\n\ndate = \"11th July\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2022\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- Sets the input process to a certain node\n\"\"\"\n\n\n\n\nthankyou = \"\"\"\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + UPPER + site + developer + ENTER + \"</a>\") \n\n\n"}
+}

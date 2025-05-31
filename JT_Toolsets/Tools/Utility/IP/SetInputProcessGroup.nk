@@ -1,0 +1,222 @@
+Group {
+ name VIEWER_INPUT
+ help "Sets the input process to this nodes which contains a number of options from luts and grades for the user to be control."
+ tile_color 0x7aa9ffff
+ label "\n\[ expr \{\[value techgrade] ? \"tech\\n\" : \"\"\}]\[ expr \{\[value avidgrade] ? \"avid\\n\" : \"\"\}]\[ expr \{\[value lookgrade] ? \"look\\n\" : \"\"\}]\[ expr \{\[value lut] ? \"lut\\n\" : \"\"\}]\[ expr \{\[value lookgrade] ? \"look\\n\" : \"\"\}]\[expr \{ \[numvalue disableContrast] == 0 ? (\[value contrast] != 0 ? \"contrast \[value contrast]\\n\" : \"\") : \"\" \}]-\n\n\n\n"
+ selected true
+ hide_input true
+ addUserKnob {20 Set l "Set Input Process Group"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION SetInputProcessGroup
+ addUserKnob {26 ""}
+ addUserKnob {6 techgrade l "tech grade" t "When enabled, this option will activate the 'tech' during the input process. If disabled, the 'tech' will be turned off and not used in the input process." +STARTLINE}
+ addUserKnob {6 avidgrade l avid t "When enabled, this option will activate the 'avid' during the input process. If disabled, the 'avid' will be turned off and not used in the input process." +STARTLINE}
+ addUserKnob {6 lookgrade l look t "When enabled, this option will activate the 'look' during the input process. If disabled, the 'look' will be turned off and not used in the input process." +STARTLINE}
+ addUserKnob {6 lut t "When enabled, this option will activate the 'lut' during the input process. If disabled, the 'lut' will be turned off and not used in the input process." +STARTLINE}
+ addUserKnob {41 contrast t "Adjust the Contrast from here through the input process." T ColorCorrect1.contrast}
+ addUserKnob {6 disableContrast l disable t "When disabled, this option will disable the 'contrast' during the input process. If enabled, the 'contrast' will be turned off and not used in the input process." -STARTLINE}
+ addUserKnob {26 ""}
+ addUserKnob {22 setInputProcessGroupTab l "set as input process" t "Sets the input process to this node which contains a set of custom nodes/options.\n\nIf the node is changed or tweaked this will need to be set again." T "def setInputProcess():\n    \n    node = nuke.thisNode()\n    viewerNode = nuke.activeViewer().node()\n    viewerNode.knob(\"input_process_node\").setValue(node.name())\n    \nsetInputProcess()" +STARTLINE}
+ addUserKnob {26 ""}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Set Input Process Group</font><font color=#747474> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br> \n<b> Set Input Process</b> is used to quickly<br>allow the user to set the viewer Input<br>to a set of nodes contained within this<br>group node.\n<br></b><i>\n<br><strong>•</br> The knob \"gain\", \"gamma\" and in<br>nuke 15 onwards \"saturation\" is fixed<br>knobs to the viewer. (DO NOT<br>RECOMMEND MAKING AS IT IS ALREADY<br>THERE)\n</i>\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#777;\">John Toth <b>© 2024 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#747474\">Tool Demo" t "Opens a web page that will take you to a demo video about this nuke tool." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#747474\">Version Log</a>\n" t "Log that keeps the changed of each iteration version of this nuke tool." -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.0.0\"\ncontext = \"Utility/Input Process\"\n\n\ndate = \"21th July\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- Sets the input process of a set of nodes contained within this group node.\n\"\"\"\n\n\n\n\nthankyou = \"\"\"\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + UPPER + site + developer + ENTER + \"</a>\") \n\n\n"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode1
+  tile_color 0x7aa9ffff
+  label "<center>LUTS ETC"
+  note_font_size 42
+  xpos 28
+  ypos -931
+  bdwidth 341
+  bdheight 840
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 70
+  ypos -1045
+ }
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 104
+  ypos -847
+ }
+set N357e6600 [stack 0]
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos -847
+ }
+ NoOp {
+  name tech_grade
+  label "\nreplace me\n-"
+  xpos 180
+  ypos -816
+ }
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos -751
+ }
+push $N357e6600
+ Switch {
+  inputs 2
+  which {{parent.techgrade}}
+  name Switch3
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  xpos 70
+  ypos -758
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 104
+  ypos -631
+ }
+set N356fc600 [stack 0]
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos -631
+ }
+ NoOp {
+  name avid_grade1
+  label "\nreplace me\n-"
+  xpos 180
+  ypos -599
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos -535
+ }
+push $N356fc600
+ Switch {
+  inputs 2
+  which {{parent.avidgrade}}
+  name Switch2
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  xpos 70
+  ypos -542
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 104
+  ypos -463
+ }
+set N356fdc00 [stack 0]
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos -463
+ }
+ NoOp {
+  name look_grade
+  label "\nreplace me\n-"
+  xpos 180
+  ypos -432
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos -367
+ }
+push $N356fdc00
+ Switch {
+  inputs 2
+  which {{parent.lookgrade}}
+  name Switch1
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  xpos 70
+  ypos -374
+ }
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 104
+  ypos -246
+ }
+set N35701400 [stack 0]
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos -246
+ }
+ NoOp {
+  name lut_grade1
+  label "\nreplace me\n-"
+  xpos 180
+  ypos -215
+ }
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos -150
+ }
+push $N35701400
+ Switch {
+  inputs 2
+  which {{parent.lookgrade}}
+  name Switch4
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  xpos 70
+  ypos -157
+ }
+ ColorCorrect {
+  name ColorCorrect1
+  xpos 70
+  ypos -33
+  disable {{parent.disableContrast}}
+ }
+ Dot {
+  name Connect
+  label Connect
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 104
+  ypos 138
+ }
+ Output {
+  name Output1
+  xpos 70
+  ypos 279
+ }
+ StickyNote {
+  inputs 0
+  name StickyNote1
+  label "<b> <center>INSTRUCTION</center></b>\n•  You can add mroe options to the VIEWER INPUT, example show AvidGrade, Tech Grades, Luts ETC\n\n• To add any other feratures, copy it into this node.\n• Create custom knobs on this node to add custom features\n• When \"set as input Process\" is pressed it will update/refresh the IP (input process) with custom features.\n\n• The NoOp nodes can be replaced with correct \"tech grade\", \"avid\", \"look\" and \"lut\" nodes that are custom which will be already setup ready to be used.\n\n\n<b>NOTE:</b>\n• The knob \"gain\", \"gamma\" and in nuke 15 onwards \"saturation\" is a fixed viewer. ( DO NOT RECOMMEND MAKING AS IT IS ALREADY THERE)"
+  note_font "Bitstream Vera Sans"
+  xpos 306
+  ypos 76
+ }
+end_group

@@ -1,0 +1,38 @@
+Group {
+ name AutoCrop1
+ help "Uses the curvetool node to analyze the input based on the type.\n\nThe result will be baked into a crop node placed inside this group."
+ onCreate "nuke.thisNode().knob('getViewerRange').execute()\nnuke.thisNode().knob('onCreate').setValue('')\n"
+ tile_color 0xa57aaaff
+ label "\[value first] -  \[value last] "
+ selected true
+ addUserKnob {20 autoCrop l "Auto Crop"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION AutoCrop
+ addUserKnob {4 type t "<b>• format</b> - the autocrop will crop to the input format.\n\n<b>• bbox</b> - will  autocrop to the bbox from the input," M {format bbox "" "" "" "" "" "" ""}}
+ addUserKnob {3 first l "frame range" t "Enter the appropriate first frame to autocrop start from."}
+ first 1001
+ addUserKnob {3 last l "" t "Enter the appropriate last frame to autocrop end on." -STARTLINE}
+ last 1001
+ addUserKnob {22 getViewerRange l "      Get Viewer Range     " t "Automatically grab the viewer frame range and set that first and last frame accordingly." -STARTLINE T "n=nuke.thisNode()\nv=nuke.activeViewer().node()\n\nfr=v\['frame_range'].value().split('-')\nif not(v\['frame_range_lock'].value()):\n    fr=str(nuke.root().frameRange()).split('-')\n\nn\['first'].setValue(int(fr\[0]))\nn\['last'].setValue(int(fr\[1]))\n\n"}
+ addUserKnob {22 autocrop t "Analyze the frame range and autocrop based on the type as well." T "import nuke\nimport nukescripts\n\ndef clear_autocrop_nodes(node):\n    \"\"\"Clear any previous content in the autocrop.\"\"\"\n    all_nodes = node.nodes()\n    for a in all_nodes:\n        if a.name() not in ('Input', 'Output1'):\n            nuke.delete(a)\n\ndef set_selection_to_input(node):\n    \"\"\"Set the selection to the Input node inside the group.\"\"\"\n    input_node = node.node('Input')\n    input_node\['selected'].setValue(True)\n\ndef run_autocrop(first_frame, last_frame):\n    \"\"\"Run AutoCrop with the given frame range.\"\"\"\n    nukescripts.autocrop(first=int(first_frame), last=int(last_frame), inc=None, layer=\"rgba\")\n\ndef custom_autocrop(first_frame, last_frame):\n    \"\"\"Custom AutoCrop function using CurveTool.\"\"\"\n    def autocrop(first=None, last=None, inc=1, layer=\"rgba\"):\n        \"\"\"Run the CurveTool's AutoCrop function.\"\"\"\n        # Sort out execute range\n        root = nuke.root()\n        if first is None:\n            first = int(first_frame)\n        if last is None:\n            last = int(last_frame)\n\n        # Remember original set of selected nodes\n        original_nodes = nuke.selectedNodes()\n\n        # Deselect everything to add CurveTool nodes\n        for node in nuke.allNodes():\n            node\['selected'].setValue(False)\n\n        for node in original_nodes:\n            # Reselect originally selected nodes and create a CurveTool node\n            node\['selected'].setValue(True)\n            autocropper = nuke.createNode(\"CurveTool\", f'''operation 0 ROI \{\{input.bbox.x input.bbox.y input.bbox.x+bbox.w input.bbox.y+bbox.h\}\} Layer \{layer\} label \"Processing Crop...\" selected true''', False)\n\n            # Execute the CurveTool node thru all the frames\n            nuke.executeMultiple(\[autocropper], (\[first, last, inc],))\n\n            # Add crop node and transfer data\n            autocropper\['selected'].setValue(True)\n            cropnode = nuke.createNode(\"Crop\", \"label AutoCrop\", False)\n            cropnode\['box'].copyAnimations(autocropper\['autocropdata'].animations())\n            cropnode\['indicators'].setValue(1)\n\n            # Clean up\n            for temp_node in (autocropper,):\n                temp_node\['selected'].setValue(True)\n                nuke.delete(temp_node)\n\n            # Place the new crop node\n            nuke.autoplace(cropnode)\n            cropnode\['selected'].setValue(False)\n\n    # Run the custom autocrop function\n    autocrop()\n\ndef main():\n    \"\"\"Main function to perform the operation based on the node's type.\"\"\"\n    node = nuke.thisNode()\n    first_frame = node\['first'].getValue()\n    last_frame = node\['last'].getValue()\n\n    # Clear any previous content in the autocrop\n    clear_autocrop_nodes(node)\n\n    # Set the selection to the Input node inside the group\n    set_selection_to_input(node)\n\n    # Determine the operation type and run the corresponding autocrop\n    if node\['type'].value() == 'format':\n        run_autocrop(first_frame, last_frame)\n    else:\n        custom_autocrop(first_frame, last_frame)\n\n    # Reselect the main node to keep it selected after the operation\n    node\['selected'].setValue(True)\n\n# Run the main function\nmain()\n" +STARTLINE}
+ addUserKnob {22 clearAutoCrop l "clear autocrop" t "Clear the autocrop inside this node if any." -STARTLINE T "node = nuke.thisNode()\nallNodes = node.nodes()\n\nfor a in allNodes :\n    if a.name() == 'Input' or a.name() == 'Output1' :\n        node = node\n    else :\n        nuke.delete(a)"}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>\nAutoCrop\n</font><font color=#a57aaa> v1.1\n"}
+ addUserKnob {26 ""}
+ addUserKnob {26 text l "" +STARTLINE T "<b> • AutoCrop </b> uses the CurveTool node to analyze<br>the input based on the type.The result will be baked<br>into a crop node placed inside this group.\n\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#a57aaa;\">John Toth <b>© 2023 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#a57aaa\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#a57aaa\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.1.0\"\ncontext = \"Transform\"\n\n\ndate = \"15th February\"\nyear = \" 2023\"\n\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- analysis the frames to generate a crop\n<br></i><b> v 1.0 </b><i>\n- code optimization\n\"\"\"\n\n\n\nthankyou = \"\"\"\n\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + UPPER + site + developer + \"</a>\") \n\n\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos -480
+  ypos -490
+ }
+ Output {
+  name Output1
+  xpos -480
+  ypos -370
+ }
+end_group

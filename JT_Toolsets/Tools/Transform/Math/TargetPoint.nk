@@ -1,0 +1,22 @@
+NoOp {
+ name TargetPoint1
+ tile_color 0xa57aaaff
+ label "(\[format  %0.2f \[value result]]°)"
+ selected true
+ addUserKnob {20 targetPointTab l TargetPoint}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION TargetPoint
+ addUserKnob {12 point t "Direction of rotation"}
+ addUserKnob {26 ""}
+ addUserKnob {12 center t "This output result connects can be expression linked to the center of a transform node."}
+ addUserKnob {26 ""}
+ addUserKnob {7 result t "This output result connects can be expression linked to the rotation of a transform node."}
+ result {{"degrees ( ( atan2 ( center.x - point.x , center.y  - point.y ) * -1) ) + 180"}}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Target Point</font><font color=#a57aaa> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>Target Point</b> calculates the rotation of<br>two points. Center always rotating at the<br>point.\n<br></b><i>\n<br><strong>•</br> This node only does the math. You can<br>use this data to expression link or use as<br>desired.\n</b></i>\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#a57aaa;\">John Toth <b>© 2024 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#a57aaa\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#a57aaa\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.0.1\"\ncontext = \"Transform/Math\"\n\n\ndate = \"15th February\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- calculation of two points. Center always orientating towards the point.\n\"\"\"\n\n\n\nthankyou = \"\"\"\n\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + UPPER + site + developer + \"</a>\") \n\n\n"}
+}
