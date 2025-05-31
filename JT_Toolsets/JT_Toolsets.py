@@ -109,10 +109,10 @@ class JTPluginManager:
         self._add_plugin_path_recursive(tools_path)
 
         # -- Add JT_Toolsets/Icons path for loading custom toolbar icons
-        nuke.pluginAddPath("JT_Toolsets/Icons")
+        nuke.pluginAddPath(os.path.join(self.root_folder, "Icons"))
 
-        # -- Add all folders under JT_Toolsets/Python to sys.path for Python imports
-        python_path = os.path.join(self.root_folder, "JT_Toolsets", python_subfolder)
+        # -- Add JT_Toolsets/Python and its subfolders to sys.path for Python imports
+        python_path = os.path.join(self.root_folder, python_subfolder)
         self._add_python_subfolders(python_path)
 
     def _add_plugin_path_recursive(self, path):
@@ -125,11 +125,12 @@ class JTPluginManager:
                     self._add_plugin_path_recursive(item_path)
 
     def _add_python_subfolders(self, base):
-        # Recursively walk JT_Toolsets/Python and add any folders with .py files to sys.path
-        for root, dirs, files in os.walk(base):
-            if any(f.endswith(".py") for f in files):
-                if root not in sys.path:
-                    sys.path.append(root)
+        # Recursively walk JT_Toolsets/Python and add folders with .py files to sys.path
+        if os.path.isdir(base):
+            for root, dirs, files in os.walk(base):
+                if any(f.endswith(".py") for f in files):
+                    if root not in sys.path:
+                        sys.path.append(root)
 
 # -- Automatically initialize the plugin manager using the current file location
 JT_root_folder = os.path.dirname(__file__)
@@ -196,6 +197,16 @@ def plugin_update():
                     menu_ref.addCommand(name, lambda n=name: nuke.createNode(n))
 
     nuke.message(f"{plugin_count} plugins loaded.")
+
+
+
+###########################################################################
+"""========================================================================
+PYTHON SCRIPTS
+========================================================================"""
+###########################################################################
+
+import keyframe_animator
 
 
 
