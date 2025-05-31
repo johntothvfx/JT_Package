@@ -100,31 +100,38 @@ PLUGIN ADDED PATH (SAFETY)
 
 class JTPluginManager:
     def __init__(self, root_folder):
+        # Store the base path to JT_Toolsets root
         self.root_folder = root_folder
 
-    def add_plugin_paths(self, subfolder='Tools'):
-        toolset_folder = os.path.join(self.root_folder, subfolder)
-        self._add_plugin_path_recursive(toolset_folder)
+    def add_plugin_paths(self, tools_subfolder='Tools', python_subfolder='Python'):
+        # -- Add all subdirectories inside JT_Toolsets/Tools as plugin paths
+        tools_path = os.path.join(self.root_folder, tools_subfolder)
+        self._add_plugin_path_recursive(tools_path)
+
+        # -- Add JT_Toolsets/Icons path for loading custom toolbar icons
         nuke.pluginAddPath("JT_Toolsets/Icons")
 
+        # -- Add all folders under JT_Toolsets/Python to sys.path for Python imports
+        python_path = os.path.join(self.root_folder, "JT_Toolsets", python_subfolder)
+        self._add_python_subfolders(python_path)
+
     def _add_plugin_path_recursive(self, path):
-        folder_list = []
-
-        # Check if the provided path is a directory
+        # Recursively add folders containing gizmos or .nk scripts to plugin paths
         if os.path.isdir(path):
-            # Add the current folder to the list
-            folder_list.append(path)
             nuke.pluginAddPath(path)
-
-            # Iterate over all the items in the current directory
             for item in os.listdir(path):
                 item_path = os.path.join(path, item)
-                # If the item is a directory, recursively call the function
                 if os.path.isdir(item_path):
-                    folder_list.extend(self._add_plugin_path_recursive(item_path))
+                    self._add_plugin_path_recursive(item_path)
 
-        return folder_list
+    def _add_python_subfolders(self, base):
+        # Recursively walk JT_Toolsets/Python and add any folders with .py files to sys.path
+        for root, dirs, files in os.walk(base):
+            if any(f.endswith(".py") for f in files):
+                if root not in sys.path:
+                    sys.path.append(root)
 
+# -- Automatically initialize the plugin manager using the current file location
 JT_root_folder = os.path.dirname(__file__)
 plugin_manager = JTPluginManager(JT_root_folder)
 plugin_manager.add_plugin_paths()
