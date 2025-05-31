@@ -1,0 +1,711 @@
+Group {
+ name FlexiBlur1
+ help "Flexi Blur applies a customizable blur effect—choose from linear, radial, zoom, spiral, or hyperbolic—to the incoming vectorized channel(s).\nEach mode delivers a unique motion-based aesthetic, giving you full creative control."
+ onCreate "import nuke\n\nn = nuke.thisNode()\nk = nuke.thisKnob()\n\n# Enable/disable knobs based on \"useTarget\" checkbox\nif n\['useTarget'].value():\n    n\['target'].setEnabled(True)\n    n\['angle'].setEnabled(False)\nelse:\n    n\['target'].setEnabled(False)\n    n\['angle'].setEnabled(True)\n\n# Set 'center' to middle of the group node\ndef set_center_to_middle():\n    g = nuke.thisGroup()\n    g\['center'].setValue((g.width() * 0.5, g.height() * 0.5))\n\nset_center_to_middle()\n\n# Remove the set_center_to_middle logic after onCreate has run\ndef clean_onCreate_knob():\n    knob = n\['onCreate']\n    code = knob.value()\n    lines = code.split('\\n')\n    cleaned = \[]\n\n    for line in lines:\n        if 'def set_center_to_middle' in line:\n            break\n        cleaned.append(line)\n\n    knob.setValue('\\n'.join(cleaned))\n\nclean_onCreate_knob()\n"
+ knobChanged "import nuke\n\nn = nuke.thisNode()\nk = nuke.thisKnob()\n\n# Locking target is \"usetarget\" is not enabled.\nif n.knob('useTarget').value() == 1:    \n    n\['target'].setEnabled(True)\n    n\['angle'].setEnabled(False)\nelse:\n    n\['target'].setEnabled(False)\n    n\['angle'].setEnabled(True)"
+ tile_color 0xcc804eff
+ selected true
+ addUserKnob {20 flexiBlur l "Flexi Blur"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION FlexiBlur
+ addUserKnob {41 channels t "The DirBlur effect is only applied to these channels. \nIf you set this to something other than all or none, you can use the checkboxes on the right to select individual channels." T Blur1.channels}
+ addUserKnob {41 operation t "Select the blur type to apply: \n\n<b>• linear </b>– smears pixels in a given direction. You can use this to simulate motion blur on a moving object.\n<b>• radial </b>– smears pixels around a center point. You can use this to simulate motion blur on a rotating object.\n<b>• hyperbolic </b>– smears pixels along a curved, wave-like path. You can use this to simulate lens aberrations, warped speed effects, or stylized refractions.\n<b>• spiral </b>– smears pixels in a twisting outward motion. You can use this to simulate vortex effects, magical distortions, or swirling energy.\n<b>• zoom </b>– smears pixels in all directions from a center point. You can use this to simulate light rays, or to transition between one clip and another." T menu.operation}
+ addUserKnob {41 visualizeOutput l "visualize output" t "This will turn on/off the visualize overlay.\n\nThe settings for the overlay are all in the <b>visualize</b> tab." -STARTLINE T menu.visualizeOutput}
+ addUserKnob {6 useTarget l "use target" t "When enabled, the directional blur is determined by between <b>image center</b> and <b> Target location</b>. \n\nIf this is disabled, the directional blur is determined by angle." +STARTLINE}
+ addUserKnob {12 target t "When using directional blur with <b>use target</b> enabled, pointer will determines the direction of linear blur. \n\nYou can also adjust Linear Target by dragging the target handle in the Viewer." +DISABLED}
+ addUserKnob {12 center t "Sets the center of rotation and scale on the x and y axes for the radial and zoom blur effects." +HIDDEN}
+ center {1024 778}
+ addUserKnob {22 centerButton l center t "Pressing this button will put the the values of the center to the center based on the image input." -STARTLINE +HIDDEN T "n = nuke.thisNode()\n\nn\['center'].setValue((n.width() * 0.5, n.height() * 0.5))\n\n"}
+ addUserKnob {14 size t "The length (in pixels) of the blur applied.\n" R 0 100}
+ addUserKnob {7 angle t "Determines the direction of <b>directional</b> blur when <b>UseTarget</b> is disabled." R -180 180}
+ addUserKnob {7 weight t "Lower values increase blur near the center; higher values push the blur outward.\nA value of 0.5 produces a balanced blur across the image." +HIDDEN}
+ weight 0.5
+ addUserKnob {26 divider001 l "" +STARTLINE}
+ addUserKnob {41 maskChannelMask l mask t "Enables the associated mask channel to the right. Disabling this checkbox is the same as setting the channel to none. \n\nThe channel to use as a mask. By default, the merge is limited to the non-black areas of this channel.\n" T Multiply1.maskChannelMask}
+ addUserKnob {6 inject t "Copies the mask input to the predefined mask.a channel. Injecting the mask allows you to use the same mask further downstream.\n" -STARTLINE}
+ addUserKnob {6 invert t "Inverts the use of the mask channel so that the blur is limited to the non-white areas of the mask.\n" -STARTLINE}
+ addUserKnob {6 fringe t "When enabled, only apply the effect to the edge of the mask. \nWhen disabled, the effect is applied to the entire mask." -STARTLINE}
+ addUserKnob {7 mix t "Dissolves between the original image at 0 and the full effect at 1."}
+ mix 1
+ addUserKnob {20 visualize l Visualize}
+ addUserKnob {41 visualizeOutput_1 l "visualize output" t "This will turn on/off the visualize overlay.\n\nThe settings for the overlay are all in the <b>visualize</b> tab." T menu.visualizeOutput}
+ addUserKnob {3 numberSize l size t "This decrease/increase the size of the dots beings displayed when visualize output is enabled."}
+ numberSize 10
+ addUserKnob {3 number t "This decrease/increase the amount dots being displayed when visualize output is enabled."}
+ number 25
+ addUserKnob {18 visualizeColor l "visualize color" t "This changes the colors of the dots being displayed when visualize output is enabled."}
+ visualizeColor {0 1 0}
+ addUserKnob {6 visualizeColor_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_rgb_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {7 visualizeMix l mix t "Dissolves between no visualize colour overlay on the image from 0 and 1 when visualize output is enabled.\n\n1 Being full effect"}
+ visualizeMix 1
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Flexi Blur</font><font color=#CC804E> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br> \n<b>Flexi Blur</b> applies a customizable  vectorized<br>blur effect.<br>\nChoose from linear, radial, zoom, spiral, or <br>hyperbolic—to the incoming channel(s).\n<br></b>\n\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#CC804E;\">John Toth <b>© 2023 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#CC804E\">Tool Demo" t "Opens a web page that will take you to a demo video about this nuke tool." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#CC804E\">Version Log" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nmodel_number = \"1.0.0\"\ncontext = \"Filter\"\n\n\ndate = \"17th January\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2023\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- adds vector linear,radial or zoom blur effect to channel(s)\n\"\"\"\n\n\n\nthankyou = \"\"\"Samantha Maiolo for iterative knob control\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Model Number: \" + LOWER + model_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + UPPER + site + developer + \"</a>\") \n\n\n"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x23232301
+  label "<center>Don't Touch\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  note_font_color 0xee453cff
+  xpos 301
+  ypos -1619
+  bdwidth 278
+  bdheight 166
+ }
+ Input {
+  inputs 0
+  name mask
+  label "\[value number]"
+  xpos 1720
+  ypos -1645
+  number 1
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1754
+  ypos -318
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 644
+  ypos -1648
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 678
+  ypos -1518
+ }
+set N4a31a00 [stack 0]
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 678
+  ypos -1335
+ }
+set N4c67f800 [stack 0]
+ Dot {
+  name Dot25
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1257
+  ypos -1335
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1257
+  ypos -1014
+ }
+ Remove {
+  name Remove2
+  xpos 1223
+  ypos -973
+ }
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1257
+  ypos -894
+ }
+set N4ed1b600 [stack 0]
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1424
+  ypos -894
+ }
+set N4c3d3a00 [stack 0]
+ Dot {
+  name Dot20
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1583
+  ypos -894
+ }
+ Expression {
+  temp_name0 dx
+  temp_expr0 "(x - parent.center.x) / width"
+  temp_name1 dy
+  temp_expr1 "(y - parent.center.y) / height"
+  temp_name2 dist
+  temp_expr2 "sqrt(dx*dx + dy*dy)"
+  temp_name3 weight
+  temp_expr3 "pow(max(dist, 0.0001), (parent.weight - 0.5) * 2)"
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 "dx * weight * pixel_aspect"
+  channel1 {-rgba.red rgba.green -rgba.blue none}
+  expr1 "dy * weight"
+  channel2 {-rgba.red -rgba.green rgba.blue none}
+  name Expression4
+  label zoom
+  xpos 1549
+  ypos -709
+ }
+ Dot {
+  name Dot24
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1583
+  ypos -510
+ }
+push $N4c3d3a00
+ Expression {
+  temp_name0 dx
+  temp_expr0 "(x - parent.center.x) / width"
+  temp_name1 dy
+  temp_expr1 "(y - parent.center.y) / height"
+  temp_name2 dist
+  temp_expr2 "sqrt(dx*dx + dy*dy)"
+  temp_name3 weight
+  temp_expr3 "pow(max(dist, 0.0001), (parent.weight - 0.5) * 2)"
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 "((-dy * (parent.size * 0.1) + dx * (parent.size * 0.1)) * weight) * pixel_aspect"
+  channel1 {-rgba.red rgba.green -rgba.blue none}
+  expr1 "((dx * (parent.size * 0.1) + dy * (parent.size * 0.1)) * weight)"
+  channel2 {-rgba.red -rgba.green rgba.blue none}
+  name Expression5
+  label spiral
+  xpos 1390
+  ypos -709
+ }
+ Dot {
+  name Dot19
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1424
+  ypos -582
+ }
+push $N4ed1b600
+ Expression {
+  temp_name0 dx
+  temp_expr0 "(x - parent.center.x) / width"
+  temp_name1 dy
+  temp_expr1 "(y - parent.center.y) / height\n"
+  temp_name2 dist
+  temp_expr2 "sqrt(dx*dx + dy*dy)\n"
+  temp_name3 weight
+  temp_expr3 "pow(max(dist, 0.0001), (parent.weight - 0.5) * 2)"
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 "dy * weight"
+  channel1 {-rgba.red rgba.green -rgba.blue none}
+  expr1 "dx * weight * pixel_aspect"
+  channel2 {-rgba.red -rgba.green rgba.blue none}
+  name Expression3
+  label hyperbolic
+  xpos 1223
+  ypos -709
+ }
+push $N4ed1b600
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1094
+  ypos -894
+ }
+set N4ed81600 [stack 0]
+ Expression {
+  temp_name0 dx
+  temp_expr0 "(x - parent.center.x) / width"
+  temp_name1 dy
+  temp_expr1 "(y - parent.center.y) / height\n"
+  temp_name2 dist
+  temp_expr2 "sqrt(dx*dx + dy*dy)\n"
+  temp_name3 weight
+  temp_expr3 "pow(max(dist, 0.0001), (parent.weight - 0.5) * 2)"
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 "dy * weight"
+  channel1 {-rgba.red rgba.green -rgba.blue none}
+  expr1 "- dx * weight * pixel_aspect"
+  channel2 {-rgba.red -rgba.green rgba.blue none}
+  name Expression2
+  label "radial\n"
+  xpos 1060
+  ypos -709
+ }
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1094
+  ypos -582
+ }
+push $N4ed81600
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 931
+  ypos -894
+ }
+ Expression {
+  expr0 1
+  expr1 0
+  expr2 0
+  expr3 1
+  name Expression1
+  xpos 897
+  ypos -777
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(rotate))} {-sin(radians(rotate))} 0}
+      {{sin(radians(rotate))} {cos(radians(rotate))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix2
+  label "Rotate vectors"
+  xpos 897
+  ypos -709
+  addUserKnob {20 User}
+  addUserKnob {7 rotate R -180 180}
+  rotate {{"parent.useTarget == 1 ? (degrees ( ( atan2 ( (input.width/2) - parent.target.x , (input.height/2)  - parent.target.y ) * -1) ) + 90) : parent.angle"}}
+ }
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 931
+  ypos -510
+ }
+ Switch {
+  inputs 5
+  which {{parent.operation}}
+  name Switch3
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  xpos 1223
+  ypos -517
+ }
+ Remove {
+  operation keep
+  channels rgb
+  name Remove3
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 1223
+  ypos -421
+ }
+ Multiply {
+  inputs 1+1
+  value 0
+  inject {{parent.inject}}
+  invert_mask {{!parent.invert}}
+  fringe {{parent.fringe}}
+  name Multiply1
+  label "value: \[value value]"
+  xpos 1223
+  ypos -330
+  disable {{"(\[string first \[value maskChannelMask] \[channels input1]] > -1) ? 0 : 1\n"}}
+ }
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1257
+  ypos -155
+ }
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 874
+  ypos -155
+ }
+set N4edd9600 [stack 0]
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 411
+  ypos -155
+ }
+set N4ee15600 [stack 0]
+ Dot {
+  name Dot26
+  note_font_size 35
+  note_font_color 0x3f7f3fff
+  xpos 301
+  ypos -155
+ }
+set N274ce00 [stack 0]
+ Dot {
+  name Dot28
+  note_font_size 35
+  note_font_color 0x3f7f3fff
+  xpos 191
+  ypos -155
+ }
+push $N4c67f800
+ Remove {
+  name Remove1
+  xpos 230
+  ypos -1345
+ }
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 264
+  ypos -1263
+ }
+set N4c631000 [stack 0]
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 398
+  ypos -1263
+ }
+ Grid {
+  output alpha
+  cliptype none
+  number {{parent.number} 0}
+  size {{parent.numberSize}}
+  color {1 1 1 1}
+  name Grid2
+  xpos 364
+  ypos -1201
+ }
+ Dot {
+  name Dot30
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 398
+  ypos -1119
+ }
+push $N4c631000
+ Grid {
+  output alpha
+  cliptype none
+  number {0 {parent.number}}
+  size {{parent.numberSize}}
+  color {1 1 1 1}
+  name Grid1
+  xpos 230
+  ypos -1201
+ }
+ Merge2 {
+  inputs 2
+  operation min
+  name Merge8
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 230
+  ypos -1129
+ }
+ BlackOutside {
+  name BlackOutside1
+  xpos 230
+  ypos -1066
+ }
+ Add {
+  channels rgb
+  value {{parent.visualizeColor.r} {parent.visualizeColor.g} {parent.visualizeColor.b} 1}
+  unpremult rgba.alpha
+  name Add3
+  xpos 230
+  ypos -976
+ }
+ Dot {
+  name Dot32
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 264
+  ypos -894
+ }
+push $N4c67f800
+ Dot {
+  name Dot33
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 678
+  ypos -1014
+ }
+set N4c241400 [stack 0]
+ Dot {
+  name Dot34
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 508
+  ypos -1014
+ }
+ Merge2 {
+  inputs 2
+  mix {{parent.visualizeMix}}
+  name Merge9
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 474
+  ypos -904
+ }
+ Dot {
+  name Dot35
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 508
+  ypos -774
+ }
+push $N4c241400
+ Switch {
+  inputs 2
+  which {{menu.visualizeOutput}}
+  name Switch2
+  xpos 644
+  ypos -778
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 678
+  ypos -342
+ }
+set Na811f200 [stack 0]
+ Dot {
+  name Dot17
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 324
+  ypos -342
+ }
+set N4e59200 [stack 0]
+ Dot {
+  name Dot27
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos -342
+ }
+set N3629a800 [stack 0]
+ Dot {
+  name Dot29
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 104
+  ypos -342
+ }
+ Shuffle {
+  in motion
+  name Shuffle3
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 70
+  ypos -259
+ }
+ Copy {
+  inputs 2
+  from0 rgba.red
+  to0 forward.u
+  from1 rgba.green
+  to1 forward.v
+  name Copy3
+  xpos 70
+  ypos -90
+ }
+ VectorBlur {
+  uv forward
+  scale {{parent.size} {parent.size}}
+  maskChannelMask none
+  mix {{parent.mix}}
+  name VectorBlur3
+  xpos 70
+  ypos 11
+ }
+ Dot {
+  name Dot36
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 104
+  ypos 354
+ }
+push $N274ce00
+push $N3629a800
+ Shuffle {
+  in backward
+  name Shuffle2
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 180
+  ypos -259
+ }
+ Copy {
+  inputs 2
+  from0 rgba.red
+  to0 forward.u
+  from1 rgba.green
+  to1 forward.v
+  name Copy2
+  xpos 180
+  ypos -90
+ }
+ VectorBlur {
+  uv forward
+  scale {{parent.size} {parent.size}}
+  maskChannelMask none
+  mix {{parent.mix}}
+  name VectorBlur2
+  xpos 180
+  ypos 11
+ }
+ Dot {
+  name Dot31
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos 282
+ }
+push $N4ee15600
+push $N4e59200
+ Shuffle {
+  in forward
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 290
+  ypos -259
+ }
+ Copy {
+  inputs 2
+  from0 rgba.red
+  to0 forward.u
+  from1 rgba.green
+  to1 forward.v
+  name Copy4
+  xpos 290
+  ypos -90
+ }
+ VectorBlur {
+  uv forward
+  scale {{parent.size} {parent.size}}
+  maskChannelMask none
+  mix {{parent.mix}}
+  name VectorBlur1
+  xpos 290
+  ypos 11
+ }
+ Dot {
+  name Dot18
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 324
+  ypos 206
+ }
+push $N4edd9600
+push $Na811f200
+ Copy {
+  inputs 2
+  from0 rgba.red
+  to0 forward.u
+  from1 rgba.green
+  to1 forward.v
+  name Copy1
+  xpos 644
+  ypos -95
+ }
+ VectorBlur {
+  uv forward
+  scale {{parent.size} {parent.size}}
+  maskChannelMask none
+  mix {{parent.mix}}
+  name VectorBlur4
+  xpos 644
+  ypos 6
+ }
+ Dot {
+  name Dot23
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 678
+  ypos 109
+ }
+set N36727c00 [stack 0]
+ Dot {
+  name Dot22
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 529
+  ypos 109
+ }
+ ShuffleCopy {
+  inputs 2
+  red red
+  green green
+  blue blue
+  out {{{parent.Shuffle1.in}}}
+  name ShuffleCopy1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 495
+  ypos 193
+ }
+ ShuffleCopy {
+  inputs 2
+  red red
+  green green
+  blue blue
+  out {{{parent.Shuffle2.in}}}
+  name ShuffleCopy2
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 495
+  ypos 269
+ }
+ ShuffleCopy {
+  inputs 2
+  red red
+  green green
+  blue blue
+  out {{{parent.Shuffle3.in}}}
+  name ShuffleCopy3
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 495
+  ypos 341
+ }
+ Dot {
+  name Dot21
+  note_font_size 35
+  note_font_color 0x3f7f3fff
+  xpos 529
+  ypos 474
+ }
+push $N36727c00
+ Switch {
+  inputs 2
+  which {{"\[if \{ \[lsearch \"all forward backward motion\"  \[value parent.channels]] != -1 \} \{ return \"1\n\" \} else \{ return \"0\"\}]"}}
+  name Switch1
+  xpos 644
+  ypos 471
+ }
+ Output {
+  name Output1
+  xpos 644
+  ypos 639
+ }
+push $N4a31a00
+ Blur {
+  name Blur1
+  label "size: \[value size]"
+  xpos 449
+  ypos -1530
+ }
+ NoOp {
+  inputs 0
+  name menu
+  knobChanged "grp = nuke.thisGroup()\nk = nuke.thisKnob()\n\n\n#hide/reveal certain knobs based on operation type.\ntarget = \['useTarget','target']\ncenter = \['center','centerButton', 'weight']\nangle = \['angle']\n             \nif k.name() in ('operation', 'showPanel'):\n    CONTROLS_type = grp\['operation'].value()\n    if CONTROLS_type == 'linear':\n        for i in target:\n            grp\[i].setVisible(True)\n        for i in center:\n            grp\[i].setVisible(False)\n        for i in angle:\n            grp\[i].setVisible(True)\n         \n    elif CONTROLS_type == 'radial':\n        for i in target:\n            grp\[i].setVisible(False)\n        for i in center:\n            grp\[i].setVisible(True)\n        for i in angle:\n            grp\[i].setVisible(False)\n\n                     \n    elif CONTROLS_type == 'zoom':\n        for i in target:\n            grp\[i].setVisible(False)\n        for i in center:\n            grp\[i].setVisible(True)\n        for i in angle:\n            grp\[i].setVisible(False)\n\n         \n            \n\n"
+  xpos 344
+  ypos -1521
+  addUserKnob {20 User}
+  addUserKnob {4 operation M {linear radial hyperbolic spiral zoom "" "" "" "" ""}}
+  addUserKnob {6 visualizeOutput l "visualize output" +STARTLINE}
+ }
+end_group

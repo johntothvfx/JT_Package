@@ -1,0 +1,523 @@
+Group {
+ name DepthVisualizer1
+ help " This node visualizes Depth of Field (DOF) information using an RGB color overlay. The colors indicate different depth regions relative to the focal plane:\n• Front → Objects in front of the focal plane(closer to the camera).\n\n• Focal → Objects at the focal plane (sharpest focus).\n\n•Back → Objects behind the focal plane (further from the camera)."
+ tile_color 0x31406bff
+ label "\n\n"
+ note_font "Bitstream Vera Sans"
+ note_font_color 0x8200ffff
+ selected true
+ addUserKnob {20 depthVisualizer l "Depth Visualizer"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION DepthVisualizer
+ addUserKnob {41 channels T Copy1.from0}
+ addUserKnob {26 ""}
+ addUserKnob {26 "" +HIDDEN}
+ addUserKnob {7 focaldistanceoffset l "focal distance offset" t "This is a localised adjustment of the focal plane. The camera is carrying the global focus plane value, this slider gives the option of offsetting the global value. This should not be used to \"fix\" the focal plane, the fix should happen on the global camera not in this node. \n\n\nNote: This parameter will be ignored if manually focal point is activated." +HIDDEN R -5 5}
+ addUserKnob {26 "" +HIDDEN}
+ addUserKnob {4 units t "This is scaling the measurement of the 3D environment depends what your CG departments uses (usually decimeter)." M {millimeter centimeter decimeter meter kilometer "" "" "" "" "" "" ""}}
+ units decimeter
+ addUserKnob {41 focusFrom l "focus from" t "Select the source for the focal point:\n\n<b>• Focal Picker:</b> Allows manual selection of a focal point in the image.\n<b>• Camera Input:</b> Uses the focus distance from the connected camera node.\n<b>• Axis Input:</b> Uses a 3D Axis node as the focal point reference." T Menu.focusFrom}
+ addUserKnob {26 space000 l "" +STARTLINE +HIDDEN T "\t"}
+ addUserKnob {41 focus t "When 'Focal Picker' is selected, the chosen channel will be sampled at the selected point, retrieving the depth value. This depth is then used to calculate the focal plane, setting it as the focal point." +HIDDEN T DepthSampler.focus}
+ addUserKnob {41 focal_plane l "focal plane" t "Displays the sampled depth value from the selected focal point. This value represents the calculated focal plane and is used to determine focus depth." +HIDDEN T DepthSampler.focal_plane}
+ addUserKnob {26 ""}
+ addUserKnob {7 visualizeMix l mix t "Dissolves between no visualize colour overlay on the image from 0 and 1 when visualize output is enabled.\n\n1 Being full effect"}
+ visualizeMix 0.5
+ addUserKnob {20 lens l Lens}
+ addUserKnob {18 front t "\"Defines the color overlay for the depth visualization. The colors represent different focus regions:\n\n<b>• Front:</b> Areas in front of the focal plane.\n<b>• Focal: </b> The in-focus region.\n<b>• Back: </b> Areas behind the focal plane."}
+ front {1 0 0}
+ addUserKnob {6 front_panelDropped l "panel dropped state" +HIDDEN +STARTLINE}
+ addUserKnob {18 focal t "\"Defines the color overlay for the depth visualization. The colors represent different focus regions:\n\n<b>• Front:</b> Areas in front of the focal plane.\n<b>• Focal: </b> The in-focus region.\n<b>• Back: </b> Areas behind the focal plane."}
+ focal {0 1 0}
+ addUserKnob {6 focal_panelDropped l "panel dropped state" +HIDDEN +STARTLINE}
+ addUserKnob {18 back t "\"Defines the color overlay for the depth visualization. The colors represent different focus regions:\n\n<b>• Front:</b> Areas in front of the focal plane.\n<b>• Focal: </b> The in-focus region.\n<b>• Back: </b> Areas behind the focal plane."}
+ back {0 0 1}
+ addUserKnob {6 back_panelDropped l "panel dropped state" +HIDDEN +STARTLINE}
+ addUserKnob {26 ""}
+ addUserKnob {7 fstop_offset l "fstop offset" t "This offsets the global fstop set in the camera. Values are carried in stops, so if global value is fStop 5.6 and offset is -1, then the resulting local fStop would be 4.  " R -5 5}
+ addUserKnob {7 focal_point_offset l "focal offset" t "Adjusts the focal plane position by offsetting the  depth value. Positive values push the focal plane further into the scene, while negative values bring it closer. This allows fine-tuning of focus depth beyond the sampled point." R -5 5}
+ addUserKnob {20 visualize l Visualize}
+ addUserKnob {6 color_rgb_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 focalPoint_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_rgb_1_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_rgb_2_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {2 font t "Sets the font style to use for the text. "}
+ font "\[python nuke.defaultFontPathname()]"
+ addUserKnob {4 xjustify l justify t "Sets how to align the text vertically: \n\n<b>• left</b> - align the text against the left edge of the margin.\n\n<b>• center</b> - align the text from the center of the margin.\n\n<b>• right</b> - align the text against the right edge of the margin." M {Left Center Right "" "" "" ""}}
+ addUserKnob {4 yjustify l "" t "Sets how to align the text Horizontally: \n\n<b>• top</b> - align the text against the top edge of the margin.\n\n<b>• center</b> - align the text from the center of the margin.\n\n<b>• bottom</b> - align the text against the bottom edge of the margin." -STARTLINE M {Top Center Bottom "" "" ""}}
+ yjustify Center
+ addUserKnob {4 safeZone l "safe zone" t "Overlay safe zones guidelines based on the image input.\n\n<b>• title safe</b> - any text intended for the audience should reside within this zone.\n\n<b>• action safe</b> - any visual elements intended for the audience should reside within this zone." M {"title safe" "action safe" "" ""}}
+ safeZone "action safe"
+ addUserKnob {3 margin t "The margin represents the padding from the edge of frame.\n\nThe higher the value more the paddiing will shrink in size." +DISABLED}
+ margin 100
+ addUserKnob {41 autoMargin l "auto margin" t "When this is enabled, the manual margin knob will be disabled.\n\nThis will automatically calculated the margin to the safe zone, based on the input image root format." -STARTLINE T Warning.autoMargin}
+ addUserKnob {3 fontSize l size t "Multiply the font size for all characters by this value." +DISABLED}
+ fontSize 100
+ addUserKnob {41 autoFontSize l "auto size" t "When this is enabled, the manual font size knob will be disabled.\n\nThis will calculate the font size based on the input with/height." -STARTLINE T Warning.autoFontSize}
+ addUserKnob {3 border t "Creates a black border around the text." +DISABLED}
+ border 5
+ addUserKnob {41 autoBorder l "auto border" t "When this is enabled, the manual border knob will be disabled.\n\nThis will calculate the font size based on the input with/height." -STARTLINE T Warning.autoBorder}
+ addUserKnob {18 color}
+ color {1 1 0}
+ addUserKnob {6 color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {7 labelMix l mix t "Dissolves between the overlay Depth of Field (DOF) information directly onto the image from 0 and 1, providing a visual breakdown of focus and depth regions.\n\n1 Being full effect\n\n"}
+ labelMix 1
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Depth Visualizer</font><font color=#43527d> v1.1"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br> \n<b>Depth Visualizer</b> This node visualizes Depth of Field (DOF)<br> information using an RGB color overlay. The colors indicate<br> different depth regions relative to the focal plane:<br>\n<br><b><i>\n• Front</b> → Objects in front of the focal plane<br>(closer to the camera).\n<br><b><i>\n• Focal</b> → Objects at the focal plane <br>(sharpest focus).\n<br><b><i>\n• Back</b> → Objects behind the focal plane <br>(further from the camera).\n\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#43527d\">John Toth <b>© 2021 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#31406b\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message(\"Coming Soon\")" +STARTLINE}
+ addUserKnob {22 log_1 l "<a href=\"https://johntothvfx.com\"><span style=\"color:#31406b\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "version_number = \"1.1.0\"\ncontext = \"Optical\"\nmodified_date = \"4th March 2025\"\ndeveloper = \"John Toth © 2021\"\nsite = \"<a href='website linke here'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- This node visualizes Depth of Field (DOF) information.\n<br></i><b> v 1.1 </b><i>\n- channel selection was added\n- artifacts tab was removed as it was useless\n- channel selection was added\n- camera, axis inputs were added for focal selection\n- information overlay was added\n- rgb lens overlay was added \n- multipliers was removed\n\"\"\"\nthank_you = \"\"\n\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"</i>\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n\n# Display the message\nnuke.message(message)"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode1
+  tile_color 0x334468ff
+  label "<center>ZDefocus DOF Ready to use"
+  xpos 7210
+  ypos 8355
+  bdheight 188
+ }
+ Input {
+  inputs 0
+  name axis
+  label "\[value number]"
+  xpos 7880
+  ypos 8363
+  number 2
+ }
+ Axis2 {
+  name Axis
+  xpos 7890
+  ypos 8442
+ }
+ Input {
+  inputs 0
+  name camera
+  label "\[value number]"
+  xpos 7660
+  ypos 8363
+  number 1
+ }
+ Axis2 {
+  name Camera
+  xpos 7670
+  ypos 8442
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 7439
+  ypos 8363
+ }
+ NoOp {
+  name Math
+  tile_color 0x334468ff
+  xpos 7439
+  ypos 8463
+  addUserKnob {20 math l Math}
+  addUserKnob {7 units}
+  units {{"parent.units==0 ? 1 : \nparent.units==1 ? 10 : \nparent.units==2 ? 100 : \nparent.units==3 ? 1000 : 1000000"}}
+  addUserKnob {26 ""}
+  addUserKnob {7 focal_point l "focal point" t "Position in world units of the camera focal plane." R 0 1000}
+  focal_point {{"parent.focusFrom == 0 ? parent.focal_plane + parent.focal_point_offset : parent.focusFrom == 1 ?  \[topnode parent.input1].focal_point + parent.focal_point_offset : axis+ focal_point_offset"}}
+  addUserKnob {7 fstop l f-stop t "Control for aperture size.  This is currently calibrated to matching Houdini.  \[Haven't tested Maya yet but should be the same result]" R 0 50}
+  fstop {{"\[topnode parent.input1].fstop*pow(sqrt(2),parent.fstop_offset)"}}
+  addUserKnob {26 ""}
+  addUserKnob {7 focal_length l "focal length" t "This is needed to create a proper depth relationship and should match the plate or CG render settings."}
+  focal_length {{"\[topnode parent.input1].focal"}}
+  addUserKnob {7 near l "clip near"}
+  near {{"\[value \[topnode input1].near]"}}
+  addUserKnob {7 far l "clip far"}
+  far {{"\[value \[topnode input1].far]"}}
+  addUserKnob {26 ""}
+  addUserKnob {14 filmback l "filmback size" t "The size in millimeters of the camers filmback.  This should match the live action/CG camera." R 0 100}
+  filmback {{"\[topnode parent.input1].haperture"} {"\[topnode parent.input1].vaperture"}}
+  addUserKnob {26 ""}
+  addUserKnob {7 coc R 0 2}
+  coc {{imageRes.w/filmback.w}}
+  addUserKnob {14 imageRes R 0 100}
+  imageRes {{input.width} {input.height}}
+  addUserKnob {7 aspectRatio R 0 3}
+  aspectRatio {{width/height}}
+  addUserKnob {7 aspect}
+  aspect {{input.pixel_aspect}}
+  addUserKnob {26 ""}
+  addUserKnob {7 focalPointMetres l "focal Point Metres"}
+  focalPointMetres {{"\[format \"%.1f\" \[value focal_point]]/10"}}
+  addUserKnob {26 ""}
+  addUserKnob {7 nearPoint l "near point"}
+  nearPoint {{"((hyperFocal * focal_point))/((hyperFocal) +((focal_point) - (focal_length*(units/100))))"}}
+  addUserKnob {7 nearPointMetres l "near point metres"}
+  nearPointMetres {{"\[format \"%.1f\" \[value nearPoint]]/10"}}
+  addUserKnob {26 ""}
+  addUserKnob {7 farPoint l "far point"}
+  farPoint {{"((hyperFocal * focal_point))/((hyperFocal) -((focal_point) - (focal_length*(units/100))))"}}
+  addUserKnob {7 farPointMetres l "far point metres"}
+  farPointMetres {{"\[format \"%.1f\" \[value farPoint]]/10"}}
+  addUserKnob {26 ""}
+  addUserKnob {7 hyperFocal l "hyper focus"}
+  hyperFocal {{"((((focal_length*focal_length) / (fstop*coc))+focal_length)*(units/100))"}}
+  addUserKnob {7 hyperFocalMetres l "hyper focus metres"}
+  hyperFocalMetres {{"\[format \"%.1f\" \[value hyperFocal]]/10"}}
+  addUserKnob {26 ""}
+  addUserKnob {7 axis}
+  axis {{"sqrt(pow(Axis.world_matrix.3 - Camera.world_matrix.3, 2) + pow(Axis.world_matrix.7 - Camera.world_matrix.7, 2) + pow(Axis.world_matrix.11 - Camera.world_matrix.11, 2))"}}
+  addUserKnob {13 cameraPos l "camera position"}
+  cameraPos {{"\[topnode parent.input1].world_matrix.3"} {"\[topnode parent.input1].world_matrix.7"} {"\[topnode parent.input1].world_matrix.11"}}
+ }
+ NoOp {
+  name Menu
+  knobChanged "grp = nuke.thisGroup()\nk = nuke.thisKnob()\n\n# Find the internal node inside the group\ninternal_node = grp.node(\"DepthSampler\")\n\nif not internal_node:\n    nuke.warning(\"Internal node 'DepthSampler' not found inside the group!\")\nelse:\n    if k.name() in ('focusFrom', 'showPanel'):\n        focus_source = grp\['focusFrom'].value()\n\n        linked_knobs = \{knob: grp.knobs().get(knob, None) for knob in \['focus', 'focal_plane','space000']\}\n\n        if focus_source == 'focal picker':\n            # Show the linked knobs\n            for knob_name, knob in linked_knobs.items():\n                if knob:\n                    knob.setVisible(True)\n\n        else:\n            # Hide the linked knobs properly\n            for knob_name, knob in linked_knobs.items():\n                if knob:\n                    knob.setVisible(False)\n"
+  xpos 7439
+  ypos 8511
+  addUserKnob {20 menu l Menu}
+  addUserKnob {4 focusFrom l focus M {"focal picker" "camera input" "axis input" "" "" "" "" "" "" "" "" "" "" ""}}
+  focusFrom "camera input"
+ }
+ NoOp {
+  name Warning
+  knobChanged "grp = nuke.thisGroup()\ntk = nuke.thisKnob()\n\n\nif tk.name() == \"autoFontSize\":\n    grp.knob('fontSize').setEnabled(not grp.knob('fontSize'). enabled())\n\nif tk.name() == \"autoMargin\":\n    grp.knob('margin').setEnabled(not grp.knob('margin'). enabled())\n    grp.knob('safeZone').setEnabled(not grp.knob('safeZone'). enabled())\n    \nif tk.name() == \"autoBorder\":\n    grp.knob('border').setEnabled(not grp.knob('border'). enabled())\n\nif tk.name() == \"displayFrame\":\n    grp.knob('frameOffset').setEnabled(not grp.knob('frameOffset'). enabled())\n\nif tk.name() == \"addMetaData\":\n    grp.knob('prefix').setEnabled(not grp.knob('prefix'). enabled())"
+  label callback
+  xpos 7439
+  ypos 8555
+  addUserKnob {20 warning}
+  addUserKnob {6 autoMargin l "auto margin" +STARTLINE}
+  autoMargin true
+  addUserKnob {6 autoFontSize l "auto size" +STARTLINE}
+  autoFontSize true
+  addUserKnob {6 autoBorder l "auto border" +STARTLINE}
+  autoBorder true
+ }
+ Dot {
+  name Dot53
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 7473
+  ypos 8634
+ }
+set Nb7330e00 [stack 0]
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 6923
+  ypos 8634
+ }
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 6924
+  ypos 8826
+ }
+set Nb7332a00 [stack 0]
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 6814
+  ypos 8826
+ }
+ AddChannels {
+  channels depth
+  name AddChannels1
+  xpos 6780
+  ypos 8891
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 6814
+  ypos 8970
+ }
+push $Nb7332a00
+ Remove {
+  name Remove1
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 6890
+  ypos 8891
+ }
+ Copy {
+  inputs 2
+  from0 depth.Z
+  to0 depth.Z
+  name Copy1
+  knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\n\nif k.name() == 'from0':\n    nuke.toNode('AddChannels1')\['channels'].fromScript(k.toScript())\n    nuke.toNode('AddChannels1')\['channels'].enableChannel(4, False)"
+  tile_color 0x802380ff
+  xpos 6890
+  ypos 8963
+ }
+ NoOp {
+  name DepthSampler
+  onCreate nuke.thisNode().knob('focus').setFlag(nuke.NO_ANIMATION)
+  knobChanged "n=nuke.thisNode()\nk = nuke.thisKnob()\n\nif k.name() == 'focus' and k.isAnimated() == False:\n \n    i = k.value()\n        \n    px = int(i\[0])\n    py = int(i\[1])\n    \n    r = n.sample('Z', px, py)\n\n    \n    \n    n\['focal_plane'].setValue(r)"
+  tile_color 0x802380ff
+  xpos 6890
+  ypos 9039
+  addUserKnob {20 DepthSampler}
+  addUserKnob {12 focus}
+  addUserKnob {6 color_panelDropped l "panel dropped state" +HIDDEN +STARTLINE}
+  addUserKnob {6 value_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {6 pixelValues_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {7 focal_plane l "focal plane"}
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 6924
+  ypos 9114
+ }
+set N3077f200 [stack 0]
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 7034
+  ypos 9114
+ }
+set Nb0672000 [stack 0]
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 7144
+  ypos 9114
+ }
+ Expression {
+  temp_name0 focal
+  temp_expr0 "parent.Math.focal_point "
+  expr0 0
+  expr1 0
+  expr2 0
+  expr3 "(depth.Z >  focal   ? (depth.Z -  focal) : 0)"
+  name Expression3
+  tile_color 0x802380ff
+  label Back
+  xpos 7110
+  ypos 9203
+ }
+ Add {
+  channels rgb
+  value {{clamp(parent.back)} {clamp(parent.back)} {clamp(parent.back)} 0}
+  maskChannelInput rgba.alpha
+  name Add3
+  xpos 7110
+  ypos 9299
+ }
+push 0
+push $N3077f200
+ Expression {
+  temp_name0 focal
+  temp_expr0 parent.Math.focal_point
+  expr0 0
+  expr1 0
+  expr2 0
+  expr3 "(depth.Z >  focal  ? 0 :  (focal - depth.Z))"
+  name Expression1
+  tile_color 0x802380ff
+  label Front
+  xpos 6890
+  ypos 9203
+ }
+ Add {
+  channels rgb
+  value {{clamp(parent.front)} {clamp(parent.front)} {clamp(parent.front)} 0}
+  maskChannelInput rgba.alpha
+  name Add1
+  xpos 6890
+  ypos 9299
+ }
+push $Nb0672000
+ Expression {
+  temp_name0 focal
+  temp_expr0 parent.Math.focal_length
+  temp_name1 fstop
+  temp_expr1 parent.Math.fstop
+  temp_name2 focus
+  temp_expr2 parent.Math.focal_point*parent.Math.units
+  temp_name3 units
+  temp_expr3 Z*parent.Math.units
+  expr0 0
+  expr1 0
+  expr2 0
+  expr3 "1 - ((  (( (focal / fstop) * ( (focus  * focal) / (focus - focal) ) * fabs( (1/units) - (1/focus) ))) * parent.Math.coc ) /2)"
+  name Expresion2
+  tile_color 0x802380ff
+  label Focal
+  xpos 7000
+  ypos 9203
+ }
+ Add {
+  channels rgb
+  value {{clamp(parent.focal)} {clamp(parent.focal)} {clamp(parent.focal)} 0}
+  maskChannelInput rgba.alpha
+  name Add2
+  xpos 7000
+  ypos 9299
+ }
+ Merge2 {
+  inputs 3+1
+  operation max
+  name Plus
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 7000
+  ypos 9395
+ }
+ Dot {
+  name Dot17
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 7034
+  ypos 9546
+ }
+push $Nb7330e00
+ Merge2 {
+  inputs 2
+  output rgb
+  mix {{parent.visualizeMix}}
+  name Merge2
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 7440
+  ypos 9539
+ }
+ Dot {
+  name Dot183
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 7474
+  ypos 9652
+ }
+set N31e6a200 [stack 0]
+ Dot {
+  name Dot28
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 7194
+  ypos 9652
+ }
+ Remove {
+  name Remove4
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 7160
+  ypos 9704
+ }
+ CopyBBox {
+  name CopyBBox3
+  xpos 7160
+  ypos 9772
+ }
+ Text {
+  message "Camera:                  \[expr \{\[exists input1] ? (\[exists \[topnode input1].disable] && \[regexp \{^Camera.*\} \[class \[topnode input1]]] ? \"\[value \[topnode input1].name]\" : \"No Camera Found\") : \"No Camera Found\"\}]\nAxis:                         \[expr \{\n    \[numvalue parent.focusFrom] == 0 ? \"\" : \n    \[numvalue parent.focusFrom] == 1 ? \"\" : \n    (\[exists input2] ? (\[exists \[topnode input2].disable] ? \"\[value \[topnode input2].name]\" : \"No Axis Found\") : \" No Axis Found\")\n\}]\n\nFstop:                        \[value parent.Math.fstop]\nFocal Point:            \[format %0.1f \[value parent.Math.focalPointMetres]]m  ( \[value parent.Math.focal_point])   (\[expr \{\[numvalue parent.focusFrom] == 0 ? \"focal picker\" : \n       (\[numvalue parent.focusFrom] == 1 ? \"Camera input\" : \"axis input\")\}] )\n\nFocal Length:         \[format %0.1f \[value parent.Math.focal_length]] mm  \nAspect Ratio:         \[value parent.Math.aspect]\nNear Point:            \[value parent.Math.nearPointMetres]m\nFar Point:               \[value parent.Math.farPointMetres]m\nHyperfocal:           \[value parent.Math.hyperFocalMetres]m\n"
+  Font 0
+  font "\[value parent.font]"
+  size {{"parent.autoFontSize == 0 ? parent.fontSize : Input.width / 50"}}
+  xjustify {{parent.xjustify}}
+  yjustify {{parent.yjustify+1}}
+  box {{"parent.autoMargin == 1 ? ((Input.width * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : parent.margin\n"} {"parent.autoMargin == 1 ? ((Input.height * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : parent.margin\n"} {"parent.autoMargin == 1 ? Input.width - ((Input.width * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : Input.width - (parent.margin)\n"} {"parent.autoMargin == 1 ? Input.height - ((Input.height * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : Input.height - (parent.margin)\n"}}
+  translate {0 {"parent.nanCheck && parent.infCheck  && parent.negCheck == 1 ? \nparent.yjustify == 0 ? - (size) : \nparent.yjustify == 1 ? 0 : \n(size) :  \n\nparent.nanCheck && parent.infCheck == 1 ?\nparent.yjustify == 0 ? - (size)   : \nparent.yjustify == 1 ? -((size) / 2) : \n0 : \n\nparent.infCheck && parent.negCheck == 1 ?\nparent.yjustify == 0 ? 0  : \nparent.yjustify == 1 ? ((size) / 2)  : \n(size)  : \n\nparent.infCheck == 1 ? 0  : 0\n\n\n"}}
+  color {{parent.color.r} {parent.color.g} {parent.color.b} 1}
+  name Text1
+  label "\[basename \[value font]]"
+  xpos 7160
+  ypos 9827
+ }
+ FilterErode {
+  channels alpha
+  size {{"- (parent.autoBorder == 0 ? parent.border : (Input.width * 0.1) / 100)"}}
+  name FilterErode2
+  xpos 7160
+  ypos 9875
+ }
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 7194
+  ypos 10042
+ }
+push $N31e6a200
+ Merge2 {
+  inputs 2
+  mix {{parent.labelMix}}
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 7440
+  ypos 10035
+ }
+ Output {
+  name Output1
+  xpos 7440
+  ypos 10239
+ }
+ Text2 {
+  inputs 0
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "Camera:                  \[expr \{\[exists input1] ? (\[exists \[topnode input1].disable] ? \"\[value \[topnode input1].name]\" : \"No Camera Found\") : \"No Camera Found\"\}]"
+  old_message {{67 97 109 101 114 97 58 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 91 101 120 112 114 32 123 49 32 63 32 40 49 32 63 32 34 67 97 109 101 114 97 49 34 32 58 32 34 78 111 32 67 97 109 101 114 97 32 70 111 117 110 100 34 41 32 58 32 34 78 111 32 67 97 109 101 114 97 32 70 111 117 110 100 34 125 93}
+    }
+  old_expression_markers {{32 32 37 37 42 48}
+    }
+  box {0 1455 3976 1556}
+  transforms {{0 2}
+    }
+  cursor_position 161
+  center {1024 778}
+  cursor_initialised true
+  initial_cursor_position {{0 1556}
+    }
+  group_animations {{0} imported: 0 selected: 0 items: "root transform/"}
+  animation_layers {{1 11 1024 778 0 0 1 1 0 0 0 0}
+    }
+  name Text2
+  label "backup label reveal"
+  xpos 7000
+  ypos 9827
+ }
+ Expression {
+  inputs 0
+  temp_name0 focal
+  temp_expr0 "\[value cameraName].focal"
+  temp_name1 fstop
+  temp_expr1 "\[value cameraName].fstop"
+  temp_name2 focus
+  temp_expr2 "(useCamera == 0 ? focal_plane : \[value cameraName].focal_point) * scale"
+  temp_name3 units
+  temp_expr3 "Z * scale"
+  channel0 depth
+  expr0 "(  (( (focal / fstop) * ( (focus  * focal) / (focus - focal) ) * fabs( (1/units) - (1/focus) ))) * (input.width / \[value cameraName].haperture) ) /2"
+  name Expresion1
+  knobChanged "n=nuke.thisNode()\nk = nuke.thisKnob()\n\nif k.name() == 'focus' and k.isAnimated() == False:\n \n    i = k.value()\n        \n    px = int(i\[0])\n    py = int(i\[1])\n    \n    r = n.sample('Z', px, py)\n\n    \n    \n    n\['focal_plane'].setValue(r)\n\n\n"
+  tile_color 0x802380ff
+  label Focal
+  xpos 7220
+  ypos 8435
+  addUserKnob {20 User}
+  addUserKnob {1 cameraName l "camera name"}
+  addUserKnob {4 units l "  units" -STARTLINE M {mm cm dm m km "" "" "" ""}}
+  units dm
+  addUserKnob {26 ""}
+  addUserKnob {4 useCamera l focus M {"focal picker" "camera input"}}
+  useCamera "camera input"
+  addUserKnob {12 focus l "   " -STARTLINE}
+  focus {1020 504}
+  addUserKnob {7 focal_plane l "focal plane"}
+  focal_plane 9
+  addUserKnob {7 scale}
+  scale {{"(units==0 ? 1 : units==1 ? 10 : units==2 ? 100 : units==3 ? 1000 : 1000000)\n"}}
+ }
+ ZDefocus2 {
+  math direct
+  size 1
+  max_size 100
+  name ZDefocus4
+  xpos 7220
+  ypos 8507
+ }
+end_group

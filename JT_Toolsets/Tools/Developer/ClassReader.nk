@@ -1,0 +1,41 @@
+Group {
+ name ClassRender1
+ help "Reads the CLASSIFICATION of the ndoes within the package"
+ onCreate "import nuke\n\ndef check_classification():\n    this_node = nuke.thisNode()\n    input_node = this_node.input(0)  # Get the first input of this node\n\n    if input_node is not None:\n        if input_node.knob(\"CLASSIFICATION\"):\n            classification_value = input_node\[\"CLASSIFICATION\"].value()\n            this_node\[\"class\"].setValue(f\"\{classification_value\}\")\n        else:\n            this_node\[\"class\"].setValue(\"No CLASSIFICATION found\")\n    else:\n        this_node\[\"class\"].setValue(\"This node has no input connected\")\n\n# To use this function, you can call it directly or connect it to a knobChanged event\ncheck_classification()\n\ndef on_knob_changed():\n    if nuke.thisKnob().name() == \"input\":\n        check_classification()\n"
+ knobChanged "check_classification()\n"
+ tile_color 0xaaaaaaff
+ label "\[value class]"
+ selected true
+ addUserKnob {20 classReader l "Class Reader"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION ClassReader
+ addUserKnob {1 class}
+ class "This node has no input connected"
+ addUserKnob {20 developer l Developer}
+ addUserKnob {4 index t "sets of operation will run on the code" M {all selection input "" "" "" "" "" "" "" "" ""}}
+ index input
+ addUserKnob {78 execute_order l order t "Lower numbers will be run first. With the exception of '-1' which will always run last.\n" n 1}
+ execute_order 1
+ addUserKnob {43 code t "custom code field"}
+ addUserKnob {6 disable_function l "disable function" t "This makes this nodes function not executable making the code null." +STARTLINE}
+ addUserKnob {22 execute T "import nuke\n\nn = nuke.thisNode().knob('disable_function').getValue()\nif n == 0:\n    exec(nuke.thisNode().knob('code').value())\nelse:\n    pass\n" +STARTLINE}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Class Reader</font><font color=#AAAAAA> v1.0</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "Overview of the node" +STARTLINE T "<br><strong>•</strong><b>Class Reader</b> can read the classification<br>of each node that belongs to the package\n<br><br>\n<i>• executable code is then available based<br>on the read.\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#AAAAAA;\">John Toth © 2024</a></b><br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#AAAAAA\">Tool Demo</span></a>" t "Launches the web page where it will have more documentation or a video about the node." T "nuke.message(\"coming soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#AAAAAA\">Version Log</span></a>" t "Contains information about this node, including classification, context, date last modified, developer notes, version number, version log, and year made." -STARTLINE T "# Constants\nversion_number = \"1.0.1\"\ncontext = \"Developer\"\nmodified_date = \"30th July 2024\"\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- Checks the CLASSIFICATION of the package nodes\n\"\"\"\nthank_you = \"Thanks message here\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = f\"<b>Date Last Modified: </b>\{modified_date\}\"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    f\"</i>\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos 0
+  ypos -9
+ }
+ Output {
+  name Output1
+  xpos 0
+  ypos 300
+ }
+end_group

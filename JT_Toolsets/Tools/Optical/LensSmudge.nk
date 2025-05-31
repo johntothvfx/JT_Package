@@ -1,0 +1,503 @@
+Group {
+ name LensSmudge1
+ help "Applies a smear effect to mimic lens smudge"
+ tile_color 0xcc804eff
+ selected true
+ addUserKnob {20 lensSmudge l "Lens Smudge"}
+ addUserKnob {41 channels t "The effect is only applied to these channels. \nIf you set this to something other than all or none, you can use the checkboxes on the right to select individual channels." T VectorBlur1.channels}
+ addUserKnob {6 channels_panelDropped l "panel dropped state" +HIDDEN +STARTLINE}
+ addUserKnob {41 gpuName l "Local GPU: " t "This is the GPU that will be used for rendering, when <b>Use GPU if available</b> is selected.\n\nIf you have more than one GPU in your machine, you can select a different <b>GPU Device</b> to use by editing your <b>Preferences</b>. (Note that selecting a different GPU will require a restart of Nuke to take effect.)\n\n<b>Local GPU</b> will be shown as <b>Not available</b> when any of the following is true:\n* <b>Use CPU</b> is selected as the <b>GPU Device</b> in your <b>Preferences</b>.\n* No suitable GPU was found on your system. Please refer to the documentation for details of the requirements for GPU acceleration.\n* It was not possible to create a context for processing on the selected GPU. For example, this can happen when there is not enough free memory available on the GPU.\n\nTo use the GPU when rendering from the command line, add <b>--gpu</b> to your command.\n" T VectorBlur2.gpuName}
+ addUserKnob {6 useGPUIfAvailable l "Use GPU if available" t "\nSelect this to render on the <b>Local GPU</b>, if available.\n\nYou can select this even if no GPU is currently available on your machine. The GPU will then be used whenever the script is opened on a machine which does have a GPU available. You should also select this if you wish to render from the command line with the <b>--gpu</b> option.\n\nIf this node requires full frames from its inputs, and is therefore unable to reduce its memory overhead, it will fall back to the CPU if an attempt to render a frame on the GPU fails due to lack of memory. When this occurs, a warning message will be printed to the console.\n" +STARTLINE}
+ useGPUIfAvailable true
+ addUserKnob {41 visualizeOutput l "visualize output" T menu.visualizeOutput}
+ addUserKnob {14 size t "The intensity size of the smudges" R 0 4}
+ addUserKnob {3 seed t "Seed value for the smudge pattern"}
+ seed 123
+ addUserKnob {22 randomize l "randomize seed" t "Randomize the seed value between 100 - 1000" -STARTLINE T "import random\n\nn = nuke.thisNode()\nr = random.randint(100,1000)\nn\['seed'].setValue(r)"}
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannelMask l mask t "Enables the associated mask channel to the right. Disabling this checkbox is the same as setting the channel to none. \n\nThe channel to use as a mask. By default, the merge is limited to the non-black areas of this channel." T Multiply1.maskChannelMask}
+ addUserKnob {6 invert t "Inverts the use of the mask channel so that the blur is limited to the non-white areas of the mask." -STARTLINE}
+ addUserKnob {41 fringe t "When enabled, only apply the effect to the edge of the mask. \nWhen disabled, the effect is applied to the entire mask." -STARTLINE T Multiply1.fringe}
+ addUserKnob {7 mix t "Dissolves between the original image at 0 and the full effect at 1."}
+ mix 1
+ addUserKnob {20 visualizeTab l Visualize}
+ addUserKnob {41 visualizeOutput_1 l "visualize output" T menu.visualizeOutput}
+ addUserKnob {3 visualSize l size t "This decrease/increase the size of the dots beings displayed when visualize output is enabled."}
+ visualSize 10
+ addUserKnob {3 number t "This decrease/increase the amount dots being displayed when visualize output is enabled."}
+ number 25
+ addUserKnob {18 visualColor l color t "This changes the colors of the dots being displayed when visualize output is enabled."}
+ visualColor {0 1 0}
+ addUserKnob {6 visualColor_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 visualizeColor_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_rgb_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {7 visualizeMix l mix t "Dissolves between no visualize colour overlay on the image from 0 and 1 when visualize output is enabled.\n\n1 Being full effect"}
+ visualizeMix 1
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" t "Node version info, for more information look at version log" +STARTLINE T "<br><font size='5'>Lens Smudge</font><font color=#CC804E> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "Overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>Lens Smudge</b> applies a smear effect to<br>image to try and mimic smudges on a camera<br>lens.\n<br></b><i>\n<br><strong>•</br> \nThe size should be value small. This effect is<br>mostly to be used to break up the \"perfect\" CG look.\n</i>\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#CC804E;\">John Toth <b>© 2020 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#CC804E\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 python_button l "<a href=\"https://johntothvfx.com\"><span style=\"color:#CC804E\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nversion_number = \"1.0.0\"\ncontext = \"Optical\"\nmodified_date = \"14th August 2024\"\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- applies a smear effect to mimic lens smudge\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode1
+  tile_color 0x23232301
+  label "<center>Don't Touch\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  note_font_color 0xee453cff
+  xpos -382
+  ypos -1711
+  bdwidth 324
+  bdheight 205
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos -33
+  ypos -1789
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1
+  ypos -1452
+ }
+set N3f46e000 [stack 0]
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -412
+  ypos -1452
+ }
+ Remove {
+  name Remove1
+  xpos -446
+  ypos -1315
+ }
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -412
+  ypos -1236
+ }
+set N4dfbf200 [stack 0]
+ Dot {
+  name Dot19
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -278
+  ypos -1236
+ }
+ Grid {
+  output alpha
+  cliptype none
+  number {{parent.number} 0}
+  size {{parent.visualSize}}
+  color {1 1 1 1}
+  name Grid3
+  xpos -312
+  ypos -1165
+ }
+ Dot {
+  name Dot30
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -278
+  ypos -1092
+ }
+push $N4dfbf200
+ Grid {
+  output alpha
+  cliptype none
+  number {0 {parent.number}}
+  size {{parent.visualSize}}
+  color {1 1 1 1}
+  name Grid4
+  xpos -446
+  ypos -1165
+ }
+ Merge2 {
+  inputs 2
+  operation min
+  name Merge8
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -446
+  ypos -1099
+ }
+ BlackOutside {
+  name BlackOutside2
+  xpos -446
+  ypos -1039
+ }
+ Add {
+  channels rgb
+  value {{parent.visualColor} {parent.visualColor} {parent.visualColor} 0}
+  unpremult rgba.alpha
+  name Add2
+  xpos -446
+  ypos -949
+ }
+ Dot {
+  name Dot32
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -412
+  ypos -867
+ }
+push $N3f46e000
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1
+  ypos -1134
+ }
+set N3f3cf400 [stack 0]
+ Dot {
+  name Dot33
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2
+  ypos -987
+ }
+set N4df9e800 [stack 0]
+ Dot {
+  name Dot34
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -168
+  ypos -987
+ }
+ Merge2 {
+  inputs 2
+  mix {{parent.visualizeMix}}
+  name Merge9
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -202
+  ypos -874
+ }
+ Dot {
+  name Dot35
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -168
+  ypos -747
+ }
+push $N4df9e800
+ Switch {
+  inputs 2
+  which {{parent.menu.visualizeOutput}}
+  name Switch3
+  xpos -32
+  ypos -750
+ }
+ Reformat {
+  type scale
+  scale 1.2
+  resize none
+  pbb true
+  name Reformat1
+  xpos -32
+  ypos -633
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1
+  ypos -558
+ }
+set N4dde9000 [stack 0]
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -120
+  ypos -558
+ }
+set N4dde3000 [stack 0]
+ Dot {
+  name Dot18
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -255
+  ypos -558
+ }
+set N3f034800 [stack 0]
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -426
+  ypos -558
+ }
+ AdjBBox {
+  numpixels {{"parent.size + 1"} {"parent.size + 1"}}
+  name AdjBBox1
+  xpos -460
+  ypos -417
+ }
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -426
+  ypos 66
+ }
+ Input {
+  inputs 0
+  name mask
+  label "\[value number]"
+  xpos 510
+  ypos -1789
+  number 1
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 544
+  ypos -630
+ }
+push $N3f3cf400
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 324
+  ypos -1134
+ }
+ Remove {
+  name Remove2
+  xpos 290
+  ypos -997
+ }
+ Add {
+  channels rgb
+  value {0 1 0 0}
+  name Add1
+  xpos 290
+  ypos -945
+ }
+ Noise {
+  size {{parent.seed}}
+  octaves 20
+  lacunarity 2.04
+  gamma 0.7
+  center {320 240}
+  color {1 0 0 1}
+  name Noise1
+  xpos 290
+  ypos -918
+ }
+ Grade {
+  black -0.5
+  black_clamp false
+  name Grade1
+  xpos 290
+  ypos -822
+ }
+ Grade {
+  multiply 10
+  black_clamp false
+  name Grade2
+  xpos 290
+  ypos -798
+ }
+ Remove {
+  operation keep
+  channels rgb
+  name Remove4
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 290
+  ypos -733
+ }
+ Multiply {
+  inputs 1+1
+  value 0
+  invert_mask {{!parent.invert}}
+  name Multiply1
+  label "value: \[value value]"
+  xpos 290
+  ypos -642
+  disable {{"(\[string first \[value maskChannelMask] \[channels input1]] > -1) ? 0 : 1\n"}}
+ }
+ Dot {
+  name Dot23
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 324
+  ypos -338
+ }
+push $N4dde9000
+ Copy {
+  inputs 2
+  from0 rgba.red
+  to0 forward.u
+  from1 rgba.green
+  to1 forward.v
+  name Copy4
+  xpos -32
+  ypos -350
+ }
+set N3f2a4000 [stack 0]
+push $N4dde3000
+ Shuffle {
+  in forward
+  name Shuffle4
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -154
+  ypos -427
+ }
+ Copy {
+  inputs 2
+  from0 -rgba.alpha
+  to0 -rgba.alpha
+  channels forward
+  name Copy2
+  xpos -154
+  ypos -350
+ }
+set N4df4a200 [stack 0]
+push $N3f034800
+ Shuffle {
+  in backward
+  name Shuffle5
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -289
+  ypos -427
+ }
+ Copy {
+  inputs 2
+  from0 -rgba.alpha
+  to0 -rgba.alpha
+  channels forward
+  name Copy7
+  xpos -289
+  ypos -350
+ }
+ VectorBlur2 {
+  useGPUIfAvailable {{parent.useGPUIfAvailable}}
+  uv motion
+  scale {{parent.size} {parent.size}}
+  mix {{parent.mix}}
+  name VectorBlur4
+  xpos -289
+  ypos -277
+  disable {{"\[expr \{\[value parent.channels] == \"all\" || \[value parent.channels] == \"backwards\" ? 0 : 1\}]\n"}}
+ }
+ Shuffle {
+  out backward
+  name Shuffle8
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -289
+  ypos -163
+ }
+ Dot {
+  name Dot21
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -255
+  ypos -6
+ }
+push $N4df4a200
+ VectorBlur2 {
+  useGPUIfAvailable {{parent.useGPUIfAvailable}}
+  uv motion
+  scale {{parent.size} {parent.size}}
+  mix {{parent.mix}}
+  name VectorBlur3
+  xpos -154
+  ypos -277
+  disable {{"\[expr \{\[value parent.channels] == \"all\" || \[value parent.channels] == \"backwards\" ? 0 : 1\}]\n"}}
+ }
+ Shuffle {
+  out forward
+  name Shuffle7
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -154
+  ypos -163
+ }
+ Dot {
+  name Dot22
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -120
+  ypos -78
+ }
+push $N3f2a4000
+ VectorBlur2 {
+  useGPUIfAvailable {{parent.useGPUIfAvailable}}
+  uv motion
+  scale {{parent.size} {parent.size}}
+  mix {{parent.mix}}
+  name VectorBlur1
+  xpos -32
+  ypos -277
+ }
+ Copy {
+  inputs 2
+  channels forward
+  name Copy8
+  xpos -32
+  ypos -90
+ }
+ Copy {
+  inputs 2
+  channels backward
+  name Copy9
+  xpos -32
+  ypos -18
+ }
+ CopyBBox {
+  inputs 2
+  name CopyBBox1
+  xpos -32
+  ypos 63
+ }
+ Reformat {
+  type scale
+  scale {{1/Reformat1.scale}}
+  resize none
+  pbb true
+  name Reformat2
+  xpos -32
+  ypos 135
+ }
+ Output {
+  name Output1
+  xpos -32
+  ypos 495
+ }
+ NoOp {
+  inputs 0
+  name menu
+  xpos -185
+  ypos -1593
+  addUserKnob {20 User}
+  addUserKnob {6 visualizeOutput l "visualize output" t "displays visual overlay" +STARTLINE}
+ }
+ VectorBlur2 {
+  inputs 0
+  name VectorBlur2
+  xpos -307
+  ypos -1597
+ }
+push $N3f46e000
+ Viewer {
+  frame 49
+  frame_range 1-100
+  monitorOutNDISenderName "NukeX - untitled - Viewer1"
+  name Viewer1
+  xpos 1170
+  ypos 879
+ }
+end_group
