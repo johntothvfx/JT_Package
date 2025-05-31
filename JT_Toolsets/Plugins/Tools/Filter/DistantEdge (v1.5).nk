@@ -1,0 +1,841 @@
+Group {
+ name DistantEdge
+ help "Creates Vectors based on the input alpha channel which is used to extrude the edges."
+ tile_color 0x752735ff
+ note_font_color 0xffffffff
+ selected true
+ addUserKnob {20 Settings}
+ addUserKnob {26 ""}
+ addUserKnob {41 channels t "Channel you want to apply the effect to.\n\n" T Remove2.channels}
+ addUserKnob {26 line l "" +STARTLINE}
+ addUserKnob {41 textureGrow l "Grow texture" t "Grows the texture based on the alpha channel.\n\nValue:\n- position will make it grow outwards.\n- negative will make it grow inwards.\n" T Growth_size_CONTROLLER_UI.size}
+ addUserKnob {14 size l "Transition Softness" t "How soft you want the extrusion to be from source and growth." R 0 100}
+ size 3
+ addUserKnob {7 stacks l Iterations t "Stacks within the growth, (maximum 5 For now). Similar to the Colour Dilate operation." R 0 5}
+ stacks 3
+ addUserKnob {1 FS_PROPERTY +HIDDEN}
+ addUserKnob {26 space l "" +STARTLINE T "\t\n"}
+ addUserKnob {20 img l "Image pre-processing" n 1}
+ img 0
+ addUserKnob {41 erodematte l "Erode Matte" t "This will internally erode the matte for you before effect takes place." T FilterErode1.size}
+ addUserKnob {20 endGroup_1 l endGroup n -1}
+ addUserKnob {26 space_02 l "" +STARTLINE T "\t"}
+ addUserKnob {20 img_2 l "Image post-processing" n 1}
+ img_2 0
+ addUserKnob {41 size_1 l blur t "Soften the operation above by adding a post processing blur to the image." T Blur5.size}
+ addUserKnob {20 endGroup_1_1 l endGroup n -1}
+ addUserKnob {26 space_1 l "" +STARTLINE T " \t "}
+ addUserKnob {20 img_1 l "Motion controls" n 1}
+ img_1 0
+ addUserKnob {41 threshold t "Threshold of the LevelSet node which checks the source alpha to calculate the motion.\n\n\nNote: Sometimes when yuo have alpha mattes close together you may need to increase the threshold and quality to get the desired look." T LevelSet.threshold}
+ addUserKnob {7 quaility l Quality t "Overal Motion Quality Level within the LevelSet node.\n\nNOTE: PLEASE KEEP THE VALUE LOW AS POSSIBLE\nChanging from low to high is a very minor change and not worth the slow down."}
+ quaility 0.125
+ addUserKnob {20 endGroup n -1}
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannel1 l "Mask Channel" T Keymix1.maskChannel}
+ addUserKnob {41 invertMask1 l Invert -STARTLINE T Keymix1.invertMask}
+ addUserKnob {26 ""}
+ addUserKnob {26 space_02_1 l "" +STARTLINE T "\t"}
+ addUserKnob {4 output t "Output from the node" M {Effect Motion "" "" ""}}
+ addUserKnob {26 aaa l "" -STARTLINE T "   \t"}
+ addUserKnob {41 filter t "Filter operation\n\n\n\n\nSelect the filtering algorithm to use when remapping pixels from their original positions to new positions. This allows you to avoid problems with image quality, particularly in high contrast areas of the frame (where highly aliased, or jaggy, edges may appear if pixels are not filtered and retain their original values).\n• Impulse - remapped pixels carry their original values.\n• Cubic - remapped pixels receive some smoothing.\n• Keys - remapped pixels receive some smoothing, plus minor sharpening (as shown by the negative -y portions of the curve).\n• Simon - remapped pixels receive some smoothing, plus medium sharpening (as shown by the negative -y portions of the curve).\n• Rifman - remapped pixels receive some smoothing, plus significant sharpening (as shown by the negative -y portions of the curve).\n• Mitchell - remapped pixels receive some smoothing, plus blurring to hide pixelation.\n• Parzen - remapped pixels receive the greatest smoothing of all filters.\n• Notch - remapped pixels receive flat smoothing (which tends to hide moire patterns).\n• Lanczos4, Lanczos6, and Sinc4 - remapped pixels receive sharpening which can be useful for scaling down. Lanczos4 provides the least sharpening and Sinc4 the most.\n" -STARTLINE T IDistort1.filter}
+ addUserKnob {26 text_1 l "" -STARTLINE T " \t"}
+ addUserKnob {26 author l "" +STARTLINE T "<br><font size='5'>Distant Edge</font><font color=#752735> v1.5<br>\n"}
+ addUserKnob {20 Help}
+ addUserKnob {26 Guide l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 Line l "" +STARTLINE}
+ addUserKnob {26 text l "" +STARTLINE T "<br><strong>1. </br> \nDistant Edge will Extend the edges using the <b>LevelSet</b> node.\n\n<br><strong>2. </br> </b> \nBy Default you need to have alpha in the <b>B pipe</b> <br>which Distant Edge will detect. Otherwise you can plug in the <b>matte Pipe</b> into<br> to an alpha, which will <b><i>automatically be registered within the node.</b></i>\n\n<br><strong>3. </br> </b>\nThere are <b>three</b> main control settings:\n<br><br>\n<b><i>Growth:</i></b> How much the edge to grow.\n<br>\n<b><i>Softness:</i></b> How soft you want the extrusion to be.\n<br>\n<b><i>Stacks:</i></b> How many Stacks you want add into the Edge growth (similar to Colour Dilate).\n<br>\n\n\n<br><strong>4. </br> </b>\nMotion Control are set low due to the fact <b>LevelSet</b> is a heavy node to calculate.<br>\n <br>\n<b>Note:</b>The difference between low and high settings are extremely <br>minor for Motion Controls (unless you are working with close together edges).\n\n\n<br><br><b>John Toth © 2019 <br>\n\n"}
+ addUserKnob {26 Link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#752735\">johntothvfx.com</a>\n"}
+ addUserKnob {26 space1111 l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 Log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#752735\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool</i><br><br><br><b>v 1.1</b><br><i>-  Crop now grows with the settings instead of straight to root format.<br>- External mask was removed with just matte input which will be automatically detected as you connect alpha to it.<br>-Copy from Matte pipe or source has been inverted for operation to B for workflow purposes/Format.</i><br><br><br><b>v 1.2</b><br><i>-  Mask Controls were added.<br>- invert operation of the effect was removed and was  added to the Texture Growth slider (negative to position).<br>-Naming of the controllers has been adjusted to be more user friendly & sense.<br>-Bouding Box calculation was reworked should be more accurate.</i><br><br><br><b>v 1.3</b><br><i>-Fixing a bug where splitting the X ad Y controller out seperately would not work which has been fixed.</b><br><i>-Fixing a bug with the mask.</i><br><br><br><b>v 1.4</b><br><i>- Effect can now be applied to overscan (no matter the size).</i><br><br><br><b>v 1.5</b><br><i>- Distant Edge can now be applied on the motion channel from the incoming input. <br><br><br><br><br><br>This node is based of DeadSetEdge<br><br><b>John Toth © 2019 \")\n"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode1
+  tile_color 0x222222ff
+  label "Checking which matte is \nused (external/internal)"
+  note_font_size 42
+  xpos 743
+  ypos -356
+  bdwidth 547
+  bdheight 607
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode10
+  tile_color 0x222222ff
+  label "distoring edges - stacking method\n\nSTMAP is used for Filter Hit and more accurate result"
+  note_font_size 42
+  xpos 31
+  ypos 3523
+  bdwidth 1038
+  bdheight 718
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode11
+  tile_color 0x222222ff
+  label softening
+  note_font_size 42
+  xpos 1062
+  ypos 2716
+  bdwidth 296
+  bdheight 232
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode12
+  tile_color 0x222222ff
+  label "post-processing\nblur"
+  note_font_size 42
+  xpos 22
+  ypos 4468
+  bdwidth 296
+  bdheight 232
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode13
+  tile_color 0x222222ff
+  label "Grabbing center"
+  note_font_size 42
+  xpos 1016
+  ypos 4350
+  bdwidth 336
+  bdheight 373
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode14
+  tile_color 0x222222ff
+  label "output - motion"
+  note_font_size 42
+  xpos 21
+  ypos 5020
+  bdwidth 296
+  bdheight 232
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode15
+  tile_color 0x222222ff
+  label "Restoring rest \nof channels\n"
+  note_font_size 42
+  xpos 17
+  ypos 5548
+  bdwidth 296
+  bdheight 232
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x222222ff
+  label "Working on selected \nchannels only"
+  note_font_size 42
+  xpos -59
+  ypos 389
+  bdwidth 437
+  bdheight 230
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode3
+  tile_color 0x222222ff
+  label "Storing channels not\ngoing to be effected"
+  note_font_size 42
+  xpos -658
+  ypos 389
+  bdwidth 437
+  bdheight 230
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode5
+  tile_color 0x222222ff
+  label "pre-processing\nerode"
+  note_font_size 42
+  xpos 1062
+  ypos 844
+  bdwidth 296
+  bdheight 232
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode6
+  tile_color 0x222222ff
+  label "Creating Motion  "
+  note_font_size 42
+  xpos 992
+  ypos 1490
+  bdwidth 433
+  bdheight 372
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode7
+  tile_color 0x222222ff
+  label "invert alpha"
+  note_font_size 42
+  xpos 1062
+  ypos 1108
+  bdwidth 296
+  bdheight 232
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode8
+  tile_color 0x222222ff
+  label "restoring center"
+  note_font_size 42
+  xpos 992
+  ypos 1874
+  bdwidth 436
+  bdheight 331
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode9
+  tile_color 0x222222ff
+  label "limiting effect area"
+  note_font_size 42
+  xpos 882
+  ypos 2306
+  bdwidth 763
+  bdheight 358
+ }
+ Input {
+  inputs 0
+  name Input
+  xpos 117
+  ypos -472
+ }
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 151
+  ypos 138
+ }
+set Nc22b8100 [stack 0]
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -502
+  ypos 138
+ }
+ Remove {
+  channels {{{Remove2.channels}}}
+  name Remove3
+  xpos -536
+  ypos 537
+ }
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -502
+  ypos 1602
+ }
+set Nc2296b00 [stack 0]
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -502
+  ypos 5706
+ }
+ Input {
+  inputs 0
+  name mask
+  xpos 907
+  ypos 2409
+  number 2
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 941
+  ypos 2466
+ }
+set Nc2295600 [stack 0]
+ Invert {
+  name Invert1
+  xpos 907
+  ypos 2577
+ }
+ Input {
+  inputs 0
+  name Matte
+  xpos 1150
+  ypos -448
+  number 1
+ }
+ Remove {
+  operation keep
+  channels alpha
+  name Remove4
+  xpos 1150
+  ypos -136
+ }
+ NoOp {
+  name autoAlphaCheck1
+  xpos 1150
+  ypos -10
+  addUserKnob {20 autoAlphaCheck}
+  addUserKnob {6 a +STARTLINE}
+  a {{"\[string first \".a\" \[channels \[input this 0]]]>-1"}}
+ }
+push $Nc22b8100
+ AddChannels {
+  channels alpha
+  name AddChannels2
+  xpos 840
+  ypos 128
+ }
+ Remove {
+  operation keep
+  channels alpha
+  name Remove1
+  xpos 840
+  ypos 176
+ }
+ Copy {
+  inputs 2
+  from0 -rgba.alpha
+  to0 -rgba.alpha
+  channels alpha
+  name Copy3
+  xpos 1150
+  ypos 170
+  disable {{!autoAlphaCheck1.a}}
+ }
+ FilterErode {
+  channels alpha
+  name FilterErode1
+  xpos 1150
+  ypos 969
+ }
+ Invert {
+  channels alpha
+  name Invert2
+  label "Disabled if it goes growth goes below 0"
+  xpos 1150
+  ypos 1250
+  disable {{"1-textureGrow > 1 ? 0 :1"}}
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1184
+  ypos 1576
+ }
+set Nc2274100 [stack 0]
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1578
+  ypos 1576
+ }
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1578
+  ypos 2034
+ }
+set Nc224f200 [stack 0]
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha black
+  out motion
+  name Shuffle2
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 1544
+  ypos 2571
+ }
+push $Nc224f200
+push $Nc2296b00
+ AdjBBox {
+  numpixels {{IDistort1.uv_scale+25+(Dissolve1.which*IDistort1.uv_scale)}}
+  name AdjBBox1
+  xpos -260
+  ypos 1599
+ }
+set Nc224e400 [stack 0]
+ Reformat {
+  type scale
+  scale {{quaility+0.001}}
+  pbb true
+  name Reformat10
+  xpos 840
+  ypos 1671
+ }
+push $Nc2274100
+ Reformat {
+  type scale
+  scale {{quaility+0.001}}
+  pbb true
+  name Reformat9
+  xpos 1263
+  ypos 1647
+ }
+ CopyBBox {
+  inputs 2
+  name CopyBBox2
+  xpos 1263
+  ypos 1695
+ }
+ LevelSet {
+  threshold 0.25
+  gradient motion
+  matte_limit -1
+  name LevelSet
+  xpos 1263
+  ypos 1737
+ }
+ Reformat {
+  type "to box"
+  box_width {{Copy3.format.width}}
+  box_height {{Copy3.format.height}}
+  box_fixed true
+  box_pixel_aspect {{Input.pixel_aspect}}
+  pbb true
+  name Reformat8
+  selected true
+  xpos 1263
+  ypos 1791
+ }
+ Merge2 {
+  inputs 2
+  operation stencil
+  Bchannels motion
+  output motion
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 1150
+  ypos 2018
+ }
+ Keymix {
+  inputs 3
+  channels motion
+  bbox B
+  name Keymix1
+  xpos 1150
+  ypos 2577
+ }
+ Blur {
+  channels motion
+  size {{parent.size} {parent.size}}
+  name Blur2
+  label "size: \[value size]"
+  xpos 1150
+  ypos 2834
+ }
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1184
+  ypos 3402
+ }
+set Nc222a400 [stack 0]
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1184
+  ypos 4194
+ }
+set Nc2229d00 [stack 0]
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1404
+  ypos 4194
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1404
+  ypos 4890
+ }
+push $Nc2229d00
+ Shuffle {
+  in motion
+  name Shuffle3
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 1150
+  ypos 4466
+ }
+ Expression {
+  expr0 0
+  expr1 0
+  expr2 0
+  expr3 "sqrt(r**2+g**2+b**2) "
+  name Expression2
+  xpos 1150
+  ypos 4616
+ }
+push $Nc224e400
+ Dot {
+  name Dot18
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -226
+  ypos 4338
+ }
+push $Nc222a400
+push $Nc22b8100
+ Remove {
+  operation keep
+  channels rgb
+  name Remove2
+  xpos 117
+  ypos 537
+ }
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 151
+  ypos 3090
+ }
+set Nc21f6b00 [stack 0]
+ Remove {
+  name Remove5
+  xpos 337
+  ypos 3081
+ }
+ Crop {
+  box {{min(Dot8.bbox.x,box.x)} {min(Dot8.bbox.y,box.y)} {max(Dot8.bbox.r,width)} {max(Dot8.bbox.t,height)}}
+  intersect true
+  name Crop3
+  xpos 337
+  ypos 3117
+ }
+ Reformat {
+  type "to box"
+  box_width {{input.width}}
+  box_height {{input.height}}
+  box_fixed true
+  box_pixel_aspect {{input.pixel_aspect}}
+  pbb true
+  name Reformat33
+  xpos 337
+  ypos 3159
+ }
+ AdjBBox {
+  name AdjBBox2
+  xpos 337
+  ypos 3207
+ }
+ Expression {
+  expr0 "(x+0.5) / width"
+  expr1 "(y+0.5) / height"
+  name Expression1
+  xpos 337
+  ypos 3303
+ }
+ Copy {
+  inputs 2
+  from0 -rgba.alpha
+  to0 -rgba.alpha
+  channels motion
+  name Copy1
+  xpos 337
+  ypos 3386
+ }
+ IDistort {
+  uv motion
+  uv_scale {{abs(Growth_size_CONTROLLER_UI.size)} {abs(Growth_size_CONTROLLER_UI.size)}}
+  name IDistort1
+  xpos 337
+  ypos 3879
+ }
+set Nc21c7900 [stack 0]
+ IDistort {
+  uv motion
+  uv_scale {{abs(Growth_size_CONTROLLER_UI.size)} {abs(Growth_size_CONTROLLER_UI.size)}}
+  filter {{IDistort1.filter}}
+  name IDistort3
+  xpos 447
+  ypos 3879
+ }
+set Nc21c7200 [stack 0]
+ IDistort {
+  uv motion
+  uv_scale {{abs(Growth_size_CONTROLLER_UI.size)} {abs(Growth_size_CONTROLLER_UI.size)}}
+  filter {{IDistort1.filter}}
+  name IDistort2
+  xpos 557
+  ypos 3879
+ }
+set Nc21c6b00 [stack 0]
+ IDistort {
+  uv motion
+  uv_scale {{abs(Growth_size_CONTROLLER_UI.size)} {abs(Growth_size_CONTROLLER_UI.size)}}
+  filter {{IDistort1.filter}}
+  name IDistort4
+  xpos 667
+  ypos 3879
+ }
+set Nc21c6400 [stack 0]
+ IDistort {
+  uv motion
+  uv_scale {{abs(Growth_size_CONTROLLER_UI.size)} {abs(Growth_size_CONTROLLER_UI.size)}}
+  filter {{IDistort1.filter}}
+  name IDistort5
+  xpos 777
+  ypos 3879
+ }
+set Nc21c5d00 [stack 0]
+ IDistort {
+  uv motion
+  uv_scale {{abs(Growth_size_CONTROLLER_UI.size)} {abs(Growth_size_CONTROLLER_UI.size)}}
+  filter {{IDistort1.filter}}
+  name IDistort6
+  xpos 887
+  ypos 3879
+ }
+ Dot {
+  name Dot25
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 921
+  ypos 4116
+ }
+push $Nc21c5d00
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 811
+  ypos 4068
+ }
+push $Nc21c6400
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 701
+  ypos 4044
+ }
+push $Nc21c6b00
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 591
+  ypos 4020
+ }
+push 0
+push $Nc21c7200
+ Dot {
+  name Dot17
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 481
+  ypos 3996
+ }
+push $Nc21c7900
+ Dissolve {
+  inputs 6+1
+  channels {{{IDistort1.channels}}}
+  which {{stacks}}
+  name Dissolve1
+  xpos 337
+  ypos 4113
+ }
+push $Nc21f6b00
+ STMap {
+  inputs 2
+  uv rgb
+  name STMap2
+  label "KEEP FILTER ON CUBIC\nDO NOT LINK IT TO DISTORT"
+  xpos 117
+  ypos 4100
+ }
+ CopyBBox {
+  inputs 2
+  name CopyBBox1
+  xpos 117
+  ypos 4335
+ }
+ BlackOutside {
+  name BlackOutside2
+  xpos 117
+  ypos 4359
+ }
+ Blur {
+  inputs 1+1
+  channels rgb
+  crop false
+  name Blur5
+  label "size: \[value size]"
+  xpos 117
+  ypos 4610
+ }
+ Copy {
+  inputs 2
+  from0 -rgba.alpha
+  to0 -rgba.alpha
+  channels motion
+  name Copy2
+  xpos 117
+  ypos 4874
+  disable {{!output}}
+ }
+ Shuffle {
+  in motion
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]:nuke:link:Distant_Edge.Shuffle1.disable"
+  xpos 117
+  ypos 5116
+  disable {{output-1}}
+ }
+ Copy {
+  inputs 2
+  from0 -rgba.alpha
+  to0 -rgba.alpha
+  channels all
+  name Copy5
+  xpos 117
+  ypos 5690
+ }
+ Crop {
+  box {{min(Input.bbox.x,box.x)} {min(Input.bbox.y,box.y)} {max(Input.bbox.r,width)} {max(Input.bbox.t,height)}}
+  intersect true
+  name Crop11
+  xpos 117
+  ypos 6086
+ }
+ BlackOutside {
+  name BlackOutside1
+  xpos 117
+  ypos 6133
+ }
+ Output {
+  name Output
+  xpos 117
+  ypos 6254
+ }
+push $Nc2295600
+ NoOp {
+  name Check
+  xpos 1051
+  ypos 2463
+  addUserKnob {20 autoAlphaCheck}
+  addUserKnob {6 a +STARTLINE}
+  a {{"clamp(\[lsearch \[channels this] rgba.alpha]+1, 0, 1)"}}
+ }
+ Dilate {
+  inputs 0
+  size 3
+  name Growth_size_CONTROLLER_UI
+  xpos 620
+  ypos 3729
+ }
+push $Nc222a400
+ Shuffle {
+  in motion
+  name Shuffle4
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 249
+  ypos 4250
+ }
+push $Nc224e400
+ Reformat {
+  type scale
+  scale {{quaility}}
+  pbb true
+  name Reformat5
+  xpos 984
+  ypos 1599
+ }
+ Reformat {
+  type scale
+  scale {{1+Reformat5.scale}}
+  resize none
+  center false
+  pbb true
+  name Reformat2
+  xpos 984
+  ypos 1623
+ }
+ Crop {
+  box {0 1.5 {input.width} {input.height}}
+  intersect true
+  crop false
+  name Crop1
+  label "Bug Fix"
+  xpos 984
+  ypos 1647
+ }
+ Dot {
+  name Dot19
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1018
+  ypos 1698
+ }
+push $Nc2274100
+ Reformat {
+  type scale
+  scale {{quaility}}
+  pbb true
+  name Reformat1
+  xpos 1150
+  ypos 1599
+ }
+ Reformat {
+  type scale
+  scale {{1+Reformat1.scale}}
+  resize none
+  center false
+  pbb true
+  name Reformat6
+  xpos 1150
+  ypos 1623
+ }
+ Crop {
+  box {0 1.5 {input.width} {input.height}}
+  intersect true
+  crop false
+  name Crop2
+  label "Bug Fix"
+  xpos 1150
+  ypos 1647
+ }
+ CopyBBox {
+  inputs 2
+  name CopyBBox3
+  xpos 1150
+  ypos 1695
+ }
+ Reformat {
+  type scale
+  scale {{1/Reformat2.scale}}
+  resize none
+  center false
+  pbb true
+  name Reformat3
+  xpos 1150
+  ypos 1791
+ }
+ Reformat {
+  type scale
+  scale {{1/Reformat5.scale}}
+  pbb true
+  name Reformat4
+  xpos 1150
+  ypos 1815
+ }
+end_group

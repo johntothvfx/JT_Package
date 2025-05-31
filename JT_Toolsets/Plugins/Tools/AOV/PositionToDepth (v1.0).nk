@@ -1,0 +1,190 @@
+Group {
+ name PositionToDepth
+ help "Converts position data into depth."
+ tile_color 0x184789ff
+ note_font_color 0xfefefeff
+ selected true
+ addUserKnob {20 PositionToDepth l "Position To Depth"}
+ addUserKnob {26 ""}
+ addUserKnob {41 channels l channel t "Select your position channel that you want to use to convert from into depth." T Shuffle1.in}
+ addUserKnob {26 space000 l "" +STARTLINE T "\t"}
+ addUserKnob {83 output t "Converts the Position channel into the follow depth:\n\nnormalized - depth.Z (nuke format 1/z/)\nWorld - Z (real world units)" M {normalized world}}
+ output world
+ addUserKnob {26 ""}
+ addUserKnob {26 title_1 l "" +STARTLINE T "<br><font size='5'>Position to Depth</font><font color=#194d95> v1.0<br>"}
+ addUserKnob {20 help_1 l Help}
+ addUserKnob {26 title l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 text l "" t text +STARTLINE T "<br><strong>1. </br> \nA Simple tool that <b>extracts the position <br>data and converts it to depth.</b>\n<br><strong>2. </br> </b>\nThe depth can be converted to<b> Normalized <br>depth  or Real world Units.</b>\n<br><br>\n<b>Note:</b><i><br>\n- <b>Normalized Depth</b> - values between 0-1, <br>it is Nuke's default format is (1/z).\n<br>\n- <b>Real World Units</b> -  is distance from camera<br> (e.g from CG renders).\n\n\n\n<br><br><b>John Toth © 2020 <br>\n"}
+ addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#194d95\">johntothvfx.com</a>\n"}
+ addUserKnob {26 space001 l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#194d95\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool<br><br><i>Special Thanks to Ben Dickson and Daniel Velikov teaching me the depth normalized and world space units</i><br><br></i><b>John Toth © 2020\")\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos 0
+  ypos -81
+ }
+ Dot {
+  name Dot2
+  xpos 34
+  ypos 54
+ }
+set Ndd3bfb0 [stack 0]
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -110
+  ypos 54
+ }
+ Dot {
+  name Dot1
+  xpos -110
+  ypos 258
+ }
+set N9ec83d0 [stack 0]
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -110
+  ypos 498
+ }
+push $N9ec83d0
+push $Ndd3bfb0
+ Shuffle {
+  in Pobject
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 0
+  ypos 98
+ }
+ Expression {
+  temp_name0 dx
+  temp_expr0 Camera_INPUT.translate.x-r
+  temp_name1 dy
+  temp_expr1 Camera_INPUT.translate.y-g
+  temp_name2 dz
+  temp_expr2 Camera_INPUT.translate.z-b
+  channel0 rgba
+  expr0 sqrt(dx*dx+dy*dy+dz*dz)
+  channel1 none
+  channel2 none
+  channel3 rgb
+  name Expression7
+  label "convert p world to z-depth"
+  xpos 0
+  ypos 177
+ }
+ Copy {
+  inputs 2
+  from0 -rgba.alpha
+  to0 -rgba.alpha
+  channels alpha
+  name Copy1
+  xpos 0
+  ypos 242
+ }
+ CopyBBox {
+  inputs 2
+  name CopyBBox1
+  selected true
+  xpos 0
+  ypos 495
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 34
+  ypos 647
+ }
+set Nfc73840 [stack 0]
+push $Nfc73840
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos 647
+ }
+ Expression {
+  channel0 rgb
+  expr0 1/r
+  channel1 none
+  channel2 none
+  name Expression1
+  xpos 180
+  ypos 788
+ }
+ Switch {
+  inputs 2
+  which {{output}}
+  name Switch1
+  xpos 0
+  ypos 788
+ }
+ Premult {
+  name Premult1
+  xpos 0
+  ypos 908
+ }
+ BlackOutside {
+  name BlackOutside1
+  xpos 0
+  ypos 1041
+ }
+ Expression {
+  expr0 isinf(r)?0:r
+  expr1 isinf(g)?0:g
+  expr2 isinf(b)?0:b
+  expr3 isinf(a)?0:a
+  name Expression3
+  label "infinity To Black"
+  xpos 0
+  ypos 1065
+ }
+ Expression {
+  expr0 isnan(r)?0:r
+  expr1 isnan(g)?0:g
+  expr2 isnan(b)?0:b
+  expr3 isnan(a)?0:a
+  name Expression6
+  label nan_To_Black
+  xpos 0
+  ypos 1101
+ }
+ Output {
+  name Output1
+  xpos 0
+  ypos 1316
+ }
+ Input {
+  inputs 0
+  name camera
+  xpos 180
+  ypos -81
+  number 1
+ }
+ Axis2 {
+  translate {{"\[value \[topnode parent.input1].translate.x]"} {"\[value \[topnode parent.input1].translate.y]"} {"\[value \[topnode parent.input1].translate.z]"}}
+  name Camera_INPUT
+  tile_color 0xffff
+  xpos 190
+  ypos 162
+  addUserKnob {20 User}
+  addUserKnob {7 focal}
+  focal {{"\[value \[topnode parent.input1].focal]"}}
+  addUserKnob {7 haperture}
+  haperture {{"\[value \[topnode parent.input1].haperture]"}}
+  addUserKnob {26 ""}
+  addUserKnob {7 winroll}
+  winroll {{"\[value \[topnode parent.input1].winroll]"}}
+  addUserKnob {30 wintranslate}
+  wintranslate {{"\[value \[topnode parent.input1].win_translate.u]"} {"\[value \[topnode parent.input1].win_translate.v]"}}
+  addUserKnob {30 winscale}
+  winscale {{"\[value \[topnode parent.input1].win_scale.u]"} {"\[value \[topnode parent.input1].win_scale.v]"}}
+ }
+end_group

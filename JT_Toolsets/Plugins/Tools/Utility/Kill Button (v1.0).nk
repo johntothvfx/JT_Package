@@ -1,0 +1,22 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+NoOp {
+name KillButton
+tile_color 0x288264ff
+note_font_color 0xffffffff
+selected true
+addUserKnob {20 Settings}
+addUserKnob {26 ""}
+addUserKnob {22 KillViewers l "<font size='4'>Kill All Viewers" t "Kills all Viewers within the script.\n\nThis includes every viewer every ones which may be in groups." T "for i in nukescripts.snap3d.allNodes():\n   if 'Viewer' in i.Class():\n     try:\n         nuke.delete(i)\n     except:\n         pass" +STARTLINE}
+addUserKnob {26 space l "" -STARTLINE T " "}
+addUserKnob {22 unhide l "<font size='4'>Reveal All Inputs" t "This reveals all Potential hidden inputs in the script." -STARTLINE T "for i in nukescripts.snap3d.allNodes():\n     try:\n         i\['hide_input'].setValue(False)\n     except:\n         pass"}
+addUserKnob {26 ""}
+addUserKnob {26 killbutton l "" +STARTLINE T "<br><font size='5'>Kill Button</font><font color=#277f62> v1.0<br>"}
+addUserKnob {20 help_1 l Help}
+addUserKnob {26 Guide l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+addUserKnob {26 ""}
+addUserKnob {26 steps l "" +STARTLINE T "<br><strong>1. </br> \n<b>Simple button Execution of a certain process.\n\n<br><strong>2. </br> </b>\n<b>Kill All Viewers:</b>  Does what it says, kills all Viewers<br> inside the script including any in groups.\n<br>\n<b>Reveal Hidden Inputs:</b>  Does what it says, If there are any Hidden inputs <br>it will Reveal them\n<br><br>\n<b>John Toth © 2020\n<br>"}
+addUserKnob {26 _1 l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#277f62\">johntothvfx.com</a>\n"}
+addUserKnob {26 space_1 l "" -STARTLINE T " \t\t"}
+addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#277f62\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool<br><br> Special Thanks to Daniel Velikov and Ben Dickson<br><br> Please note that none of the code is mine, I have simply just packaged multiple process into one handy tool.</i><br><br></i><b>John Toth © 2020\")\n"}
+}

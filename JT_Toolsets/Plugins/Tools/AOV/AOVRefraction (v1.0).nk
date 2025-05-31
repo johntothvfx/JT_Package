@@ -1,0 +1,547 @@
+Group {
+name AOVRefractions1
+help "Creates a Fresnel effect based on the normals, position and the camera data."
+knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\n\nif k.name() in ('output', 'showPanel'):\n    CONTROLS_type = n\['output'].value()\n    if CONTROLS_type == 'glass':\n        n\['IOR_in'].setValue(1.5)\n        n\['IOR_out'].setValue(1)\n\n    elif CONTROLS_type == 'water':\n        n\['IOR_in'].setValue(1.33)\n        n\['IOR_out'].setValue(1)\n\n    elif CONTROLS_type == 'air':\n        n\['IOR_in'].setValue(1)\n        n\['IOR_out'].setValue(1)\n\n    elif CONTROLS_type == 'ice':\n        n\['IOR_in'].setValue(1.309)\n        n\['IOR_out'].setValue(1)\n\n    elif CONTROLS_type == 'gold':\n        n\['IOR_in'].setValue(0.407)\n        n\['IOR_out'].setValue(1)\n\n    elif CONTROLS_type == 'plastic':\n        n\['IOR_in'].setValue(1.460)\n        n\['IOR_out'].setValue(1)\n\n    elif CONTROLS_type == 'steel':\n        n\['IOR_in'].setValue(2.500)\n        n\['IOR_out'].setValue(1)\n\n    elif CONTROLS_type == 'silver':\n        n\['IOR_in'].setValue(0.180)\n        n\['IOR_out'].setValue(1.350)\n\n    elif CONTROLS_type == 'iron':\n        n\['IOR_in'].setValue(2.950)\n        n\['IOR_out'].setValue(1)\n\n    elif CONTROLS_type == 'copper':\n        n\['IOR_in'].setValue(1.100)\n        n\['IOR_out'].setValue(2.430)"
+tile_color 0x184789ff
+selected true
+addUserKnob {20 AOVRefraction l "AOV Refractions"}
+addUserKnob {26 ""}
+addUserKnob {41 normalsin l "normals channel" t "Input thenormals channel input" T Shuffle2.in}
+addUserKnob {41 positonin l "position channel" t "Input the Position channel data" T shuffe.in}
+addUserKnob {26 ""}
+addUserKnob {4 output l presents t "Alpha Channel will store the incandenscence angle for dimming reflections if needed." M {air copper ice gold glass iron plastic silver steel water "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+output glass
+addUserKnob {26 space001 l "" +STARTLINE T " \t"}
+addUserKnob {7 IOR_in l "Index of Refraction:<b> in" R 0 3}
+IOR_in 1.5
+addUserKnob {7 IOR_out l "Index of Refraction: <b> Out" R 0 3}
+IOR_out 1
+addUserKnob {26 space0000 l "" +STARTLINE T " \t"}
+addUserKnob {7 rotatex l "rotate x" t "Rotates the input environment on the X axis." R -180 180}
+addUserKnob {7 rotatey l "rotate y" t "Rotates the input environment on the Y axis." R -180 180}
+addUserKnob {7 rotatez l "rotate z" t "Rotates the input environment on the Z axis." R -180 180}
+addUserKnob {26 aa l "" +STARTLINE T " \t"}
+addUserKnob {41 filter T STMap2.filter}
+addUserKnob {26 ""}
+addUserKnob {26 title l "" +STARTLINE T "<br><font size='5'>AOV Refraction</font><font color=#194d95> v1.0<br>"}
+addUserKnob {20 helptab l Help}
+addUserKnob {26 ""}
+addUserKnob {26 setup l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+addUserKnob {26 ""}
+addUserKnob {26 steps l "" +STARTLINE T "<br><strong>1. </br> \nCreated environment  Refractions based on<br> the normal and position inputs with certain<br> index of refraction material properties.\n\n<br><strong>2. </br> \nThe environment should be a Spherical map<br> (lat/long) input.\n\n<br><strong>3. </br> \nThere are simple Presets  in the node<br> for quick access to certain materials.\n\n\n\n<br><br><i><strong>Special Thanks:</i>Special thanks to Daniel Velikov<br> as this is node is based of his environment <br>refraction node.\n\n<br><br><b>John Toth © 2021 <br>"}
+addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#194d95\">johntothvfx.com</a>\n"}
+addUserKnob {26 space_1 l "" -STARTLINE T " \t\t"}
+addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#194d95\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool.<br><br><b> Special Thanks to Daniel Velikov</i><br><br></i><b>John Toth © 2021\")\n"}
+}
+BackdropNode {
+inputs 0
+name BackdropNode1
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c>Spherical map Rotation\n</center><font size='1'>\n- \n"
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos 37
+ypos -1221
+bdwidth 870
+bdheight 1187
+z_order -1
+}
+BackdropNode {
+inputs 0
+name BackdropNode12
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c>Creating index of refraction\n</center><font size='1'>\n- \n"
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos 1246
+ypos -821
+bdwidth 1026
+bdheight 1385
+z_order -1
+}
+BackdropNode {
+inputs 0
+name BackdropNode11
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c>channel"
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos 1384
+ypos -1324
+bdwidth 1249
+bdheight 286
+}
+BackdropNode {
+inputs 0
+name BackdropNode6
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c> Safety Pixel\n</center><font size='1'>\n- \n"
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos 1415
+ypos 610
+bdwidth 691
+bdheight 411
+}
+BackdropNode {
+inputs 0
+name BackdropNode7
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c> Matte Combining\n</center><font size='1'>\n- alpha channel output"
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos 1513
+ypos 1094
+bdwidth 1120
+bdheight 508
+}
+Input {
+inputs 0
+name camera
+label "input \[value number]"
+xpos 1060
+ypos -1648
+number 1
+}
+Axis2 {
+translate {{input1.translate.x} {input1.translate.y} {input1.translate.y}}
+name Camera_INPUT
+tile_color 0xffff
+xpos 1070
+ypos -1446
+addUserKnob {20 User}
+addUserKnob {7 focal}
+focal {{"\[value \[topnode parent.input1].focal]"}}
+addUserKnob {7 haperture}
+haperture {{"\[value \[topnode parent.input1].haperture]"}}
+addUserKnob {26 ""}
+addUserKnob {7 winroll}
+winroll {{"\[value \[topnode parent.input1].winroll]"}}
+addUserKnob {30 wintranslate}
+wintranslate {{"\[value \[topnode parent.input1].win_translate.u]"} {"\[value \[topnode parent.input1].win_translate.v]"}}
+addUserKnob {30 winscale}
+winscale {{"\[value \[topnode parent.input1].win_scale.u]"} {"\[value \[topnode parent.input1].win_scale.v]"}}
+}
+Input {
+inputs 0
+name Input
+xpos 1474
+ypos -1642
+}
+Dot {
+name Dot26
+note_font_size 35
+note_font_color 0xffffff
+xpos 1508
+ypos -1235
+}
+set Na53fc100 [stack 0]
+Dot {
+name Dot27
+note_font_size 35
+note_font_color 0xffffff
+xpos 2058
+ypos -1235
+}
+set N4d803900 [stack 0]
+Dot {
+name Dot28
+xpos 2524
+ypos -1235
+}
+Dot {
+name Dot2
+note_font_size 35
+note_font_color 0xffffff
+xpos 2524
+ypos 426
+}
+set N4d802b00 [stack 0]
+Shuffle {
+in alpha
+red white
+out alpha
+name IF_NO_ALPHA2
+label "<b>\[value in]</b> &rarr; \[value out]"
+xpos 2490
+ypos 1252
+disable {{"\[string first \".alpha\" \[channels \[input this 0]]]>-1\n\n"}}
+}
+Remove {
+channels rgb
+name Remove1
+xpos 2490
+ypos 1374
+}
+push $N4d802b00
+Input {
+inputs 0
+name Env
+label "input \[value number]"
+xpos 730
+ypos -1648
+number 2
+}
+Dot {
+name Dot3
+xpos 764
+ypos -1049
+}
+set N4d800f00 [stack 0]
+Transform {
+translate {0 {format.width}}
+rotate -90
+scale {1 1}
+filter impulse
+shutteroffset centred
+name Transform2
+xpos 329
+ypos -1053
+}
+Crop {
+box {{curve} {curve} {format.height} {format.width}}
+reformat true
+crop false
+name Crop2
+xpos 329
+ypos -1017
+}
+Expression {
+temp_name0 sinx
+temp_expr0 sin(x/width*PI)
+temp_name1 cosx
+temp_expr1 cos(x/width*PI)
+temp_name3 cosy
+temp_expr3 cos(y/height*2*PI)
+expr0 sinx*cosy
+channel1 {-rgba.red -rgba.green rgba.blue none}
+expr1 "sinx*sin( y / height * 2 * PI )"
+channel2 {-rgba.red rgba.green -rgba.blue none}
+expr2 cosx
+expr3 1
+name P_Sphere1
+label "Z up"
+xpos 329
+ypos -975
+}
+Transform {
+translate {{format.height} 0}
+rotate 90
+filter impulse
+shutteroffset centred
+name Transform4
+xpos 329
+ypos -908
+}
+Crop {
+box {{curve} {curve} {format.height} {format.width}}
+reformat true
+crop false
+name Crop3
+xpos 329
+ypos -884
+}
+ColorMatrix {
+matrix {
+    {1 0 0}
+    {0 {cos(radians(angle))} {-sin(radians(angle))}}
+    {0 {sin(radians(angle))} {cos(radians(angle))}}
+  }
+name X2
+xpos 329
+ypos -730
+addUserKnob {20 User}
+addUserKnob {7 angle R 0 360}
+angle {{rotatex}}
+}
+ColorMatrix {
+matrix {
+    {{cos(radians(angle))} 0 {sin(radians(angle))}}
+    {0 1 0}
+    {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+  }
+name Y2
+xpos 329
+ypos -682
+addUserKnob {20 User}
+addUserKnob {7 angle R 0 360}
+angle {{rotatey+89.85}}
+}
+ColorMatrix {
+matrix {
+    {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+    {{sin(radians(angle))} {cos(radians(angle))} 0}
+    {0 0 1}
+  }
+name Z2
+xpos 329
+ypos -634
+addUserKnob {20 User}
+addUserKnob {7 angle R 0 360}
+angle {{rotatez}}
+}
+Expression {
+temp_name0 U
+temp_expr0 "0.5 + (atan2( r, b ) / (2* PI )) "
+temp_name1 V
+temp_expr1 "0.5 - (asin ( g)  / PI) "
+expr0 U
+expr1 V
+expr2 clamp(b)
+channel3 none
+name XYZ_to_SPH_UV1
+tile_color 0xffff
+xpos 329
+ypos -514
+}
+Dot {
+name Dot4
+xpos 363
+ypos -422
+}
+push $N4d800f00
+OCIOLogConvert {
+operation "lin to log"
+name OCIOLogConvert1
+xpos 730
+ypos -514
+}
+STMap {
+inputs 2
+uv rgb
+name STMap2
+xpos 730
+ypos -432
+}
+OCIOLogConvert {
+operation "log to lin"
+name OCIOLogConvert2
+xpos 730
+ypos -346
+}
+Reformat {
+type "to box"
+format "2020 1180 0 0 2020 1180 1 IA_CG_Overscan"
+box_width {{Input.width}}
+box_height {{Input.height}}
+box_pixel_aspect {{Input.pixel_aspect}}
+resize distort
+black_outside true
+pbb true
+name Reformat3
+xpos 730
+ypos -130
+}
+Dot {
+name Dot1
+note_font_size 35
+note_font_color 0xffffff
+xpos 764
+ypos 306
+}
+push $Na53fc100
+Shuffle {
+in none
+alpha black
+name shuffe
+label "<b>\[value in]</b> &rarr; \[value out]"
+note_font "source code pro lighty"
+xpos 1474
+ypos -1148
+}
+Dot {
+name Dot10
+xpos 1508
+ypos -644
+}
+set N7c7b5600 [stack 0]
+Expression {
+temp_name0 Ix
+temp_expr0 "Camera_INPUT.world_matrix.3 - r"
+temp_name1 Iy
+temp_expr1 "Camera_INPUT.world_matrix.7 - g"
+temp_name2 Iz
+temp_expr2 "Camera_INPUT.world_matrix.11 - b"
+expr0 Ix
+expr1 Iy
+expr2 Iz
+name expression
+xpos 1474
+ypos -562
+}
+Expression {
+temp_name0 l
+temp_expr0 1/sqrt(r*r+g*g+b*b)
+expr0 r*l
+expr1 g*l
+expr2 b*l
+channel3 none
+name NORMALIZE2
+tile_color 0xffff
+xpos 1474
+ypos -418
+}
+Dot {
+name Dot6
+xpos 1508
+ypos -222
+}
+push $N7c7b5600
+Dot {
+name Dot8
+xpos 1754
+ypos -644
+}
+Expression {
+temp_name0 L
+temp_expr0 "sqrt((Camera_INPUT.world_matrix.3 - r)*(Camera_INPUT.world_matrix.3 - r) +(Camera_INPUT.world_matrix.7 - g)*(Camera_INPUT.world_matrix.7 - g) + (Camera_INPUT.world_matrix.11 - b)*(Camera_INPUT.world_matrix.11 - b) )\r+0.00001\n"
+expr0 L
+expr1 L
+expr2 L
+name expression_1
+xpos 1720
+ypos -555
+}
+Expression {
+temp_name0 l
+temp_expr0 1/sqrt(r*r+g*g+b*b)
+expr0 r*l
+expr1 g*l
+expr2 b*l
+channel3 none
+name NORMALIZE3
+tile_color 0xffff
+xpos 1720
+ypos -418
+}
+Merge2 {
+inputs 2
+operation divide
+name Merge1
+label "mix: \[value mix] (\[value bbox])"
+xpos 1720
+ypos -232
+}
+set N9294e400 [stack 0]
+push $N4d803900
+Shuffle {
+in none
+out rgb
+name Shuffle2
+label "<b>\[value in]</b> &rarr; \[value out]"
+xpos 2024
+ypos -1148
+}
+MergeExpression {
+inputs 2
+expr0 Ar*Br+Ag*Bg+Ab*Bb
+expr1 Ar*Br+Ag*Bg+Ab*Bb
+expr2 Ar*Br+Ag*Bg+Ab*Bb
+channel3 none
+name Merge_expression
+xpos 2024
+ypos -226
+}
+Shuffle {
+alpha red
+name Shuffle1
+label "<b>\[value in1]</b> &rarr; \[value out1]"
+xpos 2024
+ypos -140
+}
+Dot {
+name Dot11
+note_font_size 35
+note_font_color 0xffffff
+xpos 2058
+ypos 66
+}
+push $N9294e400
+MergeExpression {
+inputs 2
+temp_name0 IOR_Leave
+temp_expr0 index_of_refraction_out
+temp_name1 IOR_Enter
+temp_expr1 index_of_refraction_in
+temp_name2 etaRatio
+temp_expr2 IOR_Leave/IOR_Enter
+expr0 "(etaRatio * Ar - sqrt(1- (pow2(1)/pow2(1.5))*(1-Ar*Ar))) * A.\[value Shuffle2.in].red - etaRatio * Br"
+expr1 "(etaRatio * Ar - sqrt(1- (pow2(1)/pow2(1.5))*(1-Ar*Ar))) * A.\[value Shuffle2.in].green - etaRatio * Bg"
+expr2 "(etaRatio * Ar - sqrt(1- (pow2(1)/pow2(1.5))*(1-Ar*Ar))) * A.\[value Shuffle2.in].blue  - etaRatio * Bb"
+channel3 alpha
+expr3 "(etaRatio * Ar - sqrt(1- (pow2(1)/pow2(1.5))*(1-Ar*Ar))) * A.\[value Shuffle2.in].blue  - etaRatio * Bb"
+name Merge_expression1
+xpos 1720
+ypos 62
+addUserKnob {20 User}
+addUserKnob {7 index_of_refraction_out l "index of refraction out" R 0 10}
+index_of_refraction_out {{IOR_out}}
+addUserKnob {7 index_of_refraction_in l "index of refraction in" R 0 10}
+index_of_refraction_in {{IOR_in}}
+}
+Expression {
+temp_name0 U
+temp_expr0 "0.5 + (atan2( r, b ) / (2* PI )) "
+temp_name1 V
+temp_expr1 "0.5 - (asin ( g)  / PI) "
+expr0 U
+expr1 V
+expr2 clamp(b)
+channel3 none
+name XYZ_to_SPH_UV
+tile_color 0xffff
+xpos 1720
+ypos 158
+}
+MergeExpression {
+inputs 2
+expr0 "Ar(Br(x,y)*width, Bg(x,y)*height)"
+expr1 "Ag(Br(x,y)*width, Bg(x,y)*height)"
+expr2 "Ab(Br(x,y)*width, Bg(x,y)*height)"
+channel3 alpha
+expr3 "Aa(Br(x,y)*width, Bg(x,y)*height)"
+name MergeExpression2
+xpos 1720
+ypos 302
+}
+CopyBBox {
+inputs 2
+name CopyBBox1
+xpos 1720
+ypos 422
+}
+Expression {
+expr0 isinf(r)?0:r
+expr1 isinf(g)?0:g
+expr2 isinf(b)?0:b
+expr3 isinf(a)?0:a
+name Expression1
+label "infinity To Black"
+xpos 1720
+ypos 752
+}
+Expression {
+expr0 isnan(r)?0:r
+expr1 isnan(g)?0:g
+expr2 isnan(b)?0:b
+expr3 isnan(a)?0:a
+name Expression2
+label nan_To_Black
+xpos 1720
+ypos 824
+}
+Copy {
+inputs 2
+from0 -rgba.alpha
+to0 -rgba.alpha
+channels all
+name Copy2
+xpos 1720
+ypos 1362
+}
+Output {
+name Output1
+xpos 1720
+ypos 1790
+}
+end_group

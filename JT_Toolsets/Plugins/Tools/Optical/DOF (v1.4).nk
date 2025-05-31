@@ -1,0 +1,1912 @@
+Group {
+name DOF
+knobChanged "# For testing:\n#n = nuke.toNode(\"elixirDof\")\n#k = n\['dofmode']\n\n# For callback:\nn = nuke.thisNode()\nk = nuke.thisKnob()\n\n\n\nif k.name() in ('dofmode', 'showPanel'):\n    CONTROLS_type = n\['dofmode'].value()\n    if CONTROLS_type == 'pgBokeh flat':\n        n\['mode'].setVisible(True)\n        n\['UseGPU'].setVisible(False)\n\n    if CONTROLS_type == 'pgBokeh deep':\n        n\['mode'].setVisible(False)\n        n\['UseGPU'].setVisible(False)\n\n    if CONTROLS_type == 'zDefocus':\n        n\['mode'].setVisible(True)\n        n\['UseGPU'].setVisible(True)\n\n\nif k.name() == 'dofmode':\n    dropdown_choice = n\['dofmode'].value()\n    n.knobs()\['pgdeep_integrateFrontAndBackSeperately'].setVisible(dropdown_choice == 'pgBokeh deep')\n\n\n########################\nif k.name() == 'dofFarmOnly':\n    if k.value() is True :\n        n.knobs()\['tile_color'].setValue(0x8c26a3ff)\n    else: \n        n.knobs()\['tile_color'].setValue(0x4a26a3ff)\n\n########################\n\nn = nuke.thisNode()\nk = nuke.thisKnob()\n\nif k.name() in ('setFP', 'showPanel'):\n    CONTROLS_type = n\['setFP'].value()\n    if CONTROLS_type == 'on':\n        n\['focal_point'].setVisible(True)\n        n\['3Dfocal_point'].setVisible(True)\n        n\['focaldistanceoffset'].setVisible(False)\n\n    if CONTROLS_type == 'off':\n        n\['focal_point'].setVisible(False)\n        n\['3Dfocal_point'].setVisible(False)\n        n\['focaldistanceoffset'].setVisible(True)\n\n\n########################\n\nn=nuke.thisNode()\nk=nuke.thisKnob()\n\nif k.Class()=='XY_Knob' and k.isAnimated()==False:\n    i=k.value()\n    nm='3D'+k.name()\n    inp=n.node('Chn')\n    px=int(i\[0])\n    py=int(i\[1])\n    x= inp.sample('red', px, py)\n\n\n    n\[nm].setValue(\[x])\n\n\nn = nuke.thisNode()\nk = 'focal_point'\nt = nuke.thisKnob()\nflag = nuke.NO_ANIMATION\n\n\n\nif t.name() == 'setFP':\n    if t.value() is True :\n       n.knob(k).setFlag(flag)\n    else: \n        n.knob(k).setFlag(flag)\n\n"
+tile_color 0x4a26a3ff
+label "mode: \[value dofmode]\n\n\n"
+note_font "Bitstream Vera Sans"
+note_font_color 0x8200ffff
+selected true
+addUserKnob {20 DepthTab l "Depth Of Field"}
+addUserKnob {26 ""}
+addUserKnob {4 out_type l output t "Select the output type of the node:\n\ndefocused image - image with current defocus selection applied\nfocal plane visualisation - shows the focal point (red) as well as front and back (green/blue) as a colour overlay over current image\nlens kernel - shows the lens kernel being used\nDepth - Shows the depth that is being used (normalized depth will get converted to real world units) and is useful for picking and focal point to put into the camera.\n\nDefault is: defocused image" M {"defocused image" "focal plane visualisation" "lens kernel (checking)" "Depth (sampling)" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+addUserKnob {4 dofmode l "defocus mode" t "Gives the ability to select different defocus methods. These are split into two sections, deep and flat. A deep input is expecting deep to be plugged into the deep input, the flat image input is not being used when deep modes are selected.   \n\nDeep Otions:\npgBokeh_deep\n\nFlat Options:\npgBokeh_flat\nzDefocus\n\nDefault is: pgBokeh_flat" M {"pgBokeh flat" "pgBokeh deep" zDefocus "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+addUserKnob {4 mode l "depth channel" t "Select what for of depth data is being supplied.\n\ndepth.Z input expects normalised depth (usually coming from a scanline render or similar). Normalised values range from 0 - 1, meaning an object 10 units away from camera would carry a value of 0.1. 0 being infinitely far away. \n\nZ expects real world units. If an object is 10 units away from camera the value of said object should be 10 in the Z-pass. This is usually coming from CG as a Z-Pass or using a DeepToDepth (with Z selected)\n" M {"Z - real world units" "depth.Z  - normalised" "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+addUserKnob {26 ""}
+addUserKnob {4 worldScaleMenu l "world scale" t "This is scaling the measurement of the 3D environment depends what your CG departments uses (usualy decimeter)." M {millimeter centimeter decimeter meter kilometer "" "" ""}}
+worldScaleMenu decimeter
+addUserKnob {7 maxkernel l "maximum kernel size" t "This defines the biggest possible kernel convolve. It is a failsafe for stupid camera settings or flawed depth passes." +INVISIBLE}
+maxkernel 180
+addUserKnob {7 overscan l "overscan amount" t "This is setting the amount of overscan to increase the canvas for the deep defocus, otherwise it'll cut bokeh near edge of frame.\n1.1 = 10%, 1.25 = 25%" +INVISIBLE R 0.9 1.5}
+overscan 1.1
+addUserKnob {26 ""}
+addUserKnob {83 setFP l "focal point sampler" t "This will ignore the 'focal distance' value from the camera and a picker knob wil appear which will sample the depth and that value will be the new focal point.\n\n" M {on off}}
+setFP off
+addUserKnob {41 in l depth t "Samples this channel" +INVISIBLE T Chn.in}
+addUserKnob {12 focal_point l "focal point" t "Picker for the focal point.\n\n" +HIDDEN}
+addUserKnob {7 3Dfocal_point l "Focal plane" +HIDDEN}
+addUserKnob {26 ""}
+addUserKnob {7 focaldistanceoffset l "focal distance offset" t "This is a localised adjustment of the focal plane. The camera is carrying the global focus plane value, this slider gives the option of offsetting the global value. This should not be used to \"fix\" the focal plane, the fix should happen on the global camera not in this node. \n\n\nNote: This parameter will be ignored if manually focal point is activated." R -5 5}
+addUserKnob {7 fstopoffset l "fStop offset" t "This offsets the global fStop set in the camera. Values are carried in stops, so if global value is fStop 5.6 and offset is -1, then the resulting local fStop would be 4.  " R -5 5}
+addUserKnob {26 ""}
+addUserKnob {7 frontmultiplier l "Front Multiplier" t "Scaling the Front of the depth (forces more defocus in the front of the scene)\n\nThis should be avoided and should be only done for creative purposes really." R 1 256}
+frontmultiplier 1
+addUserKnob {7 backmultiplier l "Back Multiplier" t "Scaling the back of the depth (forces more defocus in the back of the scene)\n\nThis should be avoided and should be only done for creative purposes really." R 1 256}
+backmultiplier 1
+addUserKnob {26 ""}
+addUserKnob {3 cslices l "no. of corrective Slices"}
+cslices 1
+addUserKnob {26 space001 l "" -STARTLINE T "    \t"}
+addUserKnob {83 KernelSelection l "<strong>Kernel:      " t "input - used the input kernel being supplied to drive the bokeh of the defocus\n\ncircular - basic circle bokeh to drive the defocus\n\nanamorphic - is a circle scaled down in width by 0.5 to create a basic anamorphic kernel to drive the defocus." -STARTLINE M {input circular anamorphic}}
+KernelSelection circular
+addUserKnob {26 ""}
+addUserKnob {6 dofFarmOnly l "farm only" t "Tick the box and this node will render on the farm only. This has been implemented due to the fact that defocus operations are naturally heavy, so the user can 'set and forget'. \n\nPurple node colour implies active. Pink implies \"Farm Only\" " +STARTLINE}
+addUserKnob {26 space111 l "" -STARTLINE T "\t  "}
+addUserKnob {6 pgdeep_integrateFrontAndBackSeperately l "integrate deep front and back separately" -STARTLINE +HIDDEN}
+pgdeep_integrateFrontAndBackSeperately true
+addUserKnob {6 UseGPU l "Use GPU if available" -STARTLINE +HIDDEN}
+UseGPU true
+addUserKnob {26 title l "" +STARTLINE T "<br><font size='5'>Depth of Field </font><font color=#2f186a> v1.4<br>"}
+addUserKnob {26 ""}
+addUserKnob {20 Artifacts}
+addUserKnob {26 ""}
+addUserKnob {7 PBCdialate l "depth dilate" t "Dilating depth. Not pretty so don't use unless you really have to." R 0 10}
+addUserKnob {6 edgefixswitch l "Transparent Edge Fix" t "If you are getting semi tranparent edges where they should be solid, untick this box and pray to the gods of pixel fudging. " +STARTLINE}
+addUserKnob {6 blacktomax l "Force black to depth" t "If something is black is simple adds a extrmely high value of depth in the back. This sometimes helps for blending between defocus objects." -STARTLINE}
+blacktomax true
+addUserKnob {26 ""}
+addUserKnob {20 helptab l Help}
+addUserKnob {26 basicsetup l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+addUserKnob {26 ""}
+addUserKnob {26 steps l "" +STARTLINE T "<br><strong>1. </br> \nThis is a wrapper around the tool PGBokeh/zDefocus. <br>\nIt is here to streamline Defocusing a shot using <br>the camera data.\n\n<br><strong>2. </br> \nPlease read the tips in each parameter<br> to understand more of the node.\n<br><i><b>Tip:</b> Hover mouse over knob to see tooltip.\n\n<br><br><i><strong>Special Thanks:</i>This node is based <br> of Guido Wolter & Ben Dickson.\n\n<br><br><b>John Toth © 2021 <br>"}
+addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#2f186a\">johntothvfx.com</a>\n"}
+addUserKnob {26 space l "" -STARTLINE T " \t\t"}
+addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#2f186a\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool</i></b><br><br><b>v 1.1</b><br><i>- Adding in 2D picker sampler option<br>- adding built in kernels<br>- Force black to have depth option</i></b><br><br><b>v 1.2</b><br><i>- Visualization was added in mode.</i></b><br><br><b>v 1.3</b><br><i>- Errors information have been added to the input viewer for Deep/kernel Inputs.</i></b><br><br><b>v 1.4</b><br><i>- ZDefocus mode bugs has been fixed. Switch guis have been fixed. <br>- Zdefocus parameters no longer inside another gizmo.<br>- Sampler when turned on now works on Zdefocus mode.</i><br><br><b> <br><br><b> Special Thanks to Guido Wolter as this is based of his defocus tool as a learning experience</i><br><br></i><b>John Toth © 2021\")\n"}
+}
+BackdropNode {
+inputs 0
+name BackdropNode1
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c> Depth Check (pgbokeh flat)\n</center><font size='1'>\n- For the user to check what value of depth they are using and select the correct one.\n"
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos -338
+ypos -463
+bdwidth 938
+bdheight 886
+}
+BackdropNode {
+inputs 0
+name BackdropNode10
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c> 2d to Deep\n</center><font size='1'>\n- controllers between deep or no deep."
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos -138
+ypos 6177
+bdwidth 542
+bdheight 510
+}
+BackdropNode {
+inputs 0
+name BackdropNode11
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c>  Artifacts\n</center><font size='1'>\n- transparent edges fix and extruding the alpha"
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos -449
+ypos 1287
+bdwidth 2056
+bdheight 2157
+}
+BackdropNode {
+inputs 0
+name BackdropNode12
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c> Focal Point sampler\n</center><font size='1'>\n- manually can set the focal point"
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos -2655
+ypos 761
+bdwidth 734
+bdheight 828
+}
+BackdropNode {
+inputs 0
+name BackdropNode13
+tile_color 0x232323ff
+label "<center><font size='5'></font><font color=#ee453c>Camera Data\n</center><font size='1'>"
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos -2447
+ypos 462
+bdwidth 274
+bdheight 225
+}
+BackdropNode {
+inputs 0
+name BackdropNode14
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c> Artefacts and Depth conversion reverse operation\n</center><font size='1'>\n- Reverting operation before defocus back to normal input values"
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos -135
+ypos 15345
+bdwidth 592
+bdheight 760
+}
+BackdropNode {
+inputs 0
+name BackdropNode15
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c> Dof mode Toggle\n</center><font size='1'>\n- This is putting the image back to it's normal settings"
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos -214
+ypos 11225
+bdwidth 745
+bdheight 608
+}
+BackdropNode {
+inputs 0
+name BackdropNode16
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c> zDefocus Mode\n</center><font size='1'>\n-  Same as Pgbokeh but using a zDefocus"
+note_font "Source Code Pro Light"
+note_font_size 50
+xpos 3834
+ypos 8210
+bdwidth 4129
+bdheight 3589
+}
+BackdropNode {
+inputs 0
+name BackdropNode17
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c> QC\n</center><font size='1'>\n- Reveal depth with QC Check"
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos -46
+ypos 18800
+bdwidth 397
+bdheight 559
+}
+BackdropNode {
+inputs 0
+name BackdropNode18
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c> Farm ONLY\n</center><font size='1'>\n- Toggle between deep & 2D"
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos -6841
+ypos 4775
+bdwidth 483
+bdheight 482
+}
+BackdropNode {
+inputs 0
+name BackdropNode19
+tile_color 0x424242ff
+label "<center><font size='5'></font><font color=#ee453c> zDOF Visualization\n</center><font size='1'>\n-   Creating the visualizations"
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos 5722
+ypos 8864
+bdwidth 1929
+bdheight 2435
+}
+BackdropNode {
+inputs 0
+name BackdropNode2
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c> Overscan by 10%\n</center><font size='1'>\n- This is putting the image back to it's normal settings"
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos -1920
+ypos 12523
+bdwidth 761
+bdheight 830
+}
+BackdropNode {
+inputs 0
+name BackdropNode3
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c> Inputs\n</center><font size='1'>\n- Camera input has expression driving it via node - data being fed from camera input"
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos -5340
+ypos -1434
+bdwidth 16681
+bdheight 696
+}
+BackdropNode {
+inputs 0
+name BackdropNode4
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c> Bokeh\n</center><font size='1'>\n- Always recomend to use Show Bokeh\n- Otherwise 2 quick and dirty bokehs have been added including a anaphorphic (not yet added to control HUD)\n"
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos 10563
+ypos 1348
+bdwidth 1315
+bdheight 1287
+}
+BackdropNode {
+inputs 0
+name BackdropNode5
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c> Visualization of the DOF\n</center><font size='1'>\n- The magic happens here."
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos 8199
+ypos 12583
+bdwidth 1642
+bdheight 1713
+}
+BackdropNode {
+inputs 0
+name BackdropNode6
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c> Overscan by 10%\n</center><font size='1'>\n- This is just to as a safety for no defocus artefacts"
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos -5313
+ypos 5307
+bdwidth 5603
+bdheight 440
+}
+BackdropNode {
+inputs 0
+name BackdropNode7
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c> Overscan by 10%\n</center><font size='1'>\n- This is putting the image back to it's normal settings"
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos -2547
+ypos 14862
+bdwidth 11727
+bdheight 368
+}
+BackdropNode {
+inputs 0
+name BackdropNode8
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c> Releasing Deep\n</center><font size='1'>\n- This forces PGbokeh to use Flat even if the deep is connected this, changes if put to Deep settings and will activate."
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos -5107
+ypos 5936
+bdwidth 535
+bdheight 416
+}
+BackdropNode {
+inputs 0
+name BackdropNode9
+tile_color 0x23232301
+label "<center><font size='5'></font><font color=#ee453c> Pgbokeh driven by the camera settings\n</center><font size='1'>\n- The magic happens here."
+note_font "Source Code Pro Light"
+note_font_size 40
+xpos -172
+ypos 8768
+bdwidth 635
+bdheight 560
+}
+NoOp {
+inputs 0
+name Focal_Point_Picker
+xpos -2195
+ypos 1381
+addUserKnob {20 User}
+addUserKnob {13 DepthValue l "Depth Value"}
+DepthValue {{parent.3Dfocal_point} {parent.3Dfocal_point} {parent.3Dfocal_point}}
+addUserKnob {7 FP l "Focal point"}
+FP {{"max(0,(\[topnode parent.input1].focal_point+\[knob parent.name].focaldistanceoffset)) - (max(0,(\[topnode parent.input1].focal_point+\[knob parent.name].focaldistanceoffset)) - DepthValue.x)"}}
+}
+Input {
+inputs 0
+name Deep
+label "input \[value number]"
+xpos -4900
+ypos -1095
+number 2
+}
+Dot {
+name Dot32
+note_font_size 35
+note_font_color 0xffffff
+xpos -4866
+ypos 978
+}
+set Ndfd15600 [stack 0]
+Dot {
+name Dot33
+note_font_size 35
+note_font_color 0xffffff
+xpos -2316
+ypos 977
+}
+DeepToImage {
+name DeepToImage3
+xpos -2350
+ypos 1045
+}
+Shuffle {
+in deep
+out depth
+name Shuffle1
+label "<b>\[value in]</b> &rarr; \[value out]"
+xpos -2350
+ypos 1107
+}
+Input {
+inputs 0
+name Image
+label "input \[value number]"
+xpos 100
+ypos -1095
+}
+Dot {
+name Dot2
+xpos 134
+ypos -174
+}
+set Ndfcf3200 [stack 0]
+Dot {
+name Dot6
+xpos 403
+ypos -174
+}
+Expression {
+channel0 depth
+expr0 (1/Z)==inf?0:(1/Z)
+channel1 none
+channel2 none
+name Expression1
+tile_color 0x284693ff
+label "Z.depth - Normalised 0-1\n"
+note_font_size 15
+note_font_color 0x295e84ff
+xpos 369
+ypos -44
+}
+push $Ndfcf3200
+Dot {
+name Dot3
+xpos -128
+ypos -174
+}
+Expression {
+channel0 depth
+expr0 (z.red==0?10000:z.red)
+channel1 none
+channel2 none
+name Expression2
+tile_color 0x932929ff
+label "Z - Real world Units\n"
+note_font_size 15
+xpos -162
+ypos -44
+}
+Switch {
+inputs 2
+which {{parent.mode}}
+name Switch1
+xpos 100
+ypos 182
+}
+Clamp {
+channels alpha
+name Clamp2
+xpos 100
+ypos 248
+}
+Expression {
+channel0 depth
+expr0 isinf(Z)?0:Z
+channel1 none
+channel2 none
+channel3 none
+name Expression9
+label "infinity To Black"
+xpos 100
+ypos 320
+}
+Dot {
+name Dot34
+note_font_size 35
+note_font_color 0xffffff
+xpos 134
+ypos 1218
+}
+set Ndfcc9d00 [stack 0]
+Dot {
+name Dot54
+note_font_size 35
+note_font_color 0xffffff
+xpos -1326
+ypos 1218
+}
+set Ndfcc9600 [stack 0]
+Switch {
+inputs 2
+which {{"dofmode== 0 ? 0  : dofmode==1 ? 1 : dofmode==1 ? 3 : 0"}}
+name Switch7
+xpos -2350
+ypos 1214
+}
+Shuffle {
+in depth
+name Chn
+label "Channel Selection"
+xpos -2350
+ypos 1376
+}
+push $Ndfd15600
+Dot {
+name Dot13
+note_font_size 35
+note_font_color 0xffffff
+xpos -4867
+ypos 4650
+}
+set Ndfcc8100 [stack 0]
+DeepToImage {
+name DeepToImage1
+xpos -2351
+ypos 4646
+}
+Dot {
+name Dot8
+note_font_size 35
+note_font_color 0xffffff
+xpos -2317
+ypos 5058
+}
+set Ndfca3200 [stack 0]
+push $Ndfcc9d00
+Dot {
+name Dot68
+note_font_size 35
+note_font_color 0xffffff
+xpos 134
+ypos 1698
+}
+set Ndfca2b00 [stack 0]
+Dot {
+name Dot69
+note_font_size 35
+note_font_color 0xffffff
+xpos 324
+ypos 1698
+}
+set Ndfca2400 [stack 0]
+Shuffle2 {
+fromInput1 {{0} B}
+in1 depth
+fromInput2 {{0} B}
+mappings "4 black -1 -1 rgba.green 0 1 black -1 -1 rgba.blue 0 2 black -1 -1 rgba.alpha 0 3 depth.Z 0 0 rgba.red 0 0"
+name Shuffle2
+label "<b>\[value in1]</b> &rarr; \[value out1]"
+xpos 476
+ypos 1684
+}
+Dot {
+name Dot67
+note_font_size 35
+note_font_color 0xffffff
+xpos 510
+ypos 1784
+}
+set Ndfca1600 [stack 0]
+Expression {
+expr3 Z==0?0:1
+name Expression4
+xpos 620
+ypos 1780
+}
+Dot {
+name Dot66
+note_font_size 35
+note_font_color 0xffffff
+xpos 654
+ypos 1844
+}
+set Ndfca0800 [stack 0]
+push $Ndfca0800
+Dot {
+name Dot57
+note_font_size 35
+note_font_color 0xffffff
+xpos 813
+ypos 1844
+}
+set Ndfca0100 [stack 0]
+Dot {
+name Dot56
+note_font_size 35
+note_font_color 0xffffff
+xpos 923
+ypos 1844
+}
+set Ndfc83900 [stack 0]
+Dot {
+name Dot58
+note_font_size 35
+note_font_color 0xffffff
+xpos 1033
+ypos 1844
+}
+set Ndfc83200 [stack 0]
+Dot {
+name Dot59
+note_font_size 35
+note_font_color 0xffffff
+xpos 1143
+ypos 1844
+}
+set Ndfc82b00 [stack 0]
+Dot {
+name Dot60
+note_font_size 35
+note_font_color 0xffffff
+xpos 1253
+ypos 1844
+}
+Blur {
+channels rgba
+size {{PBCdialate*16}}
+name Blur6
+xpos 1219
+ypos 1880
+}
+Unpremult {
+name Unpremult6
+xpos 1219
+ypos 1926
+}
+Expression {
+expr3 r==0?0:1
+name Expression16
+xpos 1219
+ypos 1970
+}
+Dot {
+name Dot65
+note_font_size 35
+note_font_color 0xffffff
+xpos 1253
+ypos 2144
+}
+push $Ndfc82b00
+Blur {
+channels rgba
+size {{1+PBCdialate*8}}
+name Blur5
+xpos 1109
+ypos 1880
+}
+Unpremult {
+name Unpremult5
+xpos 1109
+ypos 1926
+}
+Expression {
+expr3 r==0?0:1
+name Expression15
+xpos 1109
+ypos 1970
+}
+Dot {
+name Dot63
+note_font_size 35
+note_font_color 0xffffff
+xpos 1143
+ypos 2106
+}
+push $Ndfc83200
+Blur {
+channels rgba
+size {{PBCdialate*4}}
+name Blur4
+xpos 999
+ypos 1880
+}
+Unpremult {
+name Unpremult4
+xpos 999
+ypos 1926
+}
+Expression {
+expr3 r==0?0:1
+name Expression14
+xpos 999
+ypos 1970
+}
+Dot {
+name Dot62
+note_font_size 35
+note_font_color 0xffffff
+xpos 1033
+ypos 2068
+}
+push $Ndfc83900
+Blur {
+channels rgba
+size {{PBCdialate*2}}
+name Blur3
+xpos 889
+ypos 1880
+}
+Unpremult {
+name Unpremult2
+xpos 889
+ypos 1926
+}
+Expression {
+expr3 r==0?0:1
+name Expression13
+xpos 889
+ypos 1970
+}
+Dot {
+name Dot61
+note_font_size 35
+note_font_color 0xffffff
+xpos 923
+ypos 2030
+}
+push $Ndfca0100
+Blur {
+channels rgba
+size {{PBCdialate}}
+name Blur2
+xpos 779
+ypos 1880
+}
+Unpremult {
+name Unpremult1
+xpos 779
+ypos 1926
+}
+Expression {
+expr3 r==0?0:1
+name Expression8
+xpos 779
+ypos 1970
+}
+Merge2 {
+inputs 2
+operation under
+name Merge5
+label "mix: \[value mix] (\[value bbox])"
+xpos 779
+ypos 2020
+}
+Merge2 {
+inputs 2
+operation under
+name Merge6
+label "mix: \[value mix] (\[value bbox])"
+xpos 779
+ypos 2058
+}
+Merge2 {
+inputs 2
+operation under
+name Merge7
+label "mix: \[value mix] (\[value bbox])"
+xpos 779
+ypos 2096
+}
+Merge2 {
+inputs 2
+operation under
+name Merge9
+label "mix: \[value mix] (\[value bbox])"
+xpos 779
+ypos 2134
+}
+Merge2 {
+inputs 2
+operation stencil
+name Merge4
+label "mix: \[value mix] (\[value bbox])"
+xpos 620
+ypos 2134
+}
+push $Ndfca1600
+Merge2 {
+inputs 2
+operation disjoint-over
+name Merge1
+label "mix: \[value mix] (\[value bbox])"
+xpos 476
+ypos 2134
+}
+push $Ndfca2400
+Copy {
+inputs 2
+from0 rgba.red
+to0 depth.Z
+bbox B
+name Copy2
+xpos 290
+ypos 2134
+}
+push $Ndfca2b00
+Switch {
+inputs 2
+which {{"PBCdialate > 0 ? 1 : 0"}}
+name Switch10
+xpos 100
+ypos 2140
+}
+Expression {
+channel0 depth
+expr0 Z==0?10000:Z
+channel1 none
+channel2 none
+name Expression3
+tile_color 0x286d30ff
+label "Forcing black to max depth"
+note_font_size 15
+note_font_color 0x295e84ff
+xpos 100
+ypos 2476
+disable {{!parent.blacktomax}}
+}
+Dot {
+name Dot12
+xpos 134
+ypos 2689
+}
+set Ndfbf5600 [stack 0]
+Dot {
+name Dot7
+xpos 284
+ypos 2689
+}
+set Ndfbf4f00 [stack 0]
+Remove {
+operation keep
+channels alpha
+channels2 depth
+name Remove1
+xpos 400
+ypos 2679
+}
+set Ndfbf4800 [stack 0]
+Premult {
+channels depth
+name Premult1
+xpos 400
+ypos 2786
+}
+Dot {
+name Dot27
+xpos 434
+ypos 2895
+}
+push $Ndfbf4800
+Dot {
+name Dot25
+xpos 584
+ypos 2689
+}
+Blur {
+size 20
+name Blur1
+xpos 550
+ypos 2736
+}
+Unpremult {
+channels depth
+name Unpremult3
+xpos 550
+ypos 2786
+}
+Merge2 {
+inputs 2
+also_merge depth
+name Merge2
+xpos 550
+ypos 2892
+}
+Dot {
+name Dot26
+xpos 584
+ypos 2989
+}
+push $Ndfbf4f00
+Copy {
+inputs 2
+from0 -rgba.alpha
+to0 -rgba.alpha
+channels depth
+name Copy1
+xpos 250
+ypos 2973
+}
+Dot {
+name Dot17
+xpos 284
+ypos 3089
+}
+push $Ndfbf5600
+Switch {
+inputs 2
+which {{parent.edgefixswitch}}
+name Switch4
+xpos 100
+ypos 3086
+}
+Dot {
+name Dot10
+xpos 134
+ypos 3822
+}
+set Ndf313900 [stack 0]
+Dot {
+name Dot41
+note_font_size 35
+note_font_color 0xffffff
+xpos -6606
+ypos 3822
+}
+Switch {
+inputs 2
+which {{"dofmode== 0 ? 0  : dofmode==1 ? 1 : dofmode==1 ? 3 : 0"}}
+name Switch11
+label "DEEP FARM ONLY"
+xpos -6640
+ypos 5048
+}
+Dot {
+name Dot37
+xpos -6606
+ypos 20370
+}
+push $Ndfcc8100
+DeepReformat {
+type scale
+scale {{parent.overscan}}
+resize none
+pbb true
+name DeepReformat10
+label overscan
+xpos -4901
+ypos 5390
+}
+push 0
+Switch {
+inputs 2
+which {{parent.dofmode}}
+name Switch3
+xpos -4901
+ypos 6230
+}
+Dot {
+name Dot29
+xpos -4867
+ypos 9108
+}
+Dot {
+name Dot18
+note_font_size 35
+note_font_color 0xffffff
+xpos -1787
+ypos 9108
+}
+set Ndf310800 [stack 0]
+DeepToImage {
+name DeepToImage2
+xpos -1821
+ypos 12761
+}
+Reformat {
+type scale
+scale {{1/parent.overscan}}
+resize none
+pbb true
+name Reformat6
+xpos -1821
+ypos 12833
+}
+Shuffle {
+in deep
+name Shuffle3
+label "<b>\[value in]</b> &rarr; \[value out]"
+xpos -1821
+ypos 12916
+}
+Dot {
+name Dot28
+note_font_size 35
+note_font_color 0xffffff
+xpos -1787
+ypos 13100
+}
+push $Ndfcc9600
+Shuffle {
+in depth
+name Shuffle4
+label "<b>\[value in]</b> &rarr; \[value out]"
+xpos -1360
+ypos 12916
+}
+Dot {
+name Dot24
+note_font_size 35
+note_font_color 0xffffff
+xpos -1326
+ypos 13076
+}
+Switch {
+inputs 2
+which {{"dofmode== 0 ? 0  : dofmode==1 ? 1 : dofmode==1 ? 3 : 0"}}
+name Switch9
+xpos -1617
+ypos 13289
+}
+Expression {
+expr0 isinf(r)?0:r
+expr1 isinf(g)?0:g
+expr2 isinf(b)?0:b
+expr3 isinf(a)?0:a
+name Expression5
+label "infinity To Black"
+xpos -1617
+ypos 13451
+}
+Expression {
+expr0 isnan(r)?0:r
+expr1 isnan(g)?0:g
+expr2 isnan(b)?0:b
+expr3 isnan(a)?0:a
+name Expression10
+label "nan To Black"
+xpos -1617
+ypos 13571
+}
+Reformat {
+type scale
+scale {{1/parent.overscan}}
+resize none
+pbb true
+name Reformat9
+label overscan
+xpos -1617
+ypos 15104
+}
+Dot {
+name Dot51
+note_font_size 35
+note_font_color 0xffffff
+xpos -1583
+ypos 18488
+}
+Constant {
+inputs 0
+channels rgb
+format "318 318 0 0 318 318 1 "
+name Constant1
+xpos 11130
+ypos 1695
+}
+Dot {
+name Dot1
+note_font_size 35
+note_font_color 0xffffff
+xpos 11164
+ypos 1988
+}
+set Ndf2ba400 [stack 0]
+Dot {
+name Dot4
+note_font_size 35
+note_font_color 0xffffff
+xpos 11389
+ypos 1988
+}
+set Ndf2b9d00 [stack 0]
+Dot {
+name Dot9
+note_font_size 35
+note_font_color 0xffffff
+xpos 11654
+ypos 1986
+}
+Flare {
+position {159 159}
+radius {96 100 120}
+size_mult 0.75
+anamorph 0.5
+inner_color 0.8
+outer_falloff 10
+inner_falloff 0.6
+name Flare2
+label Anamorphic
+xpos 11620
+ypos 2049
+}
+Shuffle {
+alpha red
+name Shuffle7
+label "<b>\[value in]</b> &rarr; \[value out]"
+xpos 11620
+ypos 2116
+}
+Dot {
+name Dot14
+note_font_size 35
+note_font_color 0xffffff
+xpos 11654
+ypos 2538
+}
+push $Ndf2b9d00
+Flare {
+position {159 159}
+radius {96 100 120}
+size_mult 1.52
+inner_color 0.8
+outer_falloff 30
+inner_falloff 2.65
+name Flare1
+label Circular
+xpos 11355
+ypos 2048
+}
+Shuffle {
+alpha red
+name Shuffle6
+label "<b>\[value in]</b> &rarr; \[value out]"
+xpos 11355
+ypos 2116
+}
+Dot {
+name Dot11
+note_font_size 35
+note_font_color 0xffffff
+xpos 11389
+ypos 2372
+}
+Input {
+inputs 0
+name Kernel
+label "input \[value number]"
+xpos 10740
+ypos -1119
+number 3
+}
+Clamp {
+maximum_enable false
+name Clamp1
+xpos 10740
+ypos 2025
+}
+Reformat {
+type "to box"
+box_width 318
+name Reformat2
+xpos 10740
+ypos 2151
+}
+Keyer {
+operation "luminance key"
+range {0 0.35759198 1 1}
+name Keyer4
+xpos 10740
+ypos 2241
+}
+push $Ndf2ba400
+Merge2 {
+inputs 2
+bbox B
+name Merge3
+label "mix: \[value mix] (\[value bbox])"
+xpos 11130
+ypos 2241
+}
+Switch {
+inputs 3
+which {{KernelSelection}}
+name Switch6
+xpos 11130
+ypos 2534
+}
+Dot {
+name Dot22
+note_font_size 35
+note_font_color 0xffffff
+xpos 11164
+ypos 8532
+}
+set Ndf27d600 [stack 0]
+Dot {
+name Dot21
+xpos 11164
+ypos 13338
+}
+set Ndf27cf00 [stack 0]
+Dot {
+name Dot45
+xpos 11164
+ypos 18487
+}
+push $Ndfca3200
+Reformat {
+type scale
+scale {{parent.overscan}}
+resize none
+pbb true
+name Reformat1
+label overscan
+xpos -2350
+ypos 5414
+}
+Shuffle {
+in deep
+out depth
+name Shuffle5
+label "<b>\[value in]</b> &rarr; \[value out]"
+xpos -2350
+ypos 5620
+}
+Dot {
+name Dot5
+note_font_size 35
+note_font_color 0xffffff
+xpos -2316
+ypos 6450
+}
+Dot {
+name Dot15
+note_font_size 35
+note_font_color 0xffffff
+xpos 45
+ypos 6450
+}
+push $Ndf313900
+Reformat {
+type scale
+scale {{parent.overscan}}
+resize none
+pbb true
+name Reformat3
+label overscan
+xpos 100
+ypos 5420
+}
+Switch {
+inputs 2
+which {{"dofmode== 0 ? 0  : dofmode==1 ? 1 : dofmode==1 ? 3 : 0"}}
+name Switch5
+xpos 100
+ypos 6521
+}
+Dot {
+name Dot16
+note_font_size 35
+note_font_color 0xffffff
+xpos 134
+ypos 7482
+}
+set Ndf245600 [stack 0]
+Dot {
+name Dot43
+note_font_size 35
+note_font_color 0xffffff
+xpos 4614
+ypos 7482
+}
+set Ndf244f00 [stack 0]
+Dot {
+name Dot47
+note_font_size 35
+note_font_color 0xffffff
+xpos 8904
+ypos 7482
+}
+Dot {
+name Dot19
+xpos 8904
+ypos 13002
+}
+set Ndf244100 [stack 0]
+Dot {
+name Dot40
+xpos 9234
+ypos 13002
+}
+Remove {
+operation keep
+channels rgba
+name Remove3
+xpos 9200
+ypos 13519
+}
+Multiply {
+value 0.1
+name Multiply1
+label "\[value value]"
+xpos 9200
+ypos 13778
+}
+Dot {
+name Dot38
+xpos 9234
+ypos 14091
+}
+push $Ndf244f00
+Dot {
+name Dot71
+note_font_size 35
+note_font_color 0xffffff
+xpos 4614
+ypos 8850
+}
+set Ndf225600 [stack 0]
+Expression {
+temp_name0 fL
+temp_expr0 Cam_Data.focalL
+temp_name1 fS
+temp_expr1 Cam_Data.fStop
+temp_name2 fD
+temp_expr2 Cam_Data.focalD*Cam_Data.worldscale
+temp_name3 zD
+temp_expr3 Z*parent.Cam_Data.sceneScale
+channel0 depth
+expr0 "(  (( (fL / fS) * ( (fD  * fL) / (fD - fL) ) * fabs( (1/zD) - (1/fD) ))) * parent.Cam_Data.cocMult ) /2"
+channel1 none
+channel2 none
+channel3 none
+name DOF_Calc
+xpos 4580
+ypos 8942
+}
+Dot {
+name Dot31
+note_font_size 35
+note_font_color 0xffffff
+xpos 4614
+ypos 9090
+}
+set Ndf224800 [stack 0]
+Dot {
+name Dot78
+note_font_size 35
+note_font_color 0xffffff
+xpos 7034
+ypos 9090
+}
+set Ndf224100 [stack 0]
+Invert {
+channels depth
+name Invert1
+xpos 7000
+ypos 9944
+}
+Shuffle {
+in depth
+name Shuffle8
+label "<b>\[value in]</b> &rarr; \[value out]"
+xpos 7000
+ypos 10036
+}
+set Ndf1fb200 [stack 0]
+Expression {
+channel0 none
+channel1 none
+channel2 none
+channel3 alpha
+expr3 "a>0.25? 1:0"
+name Hard_Alpha1
+tile_color 0xffffffff
+xpos 7000
+ypos 10238
+}
+Dot {
+name Dot81
+note_font_size 35
+note_font_color 0xffffff
+xpos 6564
+ypos 10242
+}
+set Ndf1fa400 [stack 0]
+Dot {
+name Dot55
+note_font_size 35
+note_font_color 0xffffff
+xpos 6213
+ypos 10241
+}
+push $Ndf225600
+Dot {
+name Dot72
+note_font_size 35
+note_font_color 0xffffff
+xpos 4887
+ypos 8850
+}
+set Ndf1f9600 [stack 0]
+Expression {
+temp_name0 fD
+temp_expr0 Cam_Data.focalD
+temp_name1 fS
+temp_expr1 Cam_Data.fStop
+channel0 alpha
+expr0 "(depth.Z >  fD   ? (depth.Z -  fD) : 0)"
+name Expression12
+xpos 4853
+ypos 9158
+}
+Dot {
+name Dot39
+note_font_size 35
+note_font_color 0xffffff
+xpos 4887
+ypos 9426
+}
+set Ndf1f8800 [stack 0]
+Dot {
+name Dot50
+note_font_size 35
+note_font_color 0xffffff
+xpos 6126
+ypos 9426
+}
+Shuffle {
+red alpha
+green alpha
+blue alpha
+name Shuffle11
+label "<b>\[value in]</b> &rarr; \[value out]"
+xpos 6092
+ypos 9748
+}
+Multiply {
+value 0.1
+name Multiply4
+label "value: \[value value]"
+xpos 6092
+ypos 10130
+}
+Multiply {
+inputs 1+1
+value {{backmultiplier}}
+invert_mask true
+name Multiply5
+label "value: \[value value]"
+xpos 6092
+ypos 10321
+}
+Clamp {
+channels rgba
+minimum_enable false
+name Clamp3
+xpos 6092
+ypos 10520
+}
+Multiply {
+value {{clamp(1-fstopoffset)+.001}}
+invert_mask true
+name Multiply6
+label "value: \[value value]"
+xpos 6092
+ypos 10627
+}
+Clamp {
+channels rgb
+name Clamp4
+xpos 6092
+ypos 10766
+}
+Dot {
+name Dot82
+note_font_size 35
+note_font_color 0xffffff
+xpos 6126
+ypos 11154
+}
+push $Ndf1fa400
+push $Ndf1f9600
+Dot {
+name Dot73
+note_font_size 35
+note_font_color 0xffffff
+xpos 5164
+ypos 8850
+}
+Expression {
+temp_name0 fD
+temp_expr0 Cam_Data.focalD
+temp_name1 fS
+temp_expr1 Cam_Data.fStop
+channel0 alpha
+expr0 "(depth.Z >  fD  ? 0 :  (fD - depth.Z))"
+name Expression11
+xpos 5130
+ypos 9158
+}
+Dot {
+name Dot49
+note_font_size 35
+note_font_color 0xffffff
+xpos 5164
+ypos 9666
+}
+set Ndf1a6b00 [stack 0]
+Dot {
+name Dot52
+note_font_size 35
+note_font_color 0xffffff
+xpos 6454
+ypos 9666
+}
+Shuffle {
+red alpha
+green alpha
+blue alpha
+name Shuffle10
+label "<b>\[value in]</b> &rarr; \[value out]"
+xpos 6420
+ypos 9748
+}
+Multiply {
+value 0.1
+name Multiply7
+label "value: \[value value]"
+xpos 6420
+ypos 10125
+}
+Multiply {
+inputs 1+1
+value {{frontmultiplier}}
+invert_mask true
+name Multiply8
+label "value: \[value value]"
+xpos 6420
+ypos 10328
+}
+Clamp {
+channels rgba
+minimum_enable false
+name Clamp5
+xpos 6420
+ypos 10532
+}
+Multiply {
+value {{clamp(1-fstopoffset)+.001}}
+invert_mask true
+name Multiply9
+label "value: \[value value]"
+xpos 6420
+ypos 10634
+}
+Clamp {
+channels rgb
+name Clamp6
+xpos 6420
+ypos 10767
+}
+Dot {
+name Dot83
+note_font_size 35
+note_font_color 0xffffff
+xpos 6454
+ypos 10938
+}
+push $Ndf1fb200
+push $Ndf224100
+Dot {
+name Dot53
+note_font_size 35
+note_font_color 0xffffff
+xpos 7474
+ypos 9090
+}
+Shuffle {
+red black
+green black
+blue black
+alpha black
+name Shuffle9
+label "<b>\[value in]</b> &rarr; \[value out]"
+xpos 7440
+ypos 9772
+}
+Merge2 {
+inputs 2
+operation max
+Achannels {rgba.red -rgba.green -rgba.blue rgba.alpha}
+name Merge8
+tile_color 0xff0000ff
+label "mix: \[value mix]"
+xpos 7440
+ypos 10040
+disable {{disableR}}
+}
+Merge2 {
+inputs 2
+operation max
+Achannels {-rgba.red rgba.green -rgba.blue rgba.alpha}
+name Merge15
+tile_color 0xff00ff
+label "mix: \[value mix]"
+xpos 7440
+ypos 10928
+disable {{disableG}}
+}
+Merge2 {
+inputs 2
+operation max
+Achannels {-rgba.red -rgba.green rgba.blue rgba.alpha}
+name Merge16
+tile_color 0xffff
+label "mix: \[value mix]"
+xpos 7440
+ypos 11144
+disable {{disableB}}
+}
+Remove {
+operation keep
+channels rgb
+name Remove2
+xpos 7440
+ypos 11510
+}
+Dot {
+name Dot64
+note_font_size 35
+note_font_color 0xffffff
+xpos 7474
+ypos 13938
+}
+push $Ndf27cf00
+push $Ndf244100
+pgBokeh {
+inputs 2
+outputType "Focal Distance Visualization"
+frontmultiplier {{parent.frontmultiplier}}
+backmultiplier {{parent.backmultiplier}}
+focalPlane {{"setFP== 0 ? max(0,(\[topnode parent.input1].focal_point+\[knob parent.name].focaldistanceoffset)) - (max(0,(\[topnode parent.input1].focal_point+\[knob parent.name].focaldistanceoffset)) - parent.Focal_Point_Picker.FP) : setFP== 1 ? max(0,(\[topnode parent.input1].focal_point+\[knob parent.name].focaldistanceoffset)) : setFP"}}
+integrateFrontAndBackSeperately true
+realWorldLens true
+focalLength {{"\[topnode parent.input1].focal"}}
+fStop {{"\[topnode parent.input1].fstop*pow(sqrt(2),parent.fstopoffset)"}}
+worldScale mm
+worldScaleMultiplier {{parent.Cam_Data.worldscale}}
+filmFormat Custom
+apertureWidth {{"\[topnode parent.input1].haperture"}}
+apertureHeight {{"\[topnode parent.input1].vaperture"}}
+kSphAbb 1
+kChrAbbOff {0.9 1 1}
+kernelType Input
+max_kernelsize {{parent.maxkernel}}
+missingKernelChannel rgba.alpha
+kSoftness 0
+overrideNearAndFarForSlices true
+depthSlicesNearAndFar {{"\[topnode parent.input1].near"} {"\[topnode parent.input1].far"}}
+name pgBokeh2
+label "focal plane vis"
+xpos 8870
+ypos 13328
+}
+Remove {
+operation keep
+channels rgba
+name Remove4
+xpos 8870
+ypos 13526
+}
+Multiply {
+value 2
+name Multiply2
+label "\[value value]"
+xpos 8870
+ypos 13634
+}
+Switch {
+inputs 2
+which {{"dofmode== 0 ? 0  : dofmode==1 ? 0 : dofmode==1 ? 3 : 1"}}
+name Switch8
+xpos 8870
+ypos 13934
+}
+Merge2 {
+inputs 2
+operation plus
+name Plus
+label "mix: \[value mix] (\[value bbox])"
+xpos 8870
+ypos 14081
+}
+Reformat {
+type scale
+scale {{1/parent.overscan}}
+resize none
+pbb true
+name Reformat4
+label overscan
+xpos 8870
+ypos 15094
+}
+Dot {
+name Dot44
+xpos 8904
+ypos 15474
+}
+push $Ndf27d600
+Dot {
+name Dot42
+note_font_size 35
+note_font_color 0xffffff
+xpos 3995
+ypos 8532
+}
+set Ndf11ab00 [stack 0]
+Dot {
+name Dot35
+note_font_size 35
+note_font_color 0xffffff
+xpos 3995
+ypos 10314
+}
+push $Ndf1a6b00
+BlackOutside {
+name BlackOutside2
+xpos 5130
+ypos 9998
+}
+push $Ndf1f8800
+BlackOutside {
+name BlackOutside1
+xpos 4853
+ypos 9566
+}
+push $Ndf224800
+Add {
+inputs 1+1
+channels depth
+value {{parent.backmultiplier}}
+name Add1
+xpos 4580
+ypos 9560
+}
+Add {
+inputs 1+1
+channels depth
+value {{parent.frontmultiplier}}
+name Add2
+xpos 4580
+ypos 9990
+}
+ZDefocus2 {
+inputs 2
+channels rgba
+useGPUIfAvailable {{UseGPU}}
+math -direct
+focal_point {0 0}
+size 1
+max_size 100
+layers {{cslices}}
+filter_type image
+legacy_resize_mode false
+show_legacy_resize_mode false
+use_input_channels true
+name ZDefocus
+xpos 4580
+ypos 10304
+}
+Dot {
+name Dot46
+note_font_size 35
+note_font_color 0xffffff
+xpos 4614
+ypos 11538
+}
+push $Ndf310800
+push 0
+push $Ndf11ab00
+Dot {
+name Dot20
+note_font_size 35
+note_font_color 0xffffff
+xpos 654
+ypos 8532
+}
+Dot {
+name Dot30
+note_font_size 35
+note_font_color 0xffffff
+xpos 654
+ypos 9108
+}
+push $Ndf245600
+pgBokeh {
+inputs 4
+frontmultiplier {{parent.frontmultiplier}}
+backmultiplier {{parent.backmultiplier}}
+focalPlane {{"setFP== 0 ? max(0,(\[topnode parent.input1].focal_point+\[knob parent.name].focaldistanceoffset)) - (max(0,(\[topnode parent.input1].focal_point+\[knob parent.name].focaldistanceoffset)) - parent.Focal_Point_Picker.FP) : setFP== 1 ? max(0,(\[topnode parent.input1].focal_point+\[knob parent.name].focaldistanceoffset)) : setFP"}}
+integrateFrontAndBackSeperately {{pgdeep_integrateFrontAndBackSeperately}}
+realWorldLens true
+focalLength {{"\[topnode parent.input1].focal"}}
+fStop {{"\[topnode parent.input1].fstop*pow(sqrt(2),parent.fstopoffset)"}}
+worldScale mm
+worldScaleMultiplier {{parent.Cam_Data.worldscale}}
+filmFormat Custom
+apertureWidth {{"\[topnode parent.input1].haperture"}}
+apertureHeight {{"\[topnode parent.input1].vaperture"}}
+kSphAbb 1
+kChrAbbOff {0.9 1 1}
+kernelType Input
+max_kernelsize {{parent.maxkernel}}
+missingKernelChannel rgba.alpha
+kSoftness 0
+correctiveSlices {{cslices}}
+overrideNearAndFarForSlices true
+depthSlicesNearAndFar {{"\[topnode parent.input1].near"} {"\[topnode parent.input1].far"}}
+name pgBokeh4
+selected true
+xpos 100
+ypos 9104
+}
+Switch {
+inputs 2
+which {{"dofmode== 0 ? 0  : dofmode==1 ? 0 : dofmode==1 ? 3 : 1"}}
+name Switch15
+xpos 100
+ypos 11534
+}
+Dot {
+name Dot48
+note_font_size 35
+note_font_color 0xffffff
+xpos 134
+ypos 12834
+}
+Reformat {
+type scale
+scale {{1/parent.overscan}}
+resize none
+pbb true
+name Reformat7
+label overscan
+xpos 100
+ypos 15104
+}
+Expression {
+channel0 depth
+expr0 Z==10000?0:Z
+channel1 none
+channel2 none
+name Expression7
+tile_color 0x286d30ff
+label "Forcing black to max depth"
+note_font_size 15
+note_font_color 0x295e84ff
+xpos 100
+ypos 15580
+disable {{!parent.blacktomax}}
+}
+Dot {
+name Dot36
+note_font_size 35
+note_font_color 0xffffff
+xpos 134
+ypos 15786
+}
+set Ndf0ca400 [stack 0]
+Expression {
+channel0 depth
+expr0 ((1/r)==inf?0:(1/r))
+channel1 none
+channel2 none
+name Expression6
+tile_color 0x284693ff
+label "Z.depth - Normalised 0-1\nReversing operation\n"
+xpos 244
+ypos 15770
+}
+Dot {
+name Dot23
+note_font_size 35
+note_font_color 0xffffff
+xpos 278
+ypos 15963
+}
+push $Ndf0ca400
+Switch {
+inputs 2
+which {{parent.mode}}
+name Switch12
+xpos 100
+ypos 15960
+}
+Switch {
+inputs 4
+which {{parent.out_type}}
+name Switch2
+xpos 100
+ypos 18484
+}
+Assert {
+expression {{"\[exists parent.input0.name] ? \[exists parent.input2.name] ? 1 : (dofmode==0 ? 1 : dofmode==1 ? 0 : dofmode==2 ? 1: 1) : 1"}}
+message "!READ ME! Deep Defocus Mode selected but no deep input present. Please plug in deep."
+name deep_check
+xpos 100
+ypos 19070
+}
+Assert {
+expression {{"KernelSelection   >0 ? 1 : \[exists parent.input0.name] ? \[exists parent.input3.name] ? 1 : 0 : 1 "}}
+message "!READ ME! kernel input missing. Please plug in the Kernel or use the internal kernel options."
+name Kernel_Check
+xpos 100
+ypos 19118
+}
+Assert {
+expression {{"\[exists parent.input0.name] ? \[exists parent.input1.name] ? 1 : 0 : 1 "}}
+message "!READ ME! Camera input missing. Please plug in the camera."
+name camera_check
+xpos 100
+ypos 19166
+}
+Switch {
+inputs 2
+which {{"parent.dofFarmOnly==0 ? 0 : \$gui"}}
+name farmonlyswitch
+label "\[value which]"
+xpos 100
+ypos 20360
+}
+Output {
+name Output1
+xpos 100
+ypos 21614
+}
+Input {
+inputs 0
+name Camera
+label "input \[value number]"
+xpos 5900
+ypos -1096
+number 1
+}
+NoOp {
+inputs 0
+name Cam_Data
+xpos -2350
+ypos 589
+addUserKnob {20 User}
+addUserKnob {7 worldscale l "world scale multiplier"}
+worldscale {{"worldScaleMenu==0 ? 1 : worldScaleMenu==1 ? 10 : worldScaleMenu==2 ? 100 : worldScaleMenu==3 ? 1000 : 1000000"}}
+addUserKnob {26 ""}
+addUserKnob {7 focalD l "Focal Distance" t "Position in world units of the camera focal plane." R 0 1000}
+focalD {{"setFP== 0 ? max(0,(\[topnode parent.input1].focal_point+\[knob parent.name].focaldistanceoffset)) - (max(0,(\[topnode parent.input1].focal_point+\[knob parent.name].focaldistanceoffset)) - parent.Focal_Point_Picker.FP) : setFP== 1 ? max(0,(\[topnode parent.input1].focal_point+\[knob parent.name].focaldistanceoffset)) : setFP"}}
+addUserKnob {7 fStop l f-stop t "Control for aperture size.  This is currently calibrated to matching Houdini.  \[Haven't tested Maya yet but should be the same result]" R 0 50}
+fStop {{"\[topnode input1].fstop*pow(sqrt(2),parent.fstopoffset)"}}
+addUserKnob {26 ""}
+addUserKnob {7 Far l far}
+Far {{parent.backmultiplier}}
+addUserKnob {7 Near l near}
+Near {{parent.frontmultiplier}}
+addUserKnob {26 ""}
+addUserKnob {7 focalL l "focal length" t "This is needed to create a proper depth relationship and should match the plate or CG render settings."}
+focalL {{"\[topnode input1].focal"}}
+addUserKnob {7 clipNear l "clip near" R 0 1000}
+clipNear {{"\[value \[topnode input1].near]"}}
+addUserKnob {7 clipFar l "clip far" t "CG cameras far clipping value."}
+clipFar {{"\[value \[topnode input1].far]"}}
+addUserKnob {26 ""}
+addUserKnob {14 filmback l "filmback size" t "The size in millimeters of the camers filmback.  This should match the live action/CG camera." R 0 100}
+filmback {{"\[value \[topnode input1].haperture]"} {"\[value \[topnode input1].vaperture]"}}
+addUserKnob {26 ""}
+addUserKnob {7 cocMult R 0 2}
+cocMult {{imageRes.w/filmback.w}}
+addUserKnob {14 imageRes R 0 100}
+imageRes {{Image.width} {Image.height}}
+addUserKnob {7 aspectRatio R 0 3}
+aspectRatio {{width/height}}
+addUserKnob {7 sceneScale R 0 1000}
+sceneScale {{parent.Cam_Data.worldscale}}
+}
+end_group

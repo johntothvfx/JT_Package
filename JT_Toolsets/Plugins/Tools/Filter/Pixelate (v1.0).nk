@@ -1,0 +1,244 @@
+set cut_paste_input [stack 0]
+version 12.2 v8
+push $cut_paste_input
+Group {
+ name Pixelate
+ tile_color 0x752735ff
+ note_font_color 0xffffffff
+ selected true
+ xpos -826
+ ypos 302
+ addUserKnob {20 Settings}
+ addUserKnob {41 channels1 l Channels T Remove1.channels}
+ addUserKnob {26 ""}
+ addUserKnob {7 Pixelation l Size R 0 10}
+ Pixelation 2
+ addUserKnob {26 ""}
+ addUserKnob {41 from0 l "Mask Channel" T Copy2.from0}
+ addUserKnob {6 invert l Invert -STARTLINE}
+ addUserKnob {26 ""}
+ addUserKnob {26 PixelBlocks l "" +STARTLINE T "<br><font size='5'>Pixelate</font><font color=#752735> v1.0<br>"}
+ addUserKnob {20 Help}
+ addUserKnob {26 Guide l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 Steps l "" +STARTLINE T "<br><strong>1. </br> \nIncrease the <b>Pixel Size</b> settings to create a cool \"8-bit\" <br> of image from the input that keep it's <b>format resolution size.</b>\n\n<br><strong>2. </br> </b> The mask option will hard alpha any values below <b>1.0\n\n<br><br><b>John Toth © 2020 <br>"}
+ addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#752735\">johntothvfx.com</a>\n"}
+ addUserKnob {26 space_1 l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 Log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#752735\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool</i><br><br></i><br><br><b>John Toth © 2020\")\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos -132
+  ypos -729
+ }
+ Dot {
+  name Dot4
+  xpos -98
+  ypos -510
+ }
+set Nc15c3200 [stack 0]
+ Dot {
+  name Dot5
+  xpos -446
+  ypos -510
+ }
+ Remove {
+  channels {{{Remove1.channels}}}
+  name Remove2
+  xpos -480
+  ypos -447
+  disable {{"Pixelation > 0 ? 0:1"}}
+ }
+ Dot {
+  name Dot1
+  xpos -446
+  ypos 134
+ }
+ Input {
+  inputs 0
+  name mask
+  xpos 70
+  ypos -729
+  number 1
+ }
+ NoOp {
+  name autoAlphaCheck
+  xpos 70
+  ypos -705
+  addUserKnob {20 autoAlphaCheck}
+  addUserKnob {6 a +STARTLINE}
+  a {{"\[string first \".a\" \[channels \[input this 0]]]>-1"}}
+ }
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 104
+  ypos -654
+ }
+set Nc15c0800 [stack 0]
+ Shuffle {
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 180
+  ypos -668
+ }
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos -582
+ }
+push $Nc15c0800
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy2
+  xpos 70
+  ypos -591
+ }
+ Invert {
+  channels alpha
+  name Invert1
+  xpos 70
+  ypos -519
+  disable {{!invert}}
+ }
+ Remove {
+  operation keep
+  channels alpha
+  name Remove3
+  xpos 70
+  ypos -447
+ }
+ TransformMasked {
+  scale {{1/Transform2.scale}}
+  center {1024 778}
+  black_outside false
+  shutteroffset centred
+  name Transform1
+  xpos 70
+  ypos -256
+  disable {{"Pixelation > 0 ? 0:1"}}
+ }
+ Crop {
+  box {{input.bbox.x} {input.bbox.y} {input.bbox.r} {input.bbox.t}}
+  crop false
+  name Crop2
+  xpos 70
+  ypos -218
+  disable {{"Pixelation > 0 ? 0:1"}}
+  dope_sheet true
+ }
+ TransformMasked {
+  scale {{1+Pixelation*10 x1 0} {1+Pixelation*10 x1 0}}
+  center {1024 778}
+  filter impulse
+  name Transform2
+  xpos 70
+  ypos -194
+  disable {{"Pixelation > 0 ? 0:1"}}
+ }
+ Expression {
+  channel0 none
+  channel1 none
+  channel2 none
+  expr3 "a>0.1? 1:0"
+  name Expression1
+  xpos 70
+  ypos -33
+ }
+push $Nc15c3200
+ Remove {
+  operation keep
+  channels rgb
+  name Remove1
+  xpos -132
+  ypos -441
+  disable {{"Pixelation > 0 ? 0:1"}}
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -98
+  ypos -366
+ }
+set Nc1567900 [stack 0]
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -242
+  ypos -366
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -242
+  ypos -30
+ }
+push $Nc1567900
+ TransformMasked {
+  scale {{1/Transform4.scale}}
+  center {1024 778}
+  black_outside false
+  shutteroffset centred
+  name Transform3
+  xpos -132
+  ypos -256
+  disable {{"Pixelation > 0 ? 0:1"}}
+ }
+ Crop {
+  box {{input.bbox.x} {input.bbox.y} {input.bbox.r} {input.bbox.t}}
+  crop false
+  name Crop1
+  xpos -132
+  ypos -218
+  disable {{"Pixelation > 0 ? 0:1"}}
+  dope_sheet true
+ }
+ TransformMasked {
+  scale {{1+Pixelation*10 x1 0} {1+Pixelation*10 x1 0}}
+  center {1024 778}
+  filter impulse
+  name Transform4
+  xpos -132
+  ypos -194
+  disable {{"Pixelation > 0 ? 0:1"}}
+ }
+ Keymix {
+  inputs 3
+  invertMask true
+  bbox B
+  name Keymix1
+  xpos -132
+  ypos -39
+  disable {{!autoAlphaCheck.a}}
+ }
+ Copy {
+  inputs 2
+  channels all
+  bbox A
+  name Copy1
+  xpos -132
+  ypos 118
+  disable {{"Pixelation > 0 ? 0:1"}}
+ }
+ BlackOutside {
+  name BlackOutside1
+  xpos -132
+  ypos 183
+  disable {{"Pixelation > 0 ? 0:1"}}
+ }
+ Output {
+  name Output1
+  xpos -132
+  ypos 302
+ }
+end_group
+

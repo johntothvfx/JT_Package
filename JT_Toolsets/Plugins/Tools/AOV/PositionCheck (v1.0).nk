@@ -1,0 +1,650 @@
+Group {
+ inputs 2
+ name PositionCheck
+ help "Checks what your position is in by comparing it to world or camera space which is generated from depth."
+ tile_color 0x184789ff
+ selected true
+ addUserKnob {20 positionQCtab l PositionQC}
+ addUserKnob {26 ""}
+ addUserKnob {41 positionin l position T Shuffle2.in}
+ addUserKnob {41 depthin l depth T Shuffle1.in}
+ addUserKnob {26 title l "" +STARTLINE T "<br><font size='5'>Position QC</font><font color=#194d95> v1.0<br>"}
+ addUserKnob {20 helptab_1 l Help}
+ addUserKnob {26 guide l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 steps l "" +STARTLINE T "<br><strong>1. </br> \nSimply converts depth into camera/world space\n<br><strong>2. </br> </b>\nThis is used to compared your incoming<br> position pass to know what to convert to.\n<br><br><i><b>\nNote:</b> please make sure the depth is<br> normalized (1/z).\n<br><br><b>John Toth © 2020 <br>"}
+ addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#194d95\">johntothvfx.com</a>\n"}
+ addUserKnob {26 space l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#194d95\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool</i><br><br><b> Special Thanks to Daniel Velikov as this is his world/camera space.</i><br><br></i><b>John Toth © 2020\")\n"}
+}
+ Input {
+  inputs 0
+  name camera
+  xpos 84
+  ypos -129
+  number 1
+ }
+ Axis2 {
+  name Camera_INPUT
+  tile_color 0xffff
+  xpos 94
+  ypos 210
+  addUserKnob {20 User}
+  addUserKnob {7 focal}
+  focal {{"\[value \[topnode parent.input1].focal]"}}
+  addUserKnob {7 haperture}
+  haperture {{"\[value \[topnode parent.input1].haperture]"}}
+  addUserKnob {26 ""}
+  addUserKnob {7 winroll}
+  winroll {{"\[value \[topnode parent.input1].winroll]"}}
+  addUserKnob {30 wintranslate}
+  wintranslate {{"\[value \[topnode parent.input1].win_translate.u]"} {"\[value \[topnode parent.input1].win_translate.v]"}}
+  addUserKnob {30 winscale}
+  winscale {{"\[value \[topnode parent.input1].win_scale.u]"} {"\[value \[topnode parent.input1].win_scale.v]"}}
+ }
+ Input {
+  inputs 0
+  name Input
+  xpos 620
+  ypos -129
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 654
+  ypos -78
+ }
+set N446c5600 [stack 0]
+ Shuffle {
+  in depth
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 620
+  ypos 2
+ }
+set N446c4f00 [stack 0]
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 654
+  ypos 138
+ }
+set N446c4800 [stack 0]
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 874
+  ypos 138
+ }
+ Expression {
+  expr0 "( (x+.5) - width *.5  )"
+  expr1 "( ( (y+.5)  - height *.5 ) /  pixel_aspect )"
+  name Stmap_PixelAspect1
+  tile_color 0xffff
+  xpos 840
+  ypos 279
+ }
+push $N446c4800
+ MergeExpression {
+  inputs 2
+  temp_name0 srow
+  temp_expr0 "sin( radians(-Camera_INPUT.winroll ) )"
+  temp_name1 crow
+  temp_expr1 "cos( radians(-Camera_INPUT.winroll) )"
+  temp_name2 RATIO
+  temp_expr2 "1.0 / ( - width * ( Camera_INPUT.focal / Camera_INPUT.haperture ) )"
+  temp_name3 Z
+  temp_expr3 "( 1.0 / Br )"
+  expr0 "( ( ( crow * Ar ) - ( srow * Ag ) ) * Camera_INPUT.winscale.u + ( Camera_INPUT.wintranslate.u * width * 0.5 ) ) * -RATIO * Z"
+  expr1 "( ( ( srow * Ar ) + ( crow * Ag ) ) * Camera_INPUT.winscale.v  + ( Camera_INPUT.wintranslate.v * width * 0.5 ) ) * -RATIO  * Z"
+  expr2 -Z
+  name Camera_Space2
+  tile_color 0xffff
+  xpos 620
+  ypos 279
+ }
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 654
+  ypos 474
+ }
+set N20baeb00 [stack 0]
+ Expression {
+  expr0 "Camera_INPUT.world_matrix.0 * r + Camera_INPUT.world_matrix.1 * g +Camera_INPUT.world_matrix.2 * b + Camera_INPUT.world_matrix.3 "
+  expr1 "Camera_INPUT.world_matrix.4 * r + Camera_INPUT.world_matrix.5* g + Camera_INPUT.world_matrix.6 * b + Camera_INPUT.world_matrix.7"
+  expr2 "Camera_INPUT.world_matrix.8 * r + Camera_INPUT.world_matrix.9 * g + Camera_INPUT.world_matrix.10 * b + Camera_INPUT.world_matrix.11"
+  channel3 alpha
+  expr3 "Camera_INPUT.world_matrix.12 * r + Camera_INPUT.world_matrix.13 * g + Camera_INPUT.world_matrix.14 * b + Camera_INPUT.world_matrix.15"
+  name World_Space1
+  tile_color 0xff0000ff
+  xpos 620
+  ypos 519
+ }
+ Expression {
+  expr0 isinf(r)?0:r
+  expr1 isinf(g)?0:g
+  expr2 isinf(b)?0:b
+  expr3 isinf(a)?0:a
+  name Expression9
+  label "infinity To Black"
+  xpos 620
+  ypos 609
+ }
+ Expression {
+  expr0 isnan(r)?0:r
+  expr1 isnan(g)?0:g
+  expr2 isnan(b)?0:b
+  expr3 isnan(a)?0:a
+  name Expression10
+  label nan_To_Black
+  xpos 620
+  ypos 645
+ }
+ Dot {
+  name Dot8
+  xpos 654
+  ypos 730
+ }
+set N20bacf00 [stack 0]
+ Dot {
+  name Dot19
+  xpos 434
+  ypos 730
+ }
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha black
+  name Shuffle4
+  xpos 400
+  ypos 748
+ }
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "GENERATED WORLD SPACE"
+  old_message {{71 69 78 69 82 65 84 69 68 32 87 79 82 76 68 32 83 80 65 67 69}
+    }
+  box {0 0 {width} {height}}
+  yjustify bottom
+  transforms {{0 2}
+    }
+  cursor_position 9
+  font {{ Arial : Regular : Arial.ttf : 0 }}
+  global_font_scale 0.5
+  center {1617 853}
+  cursor_initialised true
+  autofit_bbox false
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1617 853 0 0 1 1 0 0 0 0}
+    }
+  name Text2
+  xpos 400
+  ypos 774
+ }
+set N3b583900 [stack 0]
+ Dot {
+  name Dot23
+  xpos 434
+  ypos 810
+ }
+push $N3b583900
+ Position {
+  translate {3 -3}
+  name Position1
+  xpos 510
+  ypos 774
+ }
+push $N20bacf00
+ Multiply {
+  inputs 1+1
+  value 0
+  name Multiply1
+  xpos 620
+  ypos 768
+ }
+ Merge2 {
+  inputs 2
+  name Merge4
+  xpos 620
+  ypos 806
+ }
+ Reformat {
+  type scale
+  format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+  scale 0.5
+  black_outside true
+  name Reformat8
+  xpos 620
+  ypos 901
+ }
+ Crop {
+  box {0 0 {width} {height}}
+  name Crop6
+  xpos 620
+  ypos 927
+ }
+ Dot {
+  name Dot17
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 654
+  ypos 1055
+ }
+push $N20baeb00
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1122
+  ypos 474
+ }
+ Expression {
+  expr0 isinf(r)?0:r
+  expr1 isinf(g)?0:g
+  expr2 isinf(b)?0:b
+  expr3 isinf(a)?0:a
+  name Expression5
+  label "infinity To Black"
+  xpos 1088
+  ypos 606
+ }
+ Expression {
+  expr0 isnan(r)?0:r
+  expr1 isnan(g)?0:g
+  expr2 isnan(b)?0:b
+  expr3 isnan(a)?0:a
+  name Expression6
+  label nan_To_Black
+  xpos 1088
+  ypos 642
+ }
+ Dot {
+  name Dot4
+  xpos 1122
+  ypos 739
+ }
+set N20a58800 [stack 0]
+ Dot {
+  name Dot10
+  xpos 902
+  ypos 739
+ }
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha black
+  name Shuffle3
+  xpos 868
+  ypos 757
+ }
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "GENERATED CAMERA SPACE"
+  old_message {{71 69 78 69 82 65 84 69 68 32 67 65 77 69 82 65 32 83 80 65 67 69}
+    }
+  box {0 0 {width} {height}}
+  yjustify bottom
+  transforms {{0 2}
+    }
+  cursor_position 10
+  font {{ Arial : Regular : Arial.ttf : 0 }}
+  global_font_scale 0.5
+  center {1617 853}
+  cursor_initialised true
+  autofit_bbox false
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1617 853 0 0 1 1 0 0 0 0}
+    }
+  name Text1
+  xpos 868
+  ypos 783
+ }
+set Nca0b200 [stack 0]
+ Dot {
+  name Dot11
+  xpos 902
+  ypos 819
+ }
+push $Nca0b200
+ Position {
+  translate {3 -3}
+  name Position2
+  xpos 978
+  ypos 783
+ }
+push $N20a58800
+ Multiply {
+  inputs 1+1
+  value 0
+  name Multiply2
+  xpos 1088
+  ypos 777
+ }
+ Merge2 {
+  inputs 2
+  name Merge5
+  xpos 1088
+  ypos 816
+ }
+ Crop {
+  box {0 0 {width} {height}}
+  crop false
+  name Crop11
+  xpos 1088
+  ypos 879
+ }
+ Reformat {
+  type scale
+  format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+  scale 0.5
+  filter impulse
+  name Reformat12
+  xpos 1088
+  ypos 903
+ }
+ Transform {
+  translate {{width} 0}
+  center {606.5 390.5}
+  name Transform8
+  xpos 1088
+  ypos 931
+ }
+ Dot {
+  name Dot18
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1122
+  ypos 1019
+ }
+push $N446c5600
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1534
+  ypos -78
+ }
+ Shuffle {
+  in position
+  name Shuffle2
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 1500
+  ypos 508
+ }
+ Expression {
+  expr0 isinf(r)?0:r
+  expr1 isinf(g)?0:g
+  expr2 isinf(b)?0:b
+  expr3 isinf(a)?0:a
+  name Expression2
+  label "infinity To Black"
+  xpos 1500
+  ypos 597
+ }
+ Expression {
+  expr0 isnan(r)?0:r
+  expr1 isnan(g)?0:g
+  expr2 isnan(b)?0:b
+  expr3 isnan(a)?0:a
+  name Expression3
+  label nan_To_Black
+  xpos 1500
+  ypos 633
+ }
+ Dot {
+  name Dot12
+  xpos 1534
+  ypos 741
+ }
+set N7c0f3200 [stack 0]
+ Dot {
+  name Dot13
+  xpos 1314
+  ypos 741
+ }
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha black
+  name Shuffle5
+  xpos 1280
+  ypos 759
+ }
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "SELECTED INPUT POSITION"
+  old_message {{83 69 76 69 67 84 69 68 32 73 78 80 85 84 32 80 79 83 73 84 73 79 78}
+    }
+  box {0 0 {width} {height}}
+  yjustify bottom
+  transforms {{0 2}
+    }
+  cursor_position 15
+  font {{ Arial : Regular : Arial.ttf : 0 }}
+  global_font_scale 0.5
+  center {1617 853}
+  cursor_initialised true
+  autofit_bbox false
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1617 853 0 0 1 1 0 0 0 0}
+    }
+  name Text3
+  xpos 1280
+  ypos 785
+ }
+set N7c0f1d00 [stack 0]
+ Dot {
+  name Dot14
+  xpos 1314
+  ypos 821
+ }
+push $N7c0f1d00
+ Position {
+  translate {3 -3}
+  name Position3
+  xpos 1390
+  ypos 785
+ }
+push $N7c0f3200
+ Multiply {
+  inputs 1+1
+  value 0
+  name Multiply3
+  xpos 1500
+  ypos 779
+ }
+ Merge2 {
+  inputs 2
+  name Merge6
+  xpos 1500
+  ypos 818
+ }
+ Crop {
+  box {0 0 {width} {height}}
+  name Crop9
+  xpos 1500
+  ypos 875
+ }
+ Reformat {
+  type scale
+  format "960 540 0 0 960 540 1 HalfHD"
+  scale 0.5
+  black_outside true
+  name Reformat10
+  xpos 1500
+  ypos 901
+ }
+ Transform {
+  translate {0 {height}}
+  center {{width/2} {height/2}}
+  shutteroffset centred
+  name Transform5
+  xpos 1500
+  ypos 927
+ }
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1534
+  ypos 983
+ }
+push $N446c4f00
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2084
+  ypos 18
+ }
+set N2194b900 [stack 0]
+ Dot {
+  name Dot15
+  xpos 2084
+  ypos 762
+ }
+set N2194b200 [stack 0]
+ Dot {
+  name Dot20
+  xpos 1864
+  ypos 762
+ }
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha black
+  name Shuffle6
+  xpos 1830
+  ypos 780
+ }
+ Text2 {
+  font_size_toolbar 100
+  font_width_toolbar 100
+  font_height_toolbar 100
+  message "SUPPLIED DEPTH TO GENERATE"
+  old_message {{83 85 80 80 76 73 69 68 32 68 69 80 84 72 32 84 79 32 71 69 78 69 82 65 84 69}
+    }
+  box {0 0 {width} {height}}
+  yjustify bottom
+  transforms {{0 2}
+    }
+  cursor_position 26
+  font {{ Arial : Regular : Arial.ttf : 0 }}
+  global_font_scale 0.5
+  center {1617 853}
+  cursor_initialised true
+  autofit_bbox false
+  group_animations {{0} imported: 0 selected: items: "root transform/"}
+  animation_layers {{1 11 1617 853 0 0 1 1 0 0 0 0}
+    }
+  name Text4
+  xpos 1830
+  ypos 806
+ }
+set N21949d00 [stack 0]
+ Dot {
+  name Dot21
+  xpos 1864
+  ypos 842
+ }
+push $N21949d00
+ Position {
+  translate {3 -3}
+  name Position4
+  xpos 1940
+  ypos 806
+ }
+push $N2194b200
+ Multiply {
+  inputs 1+1
+  value 0
+  name Multiply4
+  xpos 2050
+  ypos 800
+ }
+ Merge2 {
+  inputs 2
+  name Merge7
+  xpos 2050
+  ypos 839
+ }
+ Crop {
+  box {0 0 {width} {height}}
+  crop false
+  name Crop10
+  xpos 2050
+  ypos 887
+ }
+ Reformat {
+  type scale
+  format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+  scale 0.5
+  black_outside true
+  name Reformat11
+  xpos 2050
+  ypos 913
+ }
+ Transform {
+  translate {{width} {height}}
+  center {606.5 390.5}
+  shutteroffset centred
+  name Transform7
+  xpos 2050
+  ypos 939
+ }
+push $N2194b900
+ Remove {
+  name Remove1
+  xpos 2305
+  ypos 9
+ }
+ Merge2 {
+  inputs 2
+  name Merge8
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 2305
+  ypos 933
+ }
+ Merge2 {
+  inputs 2
+  name Merge3
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 2305
+  ypos 969
+ }
+ Merge2 {
+  inputs 2
+  name Merge2
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 2305
+  ypos 1005
+ }
+ Merge2 {
+  inputs 2
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 2305
+  ypos 1041
+ }
+ Output {
+  name Output1
+  xpos 2305
+  ypos 1263
+ }
+end_group
+

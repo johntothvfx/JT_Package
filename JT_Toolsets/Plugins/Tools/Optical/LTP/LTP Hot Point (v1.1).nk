@@ -1,0 +1,378 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+name LTP_HotPoint
+tile_color 0x713371ff
+selected true
+addUserKnob {20 Settings}
+addUserKnob {26 ""}
+addUserKnob {7 Intensity}
+Intensity 0.25
+addUserKnob {7 thickness l Thickness}
+thickness 0.5
+addUserKnob {26 space0 l "" +STARTLINE T " "}
+addUserKnob {20 Range n 1}
+Range 0
+addUserKnob {26 text l "" +STARTLINE T "\t"}
+addUserKnob {68 CS l "Color Space" -STARTLINE M {Lin Log}}
+addUserKnob {26 space_1 l "" +STARTLINE T " "}
+addUserKnob {7 lowrange l "low range" R 0 0.75}
+lowrange 0.4
+addUserKnob {7 highrange l "high range" R 0.5 1}
+highrange 0.8
+addUserKnob {20 endGroup n -1}
+addUserKnob {26 ""}
+addUserKnob {41 maskChannel l "mask channel" T Keymix3.maskChannel}
+addUserKnob {6 inverta l invert -STARTLINE}
+addUserKnob {26 ""}
+addUserKnob {26 space l "" +STARTLINE T "\t"}
+addUserKnob {68 output l Output M {"Add Source" "Result Only"}}
+addUserKnob {26 HotSpec l "" +STARTLINE T "<br><font size='5'>\nHot point\n</font><font color=#ad36b1> v1.1\n<br> <font size='3'>\nLens Treatment Package"}
+addUserKnob {20 Help}
+addUserKnob {26 Guide l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+addUserKnob {26 "" +STARTLINE}
+addUserKnob {26 steps l "" +STARTLINE T "<br><strong>1. </br> \nHot Point is part of the LTP <i>(Lens Treatment Package)</i><br> It will grab the <b>high range values</b> and add orange<br> chromostereopsis.\n\n<br><br><b><i>Note:</b><i> Useful for bright hot different surfaces.\n\n<br><br><b>John Toth © 2018 <br>"}
+addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#ad36b1\">johntothvfx.com</a>\n"}
+addUserKnob {26 space_2 l "" -STARTLINE T " \t\t"}
+addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#ad36b1\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool</i><br><br><b>v 1.1</b><br><i>- Mask input was added<br>- Log was added to the range</i><br><br></i><b>John Toth © 2018\")\n"}
+}
+BackdropNode {
+inputs 0
+name BackdropNode11
+tile_color 0x492222ff
+label "Check if there is a matte"
+note_font_size 42
+xpos 1131
+ypos 497
+bdwidth 457
+bdheight 158
+}
+BackdropNode {
+inputs 0
+name BackdropNode7
+tile_color 0x222222ff
+label "mask hard"
+note_font_size 42
+xpos 741
+ypos 604
+bdwidth 277
+bdheight 232
+}
+Input {
+inputs 0
+name mask
+xpos 1481
+ypos 320
+number 1
+}
+Dot {
+name Dot27
+note_font_size 35
+note_font_color 0xffffff
+xpos 1515
+ypos 594
+}
+set N33507190 [stack 0]
+NoOp {
+name autoAlphaCheck
+xpos 1171
+ypos 590
+addUserKnob {20 autoAlphaCheck}
+addUserKnob {6 a +STARTLINE}
+a {{"\[string first \".a\" \[channels \[input this 0]]]>-1"}}
+}
+Input {
+inputs 0
+name Input
+xpos 180
+ypos -1288
+}
+Dot {
+name Dot8
+note_font_size 35
+note_font_color 0xffffff
+xpos 214
+ypos -1182
+}
+set N36b57900 [stack 0]
+Dot {
+name Dot9
+note_font_size 35
+note_font_color 0xffffff
+xpos -116
+ypos -1182
+}
+Remove {
+channels {{{parent.Remove2.channels}}}
+name Remove3
+xpos -150
+ypos -1096
+}
+Dot {
+name Dot6
+note_font_size 35
+note_font_color 0xffffff
+xpos -115
+ypos 1434
+}
+push $N33507190
+Dot {
+name Dot15
+note_font_size 35
+note_font_color 0xffffff
+xpos 1515
+ypos 738
+}
+Reformat {
+inputs 0
+type "to box"
+box_width {{Input.bbox.r}}
+box_height {{Input.bbox.t}}
+box_fixed true
+box_pixel_aspect {{Input.pixel_aspect}}
+name Reformat1
+xpos 400
+ypos 518
+}
+AddChannels {
+channels rgb
+name AddChannels1
+xpos 400
+ypos 568
+}
+Dot {
+name Dot2
+note_font_size 35
+note_font_color 0xffffff
+xpos 434
+ypos 737
+}
+push $N36b57900
+Remove {
+operation keep
+channels rgb
+name Remove2
+xpos 180
+ypos -1096
+}
+Dot {
+name Dot1
+note_font_size 35
+note_font_color 0xffffff
+xpos 214
+ypos -918
+}
+set N30af9e70 [stack 0]
+Dot {
+name Dot16
+note_font_size 35
+note_font_color 0xffffff
+xpos 876
+ypos -918
+}
+Dot {
+name Dot4
+note_font_size 35
+note_font_color 0xffffff
+xpos 876
+ypos -582
+}
+set N334b65c0 [stack 0]
+Log2Lin {
+operation lin2log
+name Log2Lin1
+xpos 986
+ypos -586
+disable {{!CS}}
+}
+Keyer {
+operation "luminance key"
+range {{parent.lowrange} {parent.highrange} 1 1}
+name Keyer4
+xpos 986
+ypos -496
+}
+push $N334b65c0
+Copy {
+inputs 2
+from0 -rgba.alpha
+to0 -rgba.alpha
+channels alpha
+name Copy1
+xpos 842
+ypos -502
+}
+Premult {
+name Premult5
+xpos 842
+ypos -370
+}
+Dot {
+name Dot10
+note_font_size 35
+note_font_color 0xffffff
+xpos 876
+ypos -86
+}
+set N33503730 [stack 0]
+Dot {
+name Dot14
+xpos 1095
+ypos -86
+}
+set N31938800 [stack 0]
+Blur {
+channels {rgba.red -rgba.green -rgba.blue none}
+size {{thickness*10}}
+name Blur4
+label "size: \[value size]"
+xpos 1061
+ypos -15
+}
+Blur {
+channels {rgba.red rgba.green -rgba.blue none}
+size {{Blur4.size/2}}
+name Blur3
+label "size: \[value size]"
+xpos 1060
+ypos 81
+}
+Blur {
+channels {-rgba.red -rgba.green rgba.blue none}
+size {{Blur3.size/2}}
+name Blur8
+label "size: \[value size]"
+xpos 1060
+ypos 153
+}
+push $N31938800
+Dot {
+name Dot7
+note_font_size 35
+note_font_color 0xffffff
+xpos 1227
+ypos -86
+}
+Blur {
+channels {rgba.red -rgba.green -rgba.blue none}
+size {{Blur4.size/2}}
+name Blur1
+label "size: \[value size]"
+xpos 1193
+ypos -16
+}
+Blur {
+channels {rgba.red rgba.green -rgba.blue none}
+size {{Blur3.size/2}}
+name Blur2
+label "size: \[value size]"
+xpos 1193
+ypos 81
+}
+Blur {
+channels {-rgba.red -rgba.green rgba.blue none}
+size {{Blur8.size/2}}
+name Blur7
+label "size: \[value size]"
+xpos 1193
+ypos 153
+}
+Dissolve {
+inputs 2
+which 0.5
+name Dissolve1
+xpos 1133
+ypos 230
+}
+push $N33503730
+Merge2 {
+inputs 2
+operation minus
+Achannels rgb
+Bchannels rgb
+output rgb
+name Merge2
+xpos 840
+ypos 236
+}
+set N3362b690 [stack 0]
+Clamp {
+maximum_enable false
+name hot_clamp_negs2
+xpos 840
+ypos 369
+}
+Multiply {
+channels rgb
+value {{Intensity*5}}
+name Multiply1
+xpos 840
+ypos 447
+}
+Remove {
+channels alpha
+name Remove1
+xpos 840
+ypos 512
+}
+Keymix {
+inputs 3
+invertMask {{!inverta}}
+bbox B
+name Keymix3
+label "mix: \[value mix] (\[value bbox])"
+xpos 838
+ypos 722
+disable {{!autoAlphaCheck.a}}
+}
+Dot {
+name Dot3
+note_font_size 35
+note_font_color 0xffffff
+xpos 872
+ypos 1074
+}
+set N36f64570 [stack 0]
+Dot {
+name Dot5
+note_font_size 35
+note_font_color 0xffffff
+xpos 872
+ypos 1337
+}
+push $N36f64570
+push $N30af9e70
+Merge2 {
+inputs 2
+operation plus
+bbox B
+Achannels rgb
+output rgb
+also_merge all
+name Merge1
+label "mix: \[value mix] (\[value bbox])"
+xpos 182
+ypos 1064
+}
+Switch {
+inputs 2
+which {{output}}
+name Switch1
+xpos 182
+ypos 1334
+}
+Copy {
+inputs 2
+from0 -rgba.alpha
+to0 -rgba.alpha
+channels all
+name Copy2
+xpos 182
+ypos 1418
+}
+Output {
+name Output1
+xpos 182
+ypos 1694
+}
+end_group

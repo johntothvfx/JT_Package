@@ -1,0 +1,251 @@
+Group {
+ name Pixel_Offset
+ help "Offset the input by the given x and y values and repeat the input at the edges on the other side."
+ knobChanged "n = nuke.thisNode()\nk = 'customshutter'\nc = 'offsetshutterpulldown'\nt = nuke.thisKnob()\nflag = nuke.DISABLED\n\n\n\nif t.name() in (c , 'custom'):\n    CONTROLS_type = n\[c].value()\n    if CONTROLS_type == 'custom':\n        n\[k].clearFlag(flag)\n    else: \n        n.knob(k).setFlag(flag)"
+ tile_color 0xa57aaaff
+ note_font "Bitstream Vera Sans"
+ selected true
+ mapsize {0.15 0.15}
+ addUserKnob {20 pixel_offset_tab l "Pixel offset" -STARTLINE}
+ addUserKnob {26 ""}
+ addUserKnob {41 channels t "\n\nThe offset effect is only applied to these channels. \nIf you set this to something other than all or none, you can use the checkboxes on the right to select individual channels.\n" T Remove1.channels}
+ addUserKnob {26 ""}
+ addUserKnob {7 offsetx l x t "This loops the edges of the image in x." R -1000 1000}
+ offsetx {0}
+ addUserKnob {7 offsety l y t "This loops the edges of the image in Y." R -1000 1000}
+ offsety {0}
+ addUserKnob {26 ""}
+ addUserKnob {4 filteroffset l filter t "Select the filtering algorithm to use when remapping pixels from their original positions to new positions. This allows you to avoid problems with image quality, particularly in high contrast areas of the frame (where highly aliased, or jaggy, edges may appear if pixels are not filtered and retain their original values). \n\n• Impulse - remapped pixels carry their original values. \n\n• Cubic - remapped pixels receive some smoothing. \n\n• Keys - remapped pixels receive some smoothing, plus minor sharpening (as shown by the negative -y portions of the curve). \n\n• Simon - remapped pixels receive some smoothing, plus medium sharpening (as shown by the negative -y portions of the curve). \n\n• Rifman - remapped pixels receive some smoothing, plus significant sharpening (as shown by the negative -y portions of the curve). \n\n• Mitchell - remapped pixels receive some smoothing, plus blurring to hide pixelation. \n• Parzen - remapped pixels receive the greatest smoothing of all filters. \n• Notch - remapped pixels receive flat smoothing (which tends to hide moire patterns). \n\n• Lanczos4, Lanczos6, and Sinc4 - remapped pixels receive sharpening which can be useful for scaling down. Lanczos4 provides the least sharpening and Sinc4 the most." M {impulse cubic Keys Simon Riftman Mitchell Parzan notch Lanczos4 Lanczos6 sinc4 "" "" "" "" "" "" "" "" "" ""}}
+ filteroffset cubic
+ addUserKnob {6 intersect t "\n\nWhen enabled, the output bounding box is an intersection of the crop bounding box and the incoming bounding box. \nWhen disabled, the output bounding box matches the crop bounding box and can extend outside the incoming bounding box.\n" -STARTLINE}
+ addUserKnob {6 blackoutside1 l "black outside" t "his renders as black pixels outside the image boundary, making it easier to layer the element over another. If you uncheck this control, the outside area is filled with the outermost pixels of the image sequence. \nIn most cases, you should keep black outside checked. However, you may want to turn this off for camera shake, or if you want to texture-map or intersect the output with a similar shape." -STARTLINE}
+ blackoutside1 true
+ addUserKnob {7 mboffset l motionblur t "Sets the number of motion blur samples. A value of 1 should produce reasonable results for most sequences. \nIncrease the value to produce more samples for higher quality, or decrease it to shorten the processing time. The higher the value, the smoother the result." R 0 4}
+ mboffset {0}
+ addUserKnob {7 oshutter l shutter t "Enter the number of frames the shutter stays open when motion blurring. For example, a value of 0.5 corresponds to half a frame. Increasing the value produces more blur, and decreasing the value less." R 0 2}
+ oshutter {0.5}
+ addUserKnob {4 offsetshutterpulldown l "shutter offset" t "Controls how the shutter behaves with respect to the current frame value: \n\n• centred - center the shutter around the current frame. For example, if you set the shutter value to 1 and your current frame is 30, the shutter stays open from frame 29,5 to 30,5. \n\n• start - open the shutter at the current frame. For example, if you set the shutter value to 1 and your current frame is 30, the shutter stays open from frame 30 to 31. \n\n• end - close the shutter at the current frame. For example, if you set the shutter value to 1 and your current frame is 30, the shutter stays open from frame 29 to 30. \n\n• custom - open the shutter at the time you specify. In the field next to the dropdown menu, enter a value (in frames) you want to add to the current frame. To open the shutter before the current frame, enter a negative value. For example, a value of - 0.5 would open the shutter half a frame before the current frame." M {centred start end custom "" "" "" "" "" ""}}
+ offsetshutterpulldown custom
+ addUserKnob {7 customshutter l "" t "\n\nIf the shutter offset control is set to custom, this field is used to set the time that the shutter opens by adding it to the current frame. Values are in frames, so -0.5 would open the shutter half a frame before the current frame.\n" -STARTLINE R -1 1}
+ customshutter {0}
+ addUserKnob {26 title l "" +STARTLINE T "<br><font size='5'>Pixel Offset</font><font color=#a57aaa> v1.0"}
+ addUserKnob {20 helptab l Help}
+ addUserKnob {26 guide l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 steps l "" +STARTLINE T "<br><strong>1. </br> \n<b> Pixel offset</b> repeats the edges by placing it<br> on the otherside of the image in x or Y.\n\n<br><br><b>John Toth © 2021 <br>\n\n"}
+ addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#a57aaa\">johntothvfx.com</a>\n"}
+ addUserKnob {26 space003 l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#a57aaa\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool</i><br><br><b>John Toth © 2021\")\n"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x23232301
+  label "<center><font size='5'></font><font color=#ee453c> Channel Select\n</center><font size='1'>\n- This is done to avoid having the transform appear outside group on creation"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  xpos -311
+  ypos -373
+  bdwidth 403
+  bdheight 409
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode3
+  tile_color 0x23232301
+  label "<center><font size='5'></font><font color=#ee453c>offset X\n</center><font size='0.5'>\n-  loops x"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  xpos -78
+  ypos 152
+  bdwidth 503
+  bdheight 320
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode4
+  tile_color 0x23232301
+  label "<center><font size='5'></font><font color=#ee453c>offset Y\n</center><font size='0.5'>\n-  loops y"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  xpos -79
+  ypos 584
+  bdwidth 503
+  bdheight 320
+ }
+ Input {
+  inputs 0
+  name Input
+  xpos 122
+  ypos -466
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 156
+  ypos -102
+ }
+set Neecab200 [stack 0]
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -116
+  ypos -102
+ }
+ Remove {
+  operation keep
+  channels rgba
+  name Remove1
+  xpos -150
+  ypos -34
+ }
+push $Neecab200
+ Crop {
+  box {0 0 {input.width} {input.height}}
+  intersect {{intersect}}
+  crop {{blackoutside1}}
+  name Crop1
+  xpos 122
+  ypos 86
+ }
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 156
+  ypos 282
+ }
+set Neeca9600 [stack 0]
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 299
+  ypos 282
+ }
+ TransformMasked {
+  channels {{{Remove1.channels}}}
+  translate {{Transform_X.translate.x<0?Transform_X.translate.x+width:Transform_X.translate.x-width} 0}
+  center {{width/2} {height/2}}
+  filter {{Transform_X.filter}}
+  black_outside {{blackoutside1}}
+  motionblur {{mboffset}}
+  shutter {{oshutter}}
+  shutteroffset {{offsetshutterpulldown}}
+  shuttercustomoffset {{customshutter}}
+  name Transform_X2
+  xpos 265
+  ypos 350
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 299
+  ypos 426
+ }
+push $Neeca9600
+ TransformMasked {
+  channels {{{Remove1.channels}}}
+  translate {{fmod(offsetx,width)} 0}
+  center {{width/2} {height/2}}
+  filter {{filteroffset}}
+  black_outside {{blackoutside1}}
+  motionblur {{mboffset}}
+  shutter {{oshutter}}
+  shutteroffset {{offsetshutterpulldown}}
+  shuttercustomoffset {{customshutter}}
+  name Transform_X
+  xpos 122
+  ypos 350
+ }
+ Merge2 {
+  inputs 2
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 122
+  ypos 416
+ }
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 156
+  ypos 690
+ }
+set Neec8ab00 [stack 0]
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 299
+  ypos 690
+ }
+ TransformMasked {
+  channels {{{Remove1.channels}}}
+  translate {0 {Transform_Y.translate.y<0?Transform_Y.translate.y+height:Transform_Y.translate.y-height}}
+  center {{width/2} {height/2}}
+  filter {{Transform_X.filter}}
+  black_outside {{Transform_X.black_outside}}
+  motionblur {{mboffset}}
+  shutter {{oshutter}}
+  shutteroffset {{Transform_X.shutteroffset}}
+  shuttercustomoffset {{Transform_X.shuttercustomoffset}}
+  name Transform_Y1
+  xpos 265
+  ypos 758
+ }
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 299
+  ypos 840
+ }
+push $Neec8ab00
+ TransformMasked {
+  channels {{{Remove1.channels}}}
+  translate {0 {fmod(offsety,height)}}
+  center {{width/2} {height/2}}
+  filter {{Transform_X.filter}}
+  black_outside {{Transform_X.black_outside}}
+  motionblur {{mboffset}}
+  shutter {{oshutter}}
+  shutteroffset {{offsetshutterpulldown}}
+  shuttercustomoffset {{customshutter}}
+  name Transform_Y
+  xpos 122
+  ypos 758
+ }
+ Merge2 {
+  inputs 2
+  name Merge2
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 122
+  ypos 830
+ }
+ Crop {
+  box {0 0 {input.width} {input.height}}
+  intersect true
+  crop {{blackoutside1}}
+  name Crop3
+  xpos 122
+  ypos 950
+ }
+set Neec88100 [stack 0]
+ Output {
+  name Output1
+  xpos 122
+  ypos 1166
+ }
+push $Neec88100
+ Viewer {
+  frame_range 1-100
+  viewerProcess None
+  name Viewer1
+  xpos 568
+  ypos 206
+ }
+end_group

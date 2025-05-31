@@ -1,0 +1,258 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name Pixel_Repair
+ help "Looks at the incoming RGB values from the Input and repairs it using the Marker Removal node."
+ tile_color 0x27487aff
+ selected true
+ addUserKnob {20 Settings}
+ addUserKnob {26 dpace l "" +STARTLINE}
+ addUserKnob {26 Repair l "" +STARTLINE T "<font size='5'>Repair</font>\n\t"}
+ addUserKnob {4 output1 l "" t "Output option from the node or show what it's doing" +STARTLINE M {"Result Only" "Add Source" "" "" "" "" "" ""}}
+ output1 "Add Source"
+ addUserKnob {26 NAN l "" +STARTLINE T "<br><br><font size='4'>NaN</font>\n\t"}
+ addUserKnob {83 displaynan l "" t "Active To Repair NaN values" +STARTLINE M {on off}}
+ addUserKnob {26 Infinity l "" +STARTLINE T "<br><font size='4'>Infinity</font>"}
+ addUserKnob {83 displayinfinity l "" t "Active To Repair infinity values" +STARTLINE M {on off}}
+ displayinfinity off
+ addUserKnob {26 Pixel_Repair l "" t "\n<i><b>Version Log:\n</i></b>\nv 1.0\n<i>\n- creation of the tool\n</i>\n</i></b>\nv 1.1\n<i>\n- Display HUD made to be more clear\n</i>\n\n\n\n" +STARTLINE T "<br><br><font size='5'>Pixel Repair</font><font color=#4b75ba> v1.1<br>"}
+ addUserKnob {20 Help}
+ addUserKnob {26 Guide l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 Steps l "" +STARTLINE T "<br><strong>1. </br> Pixel Repair will rebuild <b><i> Nan/Infinity <b><i>values</b></i> <br><strong>2. </br> </b>It first kills all the broken pixels and makes them black\n<br><strong>3. </br> </b>Creates an alpha from the Broken Values \n<br><strong>4. </br> </b>Using the <b><i>Marker Removal</b></i> node with the option <b><i> paint type</b></i><br> to <b><i>radial </b></i>and fills in the broken area\n<br><br><strong>Note: </br> This Node works on <b><i>RGB INPUT ONLY</b></i><br><br>\n<b>Tip: </br></b> For Infinity Pixel best to find the source and fix it there.\n"}
+ addUserKnob {26 text_1 l "" +STARTLINE T " \n\t\n "}
+ addUserKnob {26 LightWrap_1 l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#4b75ba\">johntothvfx.com</a>"}
+ addUserKnob {26 space001_1 l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 Log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#4b75ba\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool</i><br><br><b>v 1.1</b><br><i>- Display HUD made to be more clear</i><br><br></b><i>-Infinity, where it would not calculate alpha, fixed</i><br><br><b>\")"}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos 490
+  ypos -1282
+ }
+ Dot {
+  name Dot19
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 524
+  ypos -1062
+ }
+set Nd8ab740 [stack 0]
+ Dot {
+  name Dot20
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 127
+  ypos -1062
+ }
+ Expression {
+  expr3 isinf(a)?0:a
+  name Expression1
+  label "infinity To Black"
+  xpos 93
+  ypos -879
+ }
+ Expression {
+  expr3 isnan(a)?0:a
+  name Expression4
+  label nan_To_Black
+  xpos 93
+  ypos -831
+ }
+ Remove {
+  channels rgb
+  name Remove5
+  xpos 93
+  ypos -705
+ }
+ Dot {
+  name Dot18
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 127
+  ypos 522
+ }
+push $Nd8ab740
+ Remove {
+  operation keep
+  channels rgb
+  name Remove4
+  xpos 490
+  ypos -705
+ }
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 524
+  ypos -405
+ }
+set Nfa7bf1b0 [stack 0]
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 764
+  ypos -405
+ }
+set Nfa5beaf0 [stack 0]
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1094
+  ypos -405
+ }
+ Expression {
+  temp_name0 infinite
+  temp_expr0 1
+  expr0 "(r == inf || r == -inf) ?infinite:0"
+  expr1 "(g == inf || g == -inf) ?infinite:0"
+  expr2 "(b == inf || b == -inf) ?infinite:0"
+  channel3 alpha
+  expr3 "(r == inf || r == -inf) ?infinite:0||(g == inf || g == -inf) ?infinite:0||(b == inf || b == -inf) ?infinite:0||(a == inf || g == -inf) ?infinite:0"
+  name Expression
+  label "Infinite RGBA"
+  xpos 1060
+  ypos -279
+ }
+ Remove {
+  name Remove2
+  xpos 1060
+  ypos -64
+  disable {{!displayinfinity}}
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1094
+  ypos 76
+ }
+push $Nfa5beaf0
+ Expression {
+  temp_name0 NanDisplay
+  temp_expr0 1
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 "isnan(r) ?NanDisplay:0"
+  expr1 "isnan(g) ?NanDisplay:0"
+  expr2 "isnan(b) ?NanDisplay:0"
+  channel3 rgba
+  expr3 isnan(r)||isnan(g)||isnan(b)||isnan(a)
+  name Expression2
+  label "nan RGBA"
+  xpos 730
+  ypos -280
+ }
+ Remove {
+  name Remove1
+  xpos 730
+  ypos -64
+  disable {{!displaynan}}
+ }
+ Merge2 {
+  inputs 2
+  operation max
+  name Max1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 730
+  ypos 66
+ }
+push $Nfa7bf1b0
+ Expression {
+  expr0 isinf(r)?0:r
+  expr1 isinf(g)?0:g
+  expr2 isinf(b)?0:b
+  expr3 isinf(a)?0:a
+  name Expression3
+  label "infinity To Black"
+  xpos 490
+  ypos -280
+  disable {{displayinfinity}}
+ }
+ Expression {
+  expr0 isnan(r)?0:r
+  expr1 isnan(g)?0:g
+  expr2 isnan(b)?0:b
+  expr3 isnan(a)?0:a
+  name Expression6
+  label nan_To_Black
+  xpos 490
+  ypos -88
+  disable {{displaynan}}
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 524
+  ypos -6
+ }
+set N56bfb50 [stack 0]
+ Copy {
+  inputs 2
+  from0 -rgba.alpha
+  to0 -rgba.alpha
+  channels alpha
+  name Copy2
+  xpos 490
+  ypos 60
+ }
+ NoTimeBlur {
+  name NoTimeBlur1
+  xpos 490
+  ypos 182
+ }
+ MarkerRemoval {
+  mode radial
+  name MarkerRemoval1
+  xpos 490
+  ypos 302
+ }
+set N45bea10 [stack 0]
+push $N45bea10
+push $N56bfb50
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 358
+  ypos -6
+ }
+ Merge2 {
+  inputs 2
+  operation difference
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 324
+  ypos 296
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 358
+  ypos 426
+ }
+ Switch {
+  inputs 2
+  which {{output1}}
+  name Switch1
+  xpos 490
+  ypos 422
+ }
+ Copy {
+  inputs 2
+  channels all
+  bbox B
+  name Copy1
+  xpos 490
+  ypos 506
+ }
+ Output {
+  name Output
+  xpos 490
+  ypos 638
+ }
+end_group

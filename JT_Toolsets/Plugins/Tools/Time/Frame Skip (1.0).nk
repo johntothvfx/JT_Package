@@ -1,0 +1,86 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name FrameSkip
+ help "Frame Skip will  remove the frames from the input and slice the front/back end together as one cut."
+ tile_color 0xb0a45dff
+ label "Skip: \[value start] - \[value end]"
+ selected true
+ addUserKnob {20 Settings}
+ addUserKnob {26 ""}
+ addUserKnob {41 start l "Skip Frame" t "First Frame input you want to drop to the end frame." T Skip_Frame.start}
+ addUserKnob {41 end l "" t "Last frame you wish to drop.\nFrom start - end." -STARTLINE T Skip_Frame.end}
+ addUserKnob {41 SetFrame l "Set Current Frame" t "Select current frame being viewed.\n\nNote: This sets it for both start and end inputs." -STARTLINE T Skip_Frame.SetFrame}
+ addUserKnob {26 SF l "" +STARTLINE T "<br><br><font size='5'>Frame Skip</font><font color=#978b4f> v1.0<br>"}
+ addUserKnob {20 Help}
+ addUserKnob {26 Guide l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 _1 l "" +STARTLINE T "<br><strong>1. </br> \nFrame Skip will simply <b>drop selected frames</b> <br>from the sequence input.\n\n<br><br><b>John Toth © 2020 <br>"}
+ addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#978b4f\">johntothvfx.com</a>\n"}
+ addUserKnob {26 space l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#978b4f\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool</i><br><br></i><b>John Toth © 2020\")\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos 204
+  ypos 370
+ }
+ Dot {
+  name Dot18
+  xpos 238
+  ypos 410
+ }
+set N38a40c10 [stack 0]
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 397
+  ypos 410
+ }
+ FrameRange {
+  first_frame {{Skip_Frame.end+1}}
+  last_frame {{input.last_frame}}
+  time ""
+  name FrameRange1
+  selected true
+  xpos 363
+  ypos 533
+ }
+push $N38a40c10
+ FrameRange {
+  first_frame {{input.first_frame}}
+  last_frame {{Skip_Frame.start-1}}
+  time ""
+  name FrameRange3
+  xpos 204
+  ypos 533
+ }
+ AppendClip {
+  inputs 2
+  firstFrame {{FrameRange3.first_frame}}
+  lastFrame 1117
+  time ""
+  name AppendClip3
+  xpos 286
+  ypos 653
+ }
+ Output {
+  name Output1
+  xpos 286
+  ypos 821
+ }
+ NoOp {
+  inputs 0
+  name Skip_Frame
+  xpos 49
+  ypos 543
+  addUserKnob {20 User}
+  addUserKnob {3 start l "Skip Frame"}
+  start 1001
+  addUserKnob {3 end l "" -STARTLINE}
+  end 1001
+  addUserKnob {22 SetFrame l "Set Current Frame" -STARTLINE T "nuke.thisNode().knob('start').setValue(nuke.frame())\nnuke.thisNode().knob('end').setValue(nuke.frame())\n"}
+ }
+end_group

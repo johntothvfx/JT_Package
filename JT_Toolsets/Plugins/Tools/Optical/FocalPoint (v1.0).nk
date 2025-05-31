@@ -1,0 +1,491 @@
+Group {
+ name FocalPoint
+ onCreate "n = nuke.thisNode()\nk = 'focal_point'\nt = nuke.thisKnob()\nflag = nuke.NO_ANIMATION\n\n\nn.knob(k).setFlag(flag)"
+ knobChanged "########################\n\n\nn=nuke.thisNode()\nk=nuke.thisKnob()\n\nif k.Class()=='XY_Knob' and k.isAnimated()==False:\n    i=k.value()\n    nm='3D'+k.name()\n    inp=n.node('Chn')\n    px=int(i\[0])\n    py=int(i\[1])\n    x= inp.sample('red', px, py)\n\n    n\[nm].setValue(\[x])\n\n\n########################\n\n#no animation can be applied to the focal point sampler (callback is on onCreate)\n\n"
+ tile_color 0x4a26a3ff
+ label "focal Point \[value 3Dfocal_point]\n\n\n"
+ note_font "Bitstream Vera Sans"
+ note_font_color 0x8200ffff
+ selected true
+ addUserKnob {20 DepthTab l "Focal Point"}
+ addUserKnob {41 in l depth t "Samples this channel" +INVISIBLE T Chn.in}
+ addUserKnob {26 ""}
+ addUserKnob {4 worldScaleMenu l "world scale" t "This is scaling the measurement of the 3D environment depends what your CG departments uses (usualy decimeter)." M {millimeter centimeter decimeter meter kilometer "" "" "" ""}}
+ worldScaleMenu meter
+ addUserKnob {26 ""}
+ addUserKnob {12 focal_point l "focal point" t "Picker for the focal point.\n\n"}
+ addUserKnob {7 3Dfocal_point l "Focal plane"}
+ addUserKnob {26 ""}
+ addUserKnob {7 fstopoffset l "fStop offset" t "This offsets the global fStop set in the camera. Values are carried in stops, so if global value is fStop 5.6 and offset is -1, then the resulting local fStop would be 4.  " R -10 10}
+ addUserKnob {26 ""}
+ addUserKnob {7 frontmultiplier l "Front Multiplier" t "Scaling the Front of the depth (forces more defocus in the front of the scene)\n\nThis should be avoided and should be only done for creative purposes really." R 0 10}
+ frontmultiplier 1
+ addUserKnob {7 backmultiplier l "Back Multiplier" t "Scaling the back of the depth (forces more defocus in the back of the scene)\n\nThis should be avoided and should be only done for creative purposes really." R 0 10}
+ backmultiplier 1
+ addUserKnob {26 ""}
+ addUserKnob {26 Title l "" +STARTLINE T "<br><font size='5'>Focal Point</font><font color=#2f186a> v1.0<br>"}
+ addUserKnob {20 Artifacts}
+ addUserKnob {26 ""}
+ addUserKnob {14 PBCdialate l "depth dilate" t "Dilating depth. Not pretty so don't use unless you really have to." R 0 100}
+ addUserKnob {6 edgefixswitch l "Transparent Edge Fix" t "If you are getting semi tranparent edges where they should be solid, untick this box and pray to the gods of pixel fudging. " +STARTLINE}
+ addUserKnob {6 blacktomax l "Force black to depth" t "If something is black is simple adds a extrmely high value of depth in the back. This sometimes helps for blending between defocus objects." -STARTLINE}
+ blacktomax true
+ addUserKnob {26 ""}
+ addUserKnob {20 help_1 l Help -STARTLINE}
+ addUserKnob {26 basicsetup l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 text l "" +STARTLINE T "<br><strong>1. </br> \nA simple tool that can calculate the focal point<br> of the depth channel, based on the camera<br> data. The output is the visualization of <br> the focal point.\n<br><br><strong>2. </br> \nThis can be used for Defocus or using the <br> visaulization to colours for mask inputs.\n\n<br><br><b>John Toth © 2021 <br>"}
+ addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#2f186a\">johntothvfx.com</a>\n"}
+ addUserKnob {26 space00 l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#2f186a\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool</i><br><br></i><b>John Toth © 2020\")\n"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode1
+  tile_color 0x23232301
+  label "<center><font size='5'></font><font color=#ee453c>Channel Sampler\n</center><font size='1'>"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  xpos -2007
+  ypos 487
+  bdwidth 274
+  bdheight 225
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x23232301
+  label "<center><font size='5'></font><font color=#ee453c>Camera Input\n</center><font size='1'>"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  xpos -2007
+  ypos 199
+  bdwidth 274
+  bdheight 225
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode3
+  tile_color 0x23232301
+  label "<center><font size='5'></font><font color=#ee453c>Visualization\n</center><font size='1'>"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  xpos -1237
+  ypos 1663
+  bdwidth 803
+  bdheight 274
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode4
+  tile_color 0x23232301
+  label "<center><font size='5'></font><font color=#ee453c>front/back Multipliers \n</center><font size='1'>"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  xpos -852
+  ypos 1272
+  bdwidth 431
+  bdheight 191
+ }
+ Input {
+  inputs 0
+  name camera
+  label "input \[value number]"
+  xpos -1910
+  ypos 320
+  number 1
+ }
+ Input {
+  inputs 0
+  name Image
+  label "input \[value number]"
+  xpos -1470
+  ypos 248
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -1436
+  ypos 641
+ }
+set N30a5ad00 [stack 0]
+ Shuffle {
+  in depth
+  name Chn
+  label "Chanel Selection"
+  xpos -1910
+  ypos 632
+ }
+push $N30a5ad00
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -886
+  ypos 642
+ }
+set N9260c7d0 [stack 0]
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -723
+  ypos 642
+ }
+set N462e83f0 [stack 0]
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -556
+  ypos 642
+ }
+ Expression {
+  temp_name0 fD
+  temp_expr0 focalD
+  temp_name1 fS
+  temp_expr1 fStop
+  channel0 alpha
+  expr0 "(depth.Z >  fD   ? (depth.Z -  fD) : 0)"
+  name Expression5
+  xpos -590
+  ypos 1358
+  addUserKnob {20 User}
+  addUserKnob {7 fstop}
+  fstop {{"\[value \[topnode parent.input1].fstop]"}}
+  addUserKnob {7 focalD l "focal point"}
+  focalD {{parent.3Dfocal_point}}
+ }
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -556
+  ypos 1619
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name shuffle2
+  xpos -590
+  ypos 1767
+ }
+push $N462e83f0
+ Expression {
+  temp_name0 fD
+  temp_expr0 focalD
+  temp_name1 fS
+  temp_expr1 fStop
+  channel0 alpha
+  expr0 "(depth.Z >  fD  ? 0 :  (fD - depth.Z))"
+  name Expression1
+  xpos -757
+  ypos 1358
+  addUserKnob {20 User}
+  addUserKnob {7 fstop}
+  fstop {{"\[value \[topnode parent.input1].fstop]"}}
+  addUserKnob {7 focalD l "focal point"}
+  focalD {{parent.3Dfocal_point}}
+ }
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -723
+  ypos 1482
+ }
+set N47889bf0 [stack 0]
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name shuffle1
+  xpos -757
+  ypos 1767
+ }
+push $N30a5ad00
+ Expression {
+  channel0 depth
+  expr0 Z==0?10000:Z
+  channel1 none
+  channel2 none
+  name Expression2
+  tile_color 0xffffffff
+  label "Forcing black to max depth"
+  note_font_color 0xff
+  xpos -1470
+  ypos 729
+  disable {{!parent.blacktomax}}
+ }
+ Dot {
+  name Dot12
+  xpos -1436
+  ypos 802
+ }
+set N2b63f940 [stack 0]
+ Dot {
+  name Dot9
+  xpos -1286
+  ypos 802
+ }
+set Nf48fe5d0 [stack 0]
+ Remove {
+  operation keep
+  channels alpha
+  channels2 depth
+  name Remove1
+  xpos -1170
+  ypos 793
+ }
+set N366455f0 [stack 0]
+ Premult {
+  channels depth
+  name Premult1
+  xpos -1170
+  ypos 899
+ }
+ Dot {
+  name Dot27
+  xpos -1136
+  ypos 1008
+ }
+push $N366455f0
+ Dot {
+  name Dot25
+  xpos -986
+  ypos 802
+ }
+ Blur {
+  size 20
+  name Blur1
+  xpos -1020
+  ypos 849
+ }
+ Unpremult {
+  channels depth
+  name Unpremult3
+  xpos -1020
+  ypos 899
+ }
+ Merge2 {
+  inputs 2
+  also_merge depth
+  name Merge2
+  xpos -1020
+  ypos 1005
+ }
+ Dot {
+  name Dot26
+  xpos -986
+  ypos 1102
+ }
+push $Nf48fe5d0
+ Copy {
+  inputs 2
+  from0 -rgba.alpha
+  to0 -rgba.alpha
+  channels depth
+  name Copy2
+  xpos -1320
+  ypos 1086
+ }
+ Dot {
+  name Dot17
+  xpos -1286
+  ypos 1202
+ }
+push $N2b63f940
+ Switch {
+  inputs 2
+  which {{parent.edgefixswitch}}
+  name Switch4
+  xpos -1470
+  ypos 1199
+ }
+ Dilate {
+  channels depth
+  size {{parent.double}}
+  name Dilate1
+  xpos -1470
+  ypos 1299
+ }
+ Expression {
+  temp_name0 fL
+  temp_expr0 focalL
+  temp_name1 fS
+  temp_expr1 fstop
+  temp_name2 fD
+  temp_expr2 focalpoint*worldscale
+  temp_name3 zD
+  temp_expr3 Z*worldscale
+  channel0 depth
+  expr0 "(  (( (fL / fS) * ( (fD  * fL) / (fD - fL) ) * fabs( (1/zD) - (1/fD) ))) * cocMult ) /2"
+  channel1 rgb
+  channel2 none
+  channel3 none
+  name Focal_Point_Calculator
+  xpos -1470
+  ypos 1382
+  addUserKnob {20 Camera}
+  addUserKnob {7 fstop}
+  fstop {{"\[value \[topnode parent.input1].fstop]*pow(sqrt(2),parent.fstopoffset)"}}
+  addUserKnob {7 focalpoint l "focal point"}
+  focalpoint {{parent.3Dfocal_point}}
+  addUserKnob {26 ""}
+  addUserKnob {7 back l "back multiplier"}
+  back {{parent.backmultiplier}}
+  addUserKnob {7 frontmultiplier l "front multiplier"}
+  frontmultiplier {{parent.frontmultiplier}}
+  addUserKnob {26 ""}
+  addUserKnob {7 focalL l "focal length"}
+  focalL {{"\[topnode input1].focal"}}
+  addUserKnob {7 clipNear l "clip near" R 0 1000}
+  clipNear {{"\[value \[topnode input1].near]"}}
+  addUserKnob {7 clipFar l "clip far" R 0 1000}
+  clipFar {{"\[value \[topnode input1].far]"}}
+  addUserKnob {26 ""}
+  addUserKnob {14 filmback l "film back size" R 0 100}
+  filmback {{"\[value \[topnode input1].haperture]"} {"\[value \[topnode input1].vaperture]"}}
+  addUserKnob {26 ""}
+  addUserKnob {7 worldscale l "world scale"}
+  worldscale {{"worldScaleMenu==0 ? 1 : worldScaleMenu==1 ? 10 : worldScaleMenu==2 ? 100 : worldScaleMenu==3 ? 1000 : 1000000"}}
+  addUserKnob {26 ""}
+  addUserKnob {7 aspectRatio l "aspect ratio"}
+  aspectRatio {{width/height}}
+  addUserKnob {7 cocMult}
+  cocMult {{imageRes.w/filmback.w}}
+  addUserKnob {14 imageRes l "image resolution" R 0 100}
+  imageRes {{input.width} {input.height}}
+ }
+set N681c91a0 [stack 0]
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -1074
+  ypos 1386
+ }
+ Shuffle {
+  in depth
+  red alpha
+  green alpha
+  blue alpha
+  name shuffle5
+  xpos -1108
+  ypos 1767
+ }
+ Invert {
+  channels rgba
+  name Invert2
+  xpos -1108
+  ypos 1815
+ }
+ Clamp {
+  channels rgba
+  name Clamp1
+  selected true
+  xpos -1108
+  ypos 1862
+ }
+push $N9260c7d0
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha black
+  name shuffle3
+  xpos -920
+  ypos 1765
+ }
+ Merge2 {
+  inputs 2
+  operation max
+  Achannels {rgba.red -rgba.green -rgba.blue rgba.alpha}
+  name Merge8
+  tile_color 0xff0000ff
+  label "mix: \[value mix]"
+  xpos -920
+  ypos 1856
+  disable {{disableR}}
+ }
+ Merge2 {
+  inputs 2
+  operation max
+  Achannels {-rgba.red rgba.green -rgba.blue rgba.alpha}
+  name Merge15
+  tile_color 0xff00ff
+  label "mix: \[value mix]"
+  xpos -757
+  ypos 1856
+  disable {{disableG}}
+ }
+ Merge2 {
+  inputs 2
+  operation max
+  Achannels {-rgba.red -rgba.green rgba.blue rgba.alpha}
+  name Merge16
+  tile_color 0xffff
+  label "mix: \[value mix]"
+  xpos -590
+  ypos 1856
+  disable {{disableB}}
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -556
+  ypos 2058
+ }
+push $N47889bf0
+push $N681c91a0
+ Add {
+  inputs 1+1
+  channels depth
+  value {{parent.frontmultiplier}}
+  name Add1
+  xpos -1470
+  ypos 1472
+ }
+ Shuffle {
+  in {{{parent.Chn.in}}}
+  name shuffle
+  label "Chanel Selection"
+  xpos -1470
+  ypos 1833
+ }
+ Copy {
+  inputs 2
+  channels rgb
+  name Copy1
+  xpos -1470
+  ypos 2042
+ }
+ Expression {
+  expr0 isinf(r)?0:r
+  expr1 isinf(g)?0:g
+  expr2 isinf(b)?0:b
+  expr3 isinf(a)?0:a
+  name Expression3
+  label "infinity To Black"
+  xpos -1470
+  ypos 2265
+ }
+ Expression {
+  expr0 isnan(r)?0:r
+  expr1 isnan(g)?0:g
+  expr2 isnan(b)?0:b
+  expr3 isnan(a)?0:a
+  name Expression4
+  label nan_To_Black
+  xpos -1470
+  ypos 2385
+ }
+ Output {
+  name Output1
+  xpos -1470
+  ypos 2583
+ }
+end_group

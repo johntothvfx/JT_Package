@@ -1,0 +1,455 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+push 0
+Group {
+ inputs 2
+ name DeepKeymix
+ tile_color 0x60ff
+ selected true
+ addUserKnob {20 Settings}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {41 channels t "\n\nThe channels to copy from input A. \nAny other channels are copied unchanged from input B.\n" T DeepRecolor1.channels}
+ addUserKnob {41 from0 l "mask channel" t "\n\nThe channel to use as a mask. By default, the effect of input A is limited to the non-black areas of this channel.\n\n\nEnables the associated mask channel to the right. Disabling this checkbox is the same as setting the channel to none.\n\n\n" T Copy1.from0}
+ addUserKnob {6 invert t "\n\nInverts the use of the mask channel so that the effect of input A is limited to the non-white areas of the mask.\n" -STARTLINE}
+ addUserKnob {7 mix1 l mix t "\n\nDissolves between the original B input at 0 and the full Keymix effect at 1.\n"}
+ mix1 1
+ addUserKnob {4 deepbbox l "Set BBox to" t "\n\nHow to output the bounding box: \n¥ union - combine the two bounding boxes. \n¥ B side - use the bounding box from input B. Any data from the A input thatÕs outside this box is clipped. \n¥ A side - use the bounding box from input A. Any data from the B input thatÕs outside this box is clipped.\n" M {union "B Side" "A Side" "" "" "" ""}}
+ addUserKnob {26 Deepkeymix l "" t "Node Title" +STARTLINE T "<br><br><font size='5'>\nDeep Keymix\n</font><font color=#000070> v1.0<br>\n"}
+ addUserKnob {20 Help}
+ addUserKnob {26 guide l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 steps l "" +STARTLINE T "<br><strong>1. </br> \n<b>Deep Keymix</b> allows you to keymix a deep image <br><b>from A into the B pipe.</b>\n\n<br><strong>2. </br> \nIt has the same settings as a Normal keymix node.\n\n\n<br><br><b><i>Note:</b> <i>Please be aware this node extracts the data from<br> deep and converts it to 2D image and then scatters it back <br>over the deep data afterwards.</b> (This happens if Channels <br>is not set to <b>all</b> otherwise<b> holdouts </b>are done using the <b><br>mask input data.)</b>\n\n\n</font><font color=#000070>\n<br><br><b>John Toth © 2020 <br>"}
+ addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#000070\">johntothvfx.com</a>\n"}
+ addUserKnob {26 space l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#000070\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool</i><br></i><br><br></i><b>John Toth © 2020\")\n"}
+}
+ Input {
+  inputs 0
+  name mask
+  xpos -590
+  ypos -1641
+  number 2
+ }
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -556
+  ypos -1422
+ }
+set Ne7e05c0 [stack 0]
+ Shuffle {
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -480
+  ypos -1438
+ }
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -446
+  ypos -1326
+ }
+push $Ne7e05c0
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy1
+  xpos -590
+  ypos -1335
+ }
+set N13f115b0 [stack 0]
+ NoOp {
+  name autoAlphaCheck
+  xpos -762
+  ypos -1329
+  addUserKnob {20 autoAlphaCheck}
+  addUserKnob {6 a +STARTLINE}
+  a {{"\[string first \".a\" \[channels \[input this 0]]]>-1"}}
+ }
+ Input {
+  inputs 0
+  name A
+  xpos -102
+  ypos -2025
+  number 1
+ }
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -68
+  ypos -1710
+ }
+set N19ee19c0 [stack 0]
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -68
+  ypos -774
+ }
+set N9dbb490 [stack 0]
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -68
+  ypos -630
+ }
+set Ne15faa0 [stack 0]
+ Input {
+  inputs 0
+  name B
+  xpos 598
+  ypos -2049
+ }
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 632
+  ypos -1710
+ }
+set Nba16780 [stack 0]
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1314
+  ypos -1710
+ }
+ Switch {
+  inputs 2
+  which {{deepbbox-1}}
+  name Switch3
+  xpos 1280
+  ypos -633
+ }
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1314
+  ypos 690
+ }
+push $N9dbb490
+push $N13f115b0
+ Multiply {
+  value {{mix1}}
+  name Multiply1
+  xpos -590
+  ypos -1222
+ }
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -556
+  ypos -1110
+ }
+set N1f0e1260 [stack 0]
+ Invert {
+  name Invert3
+  xpos -222
+  ypos -1119
+  disable {{!invert}}
+ }
+push $Nba16780
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 434
+  ypos -1710
+ }
+set Nbbe74d0 [stack 0]
+push $N19ee19c0
+ DeepMerge {
+  inputs 2
+  operation holdout
+  name DeepMerge5
+  xpos 70
+  ypos -1713
+ }
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 104
+  ypos -1638
+ }
+set N1233dcf0 [stack 0]
+ DeepToImage {
+  name DeepToImage4
+  xpos 70
+  ypos -1575
+ }
+ Remove {
+  channels deep
+  name Remove4
+  xpos 70
+  ypos -1551
+ }
+ Remove {
+  operation keep
+  channels {{{parent.DeepRecolor1.channels}}}
+  name Remove7
+  xpos 70
+  ypos -1461
+ }
+set N14b1e340 [stack 0]
+push $Nbbe74d0
+ DeepToImage {
+  name DeepToImage5
+  xpos 400
+  ypos -1575
+ }
+ Remove {
+  channels deep
+  name Remove3
+  xpos 400
+  ypos -1551
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 434
+  ypos -1452
+ }
+set N148d51f0 [stack 0]
+ Copy {
+  inputs 2+1
+  from0 -rgba.alpha
+  to0 -rgba.alpha
+  channels all
+  name Copy2
+  xpos 239
+  ypos -1126
+ }
+set N9cc3260 [stack 0]
+push $N1233dcf0
+push $Nba16780
+ DeepMerge {
+  inputs 2
+  drop_hidden true
+  metainput All
+  name DeepMerge6
+  xpos 598
+  ypos -1641
+  disable {{!AutoLayersCheck.a}}
+ }
+ DeepRecolor {
+  inputs 2
+  channels all
+  targetInputAlpha {{autoAlphaCheck2.a}}
+  name DeepRecolor2
+  note_font "source code pro lighty Bold Bold Bold Bold Bold Bold"
+  xpos 598
+  ypos -1120
+  disable {{!AutoLayersCheck.a}}
+ }
+ Dot {
+  name Dot285
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 632
+  ypos -774
+ }
+set N16aaee60 [stack 0]
+ DeepMerge {
+  inputs 2
+  name DeepMerge1
+  xpos 237
+  ypos -777
+ }
+ DeepToImage {
+  name DeepToImage1
+  xpos 237
+  ypos 423
+ }
+ Remove {
+  channels deep
+  name Remove1
+  xpos 237
+  ypos 489
+ }
+push $N1f0e1260
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -556
+  ypos -414
+ }
+set N1070ee70 [stack 0]
+ Invert {
+  name Invert1
+  xpos -590
+  ypos -207
+  disable {{invert}}
+ }
+ DeepFromImage {
+  premult true
+  set_z true
+  name DeepFromImage1
+  xpos -590
+  ypos -57
+ }
+push $Ne15faa0
+ DeepMerge {
+  inputs 2
+  operation holdout
+  name DeepMerge2
+  xpos -102
+  ypos -57
+  disable {{AutoLayersCheck.a}}
+ }
+push $N1070ee70
+ Invert {
+  name Invert2
+  xpos 400
+  ypos -423
+  disable {{!invert}}
+ }
+ DeepFromImage {
+  premult true
+  set_z true
+  name DeepFromImage2
+  xpos 400
+  ypos -345
+ }
+push $N16aaee60
+ DeepMerge {
+  inputs 2
+  operation holdout
+  name DeepMerge3
+  xpos 598
+  ypos -345
+  disable {{AutoLayersCheck.a}}
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 632
+  ypos 282
+ }
+ DeepMerge {
+  inputs 2
+  name DeepMerge4
+  xpos -102
+  ypos 279
+  disable {{AutoLayersCheck.a}}
+ }
+ DeepRecolor {
+  inputs 2
+  channels all
+  name DeepRecolor1
+  xpos -102
+  ypos 489
+  disable {{AutoLayersCheck.a}}
+ }
+ Group {
+  inputs 2
+  name Deep_CopyBBox
+  tile_color 0x60ff
+  xpos -102
+  ypos 687
+  disable {{!deepbbox}}
+  addUserKnob {20 User}
+ }
+  Input {
+   inputs 0
+   name B
+   xpos -557
+   ypos -630
+  }
+  DeepCrop {
+   use_zfar false
+   bbox {{A.bbox.x} {A.bbox.y} {A.bbox.x+A.bbox.w} {A.bbox.y+A.bbox.h}}
+   name DeepCrop1
+   selected true
+   xpos -557
+   ypos -553
+  }
+  Output {
+   name Output1
+   xpos -557
+   ypos -454
+  }
+  Input {
+   inputs 0
+   name A
+   xpos -716
+   ypos -628
+   number 1
+  }
+ end_group
+push $N16aaee60
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 984
+  ypos -774
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 984
+  ypos 906
+ }
+ Switch {
+  inputs 2
+  which {{autoAlphaCheck.a}}
+  name Switch1
+  label "BBOX settings"
+  selected true
+  xpos -102
+  ypos 897
+ }
+ Output {
+  name Output1
+  selected true
+  xpos -102
+  ypos 1143
+ }
+push $N148d51f0
+ Remove {
+  channels {{{parent.DeepRecolor1.channels}}}
+  name Remove2
+  xpos 510
+  ypos -1461
+ }
+ NoOp {
+  name AutoLayersCheck
+  xpos 510
+  ypos -1407
+  addUserKnob {20 autoAlphaCheck}
+  addUserKnob {6 a +STARTLINE}
+  a {{"\[string length \[layers \[input this 0]]]"}}
+ }
+push $N14b1e340
+ NoOp {
+  name autoAlphaCheck2
+  xpos -40
+  ypos -1455
+  addUserKnob {20 autoAlphaCheck}
+  addUserKnob {6 a +STARTLINE}
+  a {{"\[string first \".a\" \[channels \[input this 0]]]>-1"}}
+ }
+push $N9cc3260
+add_layer {CatC CatC.red CatC.green CatC.blue CatC.alpha}
+ Shuffle {
+  in CatC
+  name Shuffle2
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 239
+  ypos -1006
+ }
+end_group

@@ -1,0 +1,45 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+push 0
+Group {
+ inputs 2
+ name DeepCopyBBox
+ tile_color 0x60ff
+ selected true
+ addUserKnob {20 Settings}
+ addUserKnob {26 DeepCopyBBox l "" +STARTLINE T "<br><br><font size='5'>\nDeep CopyBBox\n</font><font color=#000070> v1.0<br>\n"}
+ addUserKnob {20 Help1 l Help}
+ addUserKnob {26 Guide l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 steps l "" +STARTLINE T "<br><strong>1. </br> \nCopied the bounding box from A into B,<br> Similar to regular copy BBox node, but used for deep.\n\n<br><strong>2. </br> \nYou can grab the bbox information from a regular 2D image.\n\n</font><font color=#000070>\n<br><br><b>John Toth © 2019 <br>"}
+ addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#000070\">johntothvfx.com</a>\n"}
+ addUserKnob {26 space l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#000070\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool</i><br></i><br><br></i><b>John Toth © 2019\")\n"}
+}
+ Input {
+  inputs 0
+  name B
+  xpos -491
+  ypos -465
+ }
+ DeepCrop {
+  use_zfar false
+  bbox {{A.bbox.x} {A.bbox.y} {A.bbox.r} {A.bbox.t}}
+  name DeepCrop1
+  selected true
+  xpos -491
+  ypos -417
+ }
+ Output {
+  name Output1
+  xpos -491
+  ypos -326
+ }
+ Input {
+  inputs 0
+  name A
+  xpos -676
+  ypos -489
+  number 1
+ }
+end_group

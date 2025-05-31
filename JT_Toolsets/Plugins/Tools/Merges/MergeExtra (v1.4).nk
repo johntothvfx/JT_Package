@@ -1,0 +1,203 @@
+Group {
+inputs 2
+name MergeExtra
+tile_color 0x4b5ec6ff
+label "mix: \[value mix] (\[value bbox])\n"
+note_font_color 0x10101ff
+selected true
+addUserKnob {20 Settings}
+addUserKnob {41 operation T IMAGE.operation}
+addUserKnob {41 bbox l "set bbox to " T IMAGE.bbox}
+addUserKnob {41 colorspace_out l colorspace T Colorspace1.colorspace_out}
+addUserKnob {26 ""}
+addUserKnob {41 Achannels l "A channels" T IMAGE.Achannels}
+addUserKnob {41 Bchannels l "B channels" T IMAGE.Bchannels}
+addUserKnob {41 output T IMAGE.output}
+addUserKnob {26 ""}
+addUserKnob {41 mix T IMAGE.mix}
+addUserKnob {26 ""}
+addUserKnob {20 CombineChannel l "Combine Channel" n 1}
+addUserKnob {41 operation_1 l operation T IMAGE1.operation}
+addUserKnob {41 output_1 l output T IMAGE1.output}
+addUserKnob {20 endGroup_1 l endGroup n -1}
+addUserKnob {26 ""}
+addUserKnob {20 CopyChannels l "Copy Channels" n 1}
+CopyChannels 0
+addUserKnob {41 channels l "Layer Copy" T COPY_CHANNEL001.channels}
+addUserKnob {41 channels_1 l "Layer Copy" T COPY_CHANNEL002.channels}
+addUserKnob {41 channels_2 l "Layer Copy" T COPY_CHANNEL003.channels}
+addUserKnob {41 channels_3 l "Layer Copy" T COPY_CHANNEL004.channels}
+addUserKnob {41 channels_4 l "Layer Copy" T COPY_CHANNEL005.channels}
+addUserKnob {20 endGroup n -1}
+addUserKnob {26 Author l "" +STARTLINE T "<br><font size='5'>Merge Extra</font><font color=#404fa9> v1.4<br>\n\n"}
+addUserKnob {20 helptab l Help}
+addUserKnob {26 Basic l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+addUserKnob {26 "" +STARTLINE}
+addUserKnob {26 steps l "" +STARTLINE T "<br><strong>1. </br> \n<b>Merge Extra</b> Is exactly the same as a normal<br> merge with a few extra parameters to speed up<br> workflow or a process.\n\n<br><strong>2. </br> </b>\nYou can combine depth passes from the incoming <br> A & B pipe as long as the depth from both inputs have<br> the same name.\n\n\n<br><strong>3. </br> </b>\nYou can also Copy 5 additional layers from A into<br> the B pipeline to quickly carry any needed layers.\n\n\n<br><br><b>John Toth © 2017 <br>"}
+addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#404fa9\">johntothvfx.com</a>\n"}
+addUserKnob {26 space l "" -STARTLINE T " \t\t"}
+addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#404fa9\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool</i></b><br><br><b>v 1.1</b><br><i>-Depth combining was added</i></b><br><br><b>v 1.2</b><br><i>- 5 Copy layers were added</i></b><br><br><b>v 1.3</b><br><i>- IU clan up and interal fixes</i></b><br><br><b>v 1.4</b><br><i>- Merge in Colorspace was added</i><i><br><br><br><b>John Toth © 2020 \")\n"}
+}
+Input {
+inputs 0
+name A
+xpos 1246
+ypos -1744
+number 1
+}
+Colorspace {
+colorspace_out {{Colorspace1.colorspace_out}}
+name Colorspace2
+xpos 1246
+ypos -1690
+}
+Dot {
+name Dot9
+note_font_size 35
+note_font_color 0xffffff
+xpos 1280
+ypos -1615
+}
+set Na9a6d500 [stack 0]
+Dot {
+name Dot20
+note_font_size 35
+note_font_color 0xffffff
+xpos 1280
+ypos -1570
+}
+set Na9b091e0 [stack 0]
+Dot {
+name Dot21
+note_font_size 35
+note_font_color 0xffffff
+xpos 1280
+ypos -1527
+}
+set Na9f9eca0 [stack 0]
+Dot {
+name Dot23
+note_font_size 35
+note_font_color 0xffffff
+xpos 1280
+ypos -1489
+}
+set Nd433db50 [stack 0]
+Dot {
+name Dot26
+note_font_size 35
+note_font_color 0xffffff
+xpos 1280
+ypos -1450
+}
+set N3a5726f0 [stack 0]
+Dot {
+name Dot27
+note_font_size 35
+note_font_color 0xffffff
+selected true
+xpos 1280
+ypos -1412
+}
+set Na9b0d500 [stack 0]
+Dot {
+name Dot29
+note_font_size 35
+note_font_color 0xffffff
+xpos 1280
+ypos -1374
+}
+push $Na9b0d500
+push $N3a5726f0
+push $Nd433db50
+push $Na9f9eca0
+push $Na9b091e0
+Input {
+inputs 0
+name mask
+xpos 1548
+ypos -1618
+number 2
+}
+push $Na9a6d500
+Input {
+inputs 0
+name B
+xpos 1390
+ypos -1744
+}
+Colorspace {
+name Colorspace1
+xpos 1390
+ypos -1690
+}
+Merge2 {
+inputs 2+1
+name IMAGE
+label "mix: \[value mix]"
+xpos 1390
+ypos -1624
+}
+Merge2 {
+inputs 2
+operation max
+bbox {{Merge_Extra.IMAGE.bbox}}
+Achannels {{{output}}}
+Bchannels {{{output}}}
+output depth
+name IMAGE1
+label "mix: \[value mix]"
+xpos 1390
+ypos -1586
+}
+Copy {
+inputs 2
+bbox B
+name COPY_CHANNEL001
+xpos 1390
+ypos -1536
+}
+Copy {
+inputs 2
+bbox B
+name COPY_CHANNEL002
+xpos 1390
+ypos -1498
+}
+Copy {
+inputs 2
+bbox B
+name COPY_CHANNEL003
+xpos 1390
+ypos -1460
+}
+Copy {
+inputs 2
+bbox B
+name COPY_CHANNEL004
+xpos 1390
+ypos -1422
+}
+Copy {
+inputs 2
+bbox B
+name COPY_CHANNEL005
+xpos 1390
+ypos -1384
+}
+Colorspace {
+colorspace_in {{Colorspace1.colorspace_out}}
+name Colorspace3
+xpos 1390
+ypos -1330
+}
+Output {
+name Output1
+xpos 1390
+ypos -1258
+}
+end_group
+
+
+
+

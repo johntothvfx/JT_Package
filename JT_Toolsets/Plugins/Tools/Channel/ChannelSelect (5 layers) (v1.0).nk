@@ -1,0 +1,1021 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name ChannelSelect
+ help "Useful when multiple mattes are in multiple channels to quickly shuffle them out into seperate RGBA to then combine them into 1 solid matte."
+ tile_color 0x5a00ff
+ selected true
+ addUserKnob {20 Settings l "Channel Select"}
+ addUserKnob {83 keepChannels l Channels t "This simply removes every other channels from this current pipe besides RGBA output." M {Keep Remove}}
+ keepChannels Remove
+ addUserKnob {26 ""}
+ addUserKnob {41 channel01 l "" t "Selected channel selected and split seperately RGBA combinging the channels together afterwards." +STARTLINE T Shuffle104.in}
+ addUserKnob {20 extra_1 l "Selected Matte Control" n 1}
+ extra_1 0
+ addUserKnob {83 Red_1 l "Red: " t "Enable or disable red channel" M {Active Disabled}}
+ addUserKnob {26 space_1 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityR_1 l "Opacity: " t "Opacity of the Red." -STARTLINE}
+ opacityR_1 1
+ addUserKnob {83 Green_1 l "Green: " t "Enable or disable green channel" M {Active Disabled}}
+ addUserKnob {26 space_2 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityG_1 l "Opacity: " t "Opacity of the Green." -STARTLINE}
+ opacityG_1 1
+ addUserKnob {83 Blue_1 l "Blue: " t "Enable or disable blue channel" M {Active Disabled}}
+ addUserKnob {26 space3 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityB_1 l "Opacity: " t "Opacity of the Blue." -STARTLINE}
+ opacityB_1 1
+ addUserKnob {83 Alpha_1 l "Alpha: " t "Enable or disable alpha channel" M {Active Disabled}}
+ addUserKnob {26 space_4 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityA_1 l "Opacity: " t "Opacity of the Alpha." -STARTLINE}
+ opacityA_1 1
+ addUserKnob {20 endGroup n -1}
+ addUserKnob {26 ""}
+ addUserKnob {41 channel02 l "" t "Selected channel selected and split seperately RGBA combinging the channels together afterwards." +STARTLINE T Shuffle6.in}
+ addUserKnob {20 extra_1_1 l "Selected Matte Control" n 1}
+ extra_1_1 0
+ addUserKnob {83 Red_2 l "Red: " t "Enable or disable red channel" M {Active Disabled}}
+ addUserKnob {26 space_2_2 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityR_2 l "Opacity: " t "Opacity of the Red." -STARTLINE}
+ opacityR_2 1
+ addUserKnob {83 Green_2 l "Green: " t "Enable or disable green channel" M {Active Disabled}}
+ addUserKnob {26 space_2_1 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityG_2 l "Opacity: " t "Opacity of the Green." -STARTLINE}
+ opacityG_2 1
+ addUserKnob {83 Blue_2 l "Blue: " t "Enable or disable blue channel" M {Active Disabled}}
+ addUserKnob {26 space3_1 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityB_2 l "Opacity: " t "Opacity of the Blue." -STARTLINE}
+ opacityB_2 1
+ addUserKnob {83 Alpha_2 l "Alpha: " t "Enable or disable alpha channel" M {Active Disabled}}
+ addUserKnob {26 space_4_1 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityA_2 l "Opacity: " t "Opacity of the Alpha." -STARTLINE}
+ opacityA_2 1
+ addUserKnob {20 endGroup_1 l endGroup n -1}
+ addUserKnob {26 ""}
+ addUserKnob {41 Channel3 l "" t "Selected channel selected and split seperately RGBA combinging the channels together afterwards." +STARTLINE T Shuffle7.in}
+ addUserKnob {20 extra_1_2 l "Selected Matte Control" n 1}
+ extra_1_2 0
+ addUserKnob {83 Red_3 l "Red: " t "Enable or Disable Red Channel" M {Active Disabled}}
+ addUserKnob {26 space_1_1 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityR_3 l "Opacity: " t "Opacity of the Red." -STARTLINE}
+ opacityR_3 1
+ addUserKnob {83 Green_3 l "Green: " t "Enable or disable green channel" M {Active Disabled}}
+ addUserKnob {26 space_2_3 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityG_3 l "Opacity: " t "Opacity of the Green." -STARTLINE}
+ opacityG_3 1
+ addUserKnob {83 Blue_3 l "Blue: " t "Enable or disable blue channel" M {Active Disabled}}
+ addUserKnob {26 space3_2 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityB_3 l "Opacity: " t "Opacity of the Blue." -STARTLINE}
+ opacityB_3 1
+ addUserKnob {83 Alpha_3 l "Alpha: " t "Enable or disable alpha channel" M {Active Disabled}}
+ addUserKnob {26 space_4_2 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityA_3 l "Opacity: " t "Opacity of the Alpha." -STARTLINE}
+ opacityA_3 1
+ addUserKnob {20 endGroup_2 l endGroup n -1}
+ addUserKnob {26 ""}
+ addUserKnob {41 Channel4 l "" t "Selected channel selected and split seperately RGBA combinging the channels together afterwards." +STARTLINE T Shuffle12.in}
+ addUserKnob {20 extra_1_1_1 l "Selected Matte Control" n 1}
+ extra_1_1_1 0
+ addUserKnob {83 Red_4 l "Red: " t "Enable or disable red channel" M {Active Disabled}}
+ addUserKnob {26 space_2_2_1 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityR_4 l "Opacity: " t "Opacity of the Red." -STARTLINE}
+ opacityR_4 1
+ addUserKnob {83 Green_4 l "Green: " t "Enable or disable green channel" M {Active Disabled}}
+ addUserKnob {26 space_2_1_1 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityG_4 l "Opacity: " t "Opacity of the green." -STARTLINE}
+ opacityG_4 1
+ addUserKnob {83 Blue_4 l "Blue: " t "Enable or disable blue channel" M {Active Disabled}}
+ addUserKnob {26 space3_1_1 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityB_4 l "Opacity: " t "Opacity of the blue." -STARTLINE}
+ opacityB_4 1
+ addUserKnob {83 Alpha_4 l "Alpha: " t "Enable or disable alpha channel" M {Active Disabled}}
+ addUserKnob {26 space_4_1_1 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityA_4 l "Opacity: " t "Opacity of the alpha." -STARTLINE}
+ opacityA_4 1
+ addUserKnob {20 endGroup_1_1 l endGroup n -1}
+ addUserKnob {26 ""}
+ addUserKnob {41 Channel5 l "" t "Selected channel selected and split seperately RGBA combinging the channels together afterwards." +STARTLINE T Shuffle17.in}
+ addUserKnob {20 extra_1_3 l "Selected Matte Control" n 1}
+ extra_1_3 0
+ addUserKnob {83 Red_5 l "Red: " t "Enable or disable red channel" M {Active Disabled}}
+ addUserKnob {26 space_1_2 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityR_5 l "Opacity: " t "Opacity of the Red." -STARTLINE}
+ opacityR_5 1
+ addUserKnob {83 Green_5 l "Green: " t "Enable or disable green channel" M {Active Disabled}}
+ addUserKnob {26 space_2_4 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityG_5 l "Opacity: " t "Opacity of the green." -STARTLINE}
+ opacityG_5 1
+ addUserKnob {83 Blue_5 l "Blue: " t "Enable or disable blue channel" M {Active Disabled}}
+ addUserKnob {26 space3_3 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityB_5 l "Opacity: " t "Opacity of the blue." -STARTLINE}
+ opacityB_5 1
+ addUserKnob {83 Alpha_5 l "Alpha: " t "Enable or disable alpha channel" M {Active Disabled}}
+ addUserKnob {26 space_4_3 l "" -STARTLINE T "     "}
+ addUserKnob {7 opacityA_5 l "Opacity: " t "Opacity of the alpha." -STARTLINE}
+ opacityA_5 1
+ addUserKnob {20 endGroup_3 l endGroup n -1}
+ addUserKnob {26 ""}
+ addUserKnob {83 swhite l Output: t "Keeps the Current RGB Colours from source selected Channel while using the merge (max operation) to combine the alpha channels.\n\nWhite simple puts RGB into a solid white colour." M {RGBA White}}
+ swhite White
+ addUserKnob {26 Title l "" +STARTLINE T "<br><br><font size='5'>Chanel Select</font><span style=\"color:rgb(99,186,75)\"> v1.0"}
+ addUserKnob {20 help_1 l Help}
+ addUserKnob {26 Guide l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 steps l "" +STARTLINE T "<br><strong>1. </br> \nChannel Select is used to be able to<br> quickly select multiple channels which <br>contain mattes to combine.\n<br>\n<br><strong>2. </br> </b>\nThis node is for speed purposes.<br>\n<i><b> Example: </b> If you have roto for each finger <br>and the palm you could quickly use this node to combine <br>the channels together to create a hand.\n<br>\n<br><strong>3. </br> </b>\nInside the node it will shuffle out <b>\"RGBA\"</b> <br>all seperately and use the <b>\"max\"</b> operation to <br> combine the mattes while having control over<br> opacity and disabled either RGBA.\n\n<br><br><b>John Toth © 2020 <br>"}
+ addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:rgb(99,186,75)\">johntothvfx.com</a>\n"}
+ addUserKnob {26 linkspace l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 Log l "<a href=\"https://johntothvfx.com\"><span style=\"color:rgb(99,186,75)\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool.</i><br><br></i><b>John Toth © 2020\")\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos -150
+  ypos 135
+ }
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -116
+  ypos 282
+ }
+set N321dee00 [stack 0]
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 720
+  ypos 282
+ }
+set N1f2c7ab0 [stack 0]
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1534
+  ypos 282
+ }
+set N32b87860 [stack 0]
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2304
+  ypos 282
+ }
+set Nf8724f0 [stack 0]
+ Dot {
+  name Dot18
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3074
+  ypos 282
+ }
+set N7542fa0 [stack 0]
+ Dot {
+  name Dot25
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3954
+  ypos 282
+ }
+ Shuffle {
+  in none
+  name Shuffle17
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 3920
+  ypos 415
+ }
+ Remove {
+  operation keep
+  channels rgba
+  name Remove20
+  xpos 3920
+  ypos 500
+ }
+ Dot {
+  name Dot26
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3954
+  ypos 643
+ }
+set N27298dc0 [stack 0]
+ Dot {
+  name Dot27
+  xpos 4064
+  ypos 643
+ }
+set N329ef9e0 [stack 0]
+ Dot {
+  name Dot28
+  xpos 4174
+  ypos 643
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle21
+  tile_color 0xffffffff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 4140
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityA_5}}
+  name Multiply17
+  label "value: \[value value]"
+  xpos 4140
+  ypos 849
+ }
+ Remove {
+  name Remove21
+  xpos 4140
+  ypos 885
+  disable {{!Alpha_5}}
+ }
+push $N329ef9e0
+ Shuffle {
+  red black
+  green black
+  alpha blue
+  name Shuffle20
+  tile_color 0x274d9cff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 4030
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityB_5}}
+  name Multiply18
+  label "value: \[value value]"
+  xpos 4030
+  ypos 849
+ }
+ Remove {
+  name Remove22
+  xpos 4030
+  ypos 885
+  disable {{!Blue_5}}
+ }
+push 0
+push $N27298dc0
+ Dot {
+  name Dot29
+  xpos 3844
+  ypos 643
+ }
+set N350ccf50 [stack 0]
+ Shuffle {
+  red black
+  blue black
+  alpha green
+  name Shuffle19
+  tile_color 0x2e9c27ff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 3810
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityG_5}}
+  name Multiply19
+  label "value: \[value value]"
+  xpos 3810
+  ypos 849
+ }
+ Remove {
+  name Remove23
+  xpos 3810
+  ypos 885
+  disable {{!Green_5}}
+ }
+push $N350ccf50
+ Dot {
+  name Dot30
+  xpos 3734
+  ypos 643
+ }
+ Shuffle {
+  green black
+  blue black
+  alpha red
+  name Shuffle18
+  tile_color 0x9c2828ff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 3700
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityR_5}}
+  name Multiply20
+  label "value: \[value value]"
+  xpos 3700
+  ypos 849
+ }
+ Remove {
+  name Remove24
+  xpos 3700
+  ypos 885
+  disable {{!Red_5}}
+ }
+ Merge2 {
+  inputs 4+1
+  operation max
+  name Max5
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 3920
+  ypos 1070
+ }
+ Dot {
+  name Dot31
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3954
+  ypos 1343
+ }
+push $N7542fa0
+ Shuffle {
+  in none
+  name Shuffle12
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 3040
+  ypos 415
+ }
+ Remove {
+  operation keep
+  channels rgba
+  name Remove15
+  xpos 3040
+  ypos 500
+ }
+ Dot {
+  name Dot19
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3074
+  ypos 643
+ }
+set N350dcef0 [stack 0]
+ Dot {
+  name Dot20
+  xpos 3184
+  ypos 643
+ }
+set N15dda5b0 [stack 0]
+ Dot {
+  name Dot21
+  xpos 3294
+  ypos 643
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle16
+  tile_color 0xffffffff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 3260
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityA_4}}
+  name Multiply13
+  label "value: \[value value]"
+  xpos 3260
+  ypos 849
+ }
+ Remove {
+  name Remove16
+  xpos 3260
+  ypos 885
+  disable {{!Alpha_4}}
+ }
+push $N15dda5b0
+ Shuffle {
+  red black
+  green black
+  alpha blue
+  name Shuffle15
+  tile_color 0x274d9cff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 3150
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityB_4}}
+  name Multiply14
+  label "value: \[value value]"
+  xpos 3150
+  ypos 849
+ }
+ Remove {
+  name Remove17
+  xpos 3150
+  ypos 885
+  disable {{!Blue_4}}
+ }
+push 0
+push $N350dcef0
+ Dot {
+  name Dot22
+  xpos 2964
+  ypos 643
+ }
+set N272b09d0 [stack 0]
+ Shuffle {
+  red black
+  blue black
+  alpha green
+  name Shuffle14
+  tile_color 0x2e9c27ff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 2930
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityG_4}}
+  name Multiply15
+  label "value: \[value value]"
+  xpos 2930
+  ypos 849
+ }
+ Remove {
+  name Remove18
+  xpos 2930
+  ypos 885
+  disable {{!Green_4}}
+ }
+push $N272b09d0
+ Dot {
+  name Dot23
+  xpos 2854
+  ypos 643
+ }
+ Shuffle {
+  green black
+  blue black
+  alpha red
+  name Shuffle13
+  tile_color 0x9c2828ff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 2820
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityR_4}}
+  name Multiply16
+  label "value: \[value value]"
+  xpos 2820
+  ypos 849
+ }
+ Remove {
+  name Remove19
+  xpos 2820
+  ypos 885
+  disable {{!Red_4}}
+ }
+ Merge2 {
+  inputs 4+1
+  operation max
+  name Max4
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 3040
+  ypos 1070
+ }
+ Merge2 {
+  inputs 2
+  operation max
+  name Max8
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 3040
+  ypos 1329
+ }
+push $Nf8724f0
+ Shuffle {
+  in none
+  name Shuffle7
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 2270
+  ypos 410
+ }
+ Remove {
+  operation keep
+  channels rgba
+  name Remove10
+  xpos 2270
+  ypos 495
+ }
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2304
+  ypos 638
+ }
+set N35c2b3a0 [stack 0]
+ Dot {
+  name Dot13
+  xpos 2414
+  ypos 638
+ }
+set N350c44e0 [stack 0]
+ Dot {
+  name Dot14
+  xpos 2524
+  ypos 638
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle11
+  tile_color 0xffffffff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 2490
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityA_3}}
+  name Multiply9
+  label "value: \[value value]"
+  xpos 2490
+  ypos 844
+ }
+ Remove {
+  name Remove11
+  xpos 2490
+  ypos 880
+  disable {{!Alpha_2}}
+ }
+push $N350c44e0
+ Shuffle {
+  red black
+  green black
+  alpha blue
+  name Shuffle10
+  tile_color 0x274d9cff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 2380
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityB_3}}
+  name Multiply10
+  label "value: \[value value]"
+  xpos 2380
+  ypos 844
+ }
+ Remove {
+  name Remove12
+  xpos 2380
+  ypos 880
+  disable {{!Blue_2}}
+ }
+push 0
+push $N35c2b3a0
+ Dot {
+  name Dot15
+  xpos 2194
+  ypos 638
+ }
+set N15e28440 [stack 0]
+ Shuffle {
+  red black
+  blue black
+  alpha green
+  name Shuffle9
+  tile_color 0x2e9c27ff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 2160
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityG_3}}
+  name Multiply11
+  label "value: \[value value]"
+  xpos 2160
+  ypos 844
+ }
+ Remove {
+  name Remove13
+  xpos 2160
+  ypos 880
+  disable {{!Green_3}}
+ }
+push $N15e28440
+ Dot {
+  name Dot16
+  xpos 2084
+  ypos 638
+ }
+ Shuffle {
+  green black
+  blue black
+  alpha red
+  name Shuffle8
+  tile_color 0x9c2828ff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 2050
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityR_3}}
+  name Multiply12
+  label "value: \[value value]"
+  xpos 2050
+  ypos 844
+ }
+ Remove {
+  name Remove14
+  xpos 2050
+  ypos 880
+  disable {{!Red_3}}
+ }
+ Merge2 {
+  inputs 4+1
+  operation max
+  name Max3
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 2270
+  ypos 1065
+ }
+ Merge2 {
+  inputs 2
+  operation max
+  name Max7
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 2270
+  ypos 1329
+ }
+push $N32b87860
+ Shuffle {
+  in none
+  name Shuffle6
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 1500
+  ypos 410
+ }
+ Remove {
+  operation keep
+  channels rgba
+  name Remove5
+  xpos 1500
+  ypos 495
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1534
+  ypos 638
+ }
+set N1fcb9fd0 [stack 0]
+ Dot {
+  name Dot4
+  xpos 1644
+  ypos 638
+ }
+set N1f885f90 [stack 0]
+ Dot {
+  name Dot5
+  xpos 1754
+  ypos 638
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle5
+  tile_color 0xffffffff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 1720
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityA_2}}
+  name Multiply5
+  label "value: \[value value]"
+  xpos 1720
+  ypos 844
+ }
+ Remove {
+  name Remove6
+  xpos 1720
+  ypos 880
+  disable {{!Alpha_2}}
+ }
+push $N1f885f90
+ Shuffle {
+  red black
+  green black
+  alpha blue
+  name Shuffle4
+  tile_color 0x274d9cff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 1610
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityB_2}}
+  name Multiply6
+  label "value: \[value value]"
+  xpos 1610
+  ypos 844
+ }
+ Remove {
+  name Remove7
+  xpos 1610
+  ypos 880
+  disable {{!Blue_2}}
+ }
+push 0
+push $N1fcb9fd0
+ Dot {
+  name Dot6
+  xpos 1424
+  ypos 638
+ }
+set N387fc1d0 [stack 0]
+ Shuffle {
+  red black
+  blue black
+  alpha green
+  name Shuffle3
+  tile_color 0x2e9c27ff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 1390
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityG_2}}
+  name Multiply7
+  label "value: \[value value]"
+  xpos 1390
+  ypos 844
+ }
+ Remove {
+  name Remove8
+  xpos 1390
+  ypos 880
+  disable {{!Green_2}}
+ }
+push $N387fc1d0
+ Dot {
+  name Dot7
+  xpos 1314
+  ypos 638
+ }
+ Shuffle {
+  green black
+  blue black
+  alpha red
+  name Shuffle2
+  tile_color 0x9c2828ff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 1280
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityR_2}}
+  name Multiply8
+  label "value: \[value value]"
+  xpos 1280
+  ypos 844
+ }
+ Remove {
+  name Remove9
+  xpos 1280
+  ypos 880
+  disable {{!Red_2}}
+ }
+ Merge2 {
+  inputs 4+1
+  operation max
+  name Max1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 1500
+  ypos 1065
+ }
+ Merge2 {
+  inputs 2
+  operation max
+  name Max6
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 1500
+  ypos 1329
+ }
+push $N1f2c7ab0
+ Shuffle {
+  in none
+  name Shuffle104
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 686
+  ypos 410
+ }
+ Remove {
+  operation keep
+  channels rgba
+  name Remove50
+  xpos 686
+  ypos 495
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 720
+  ypos 638
+ }
+set N386eb7e0 [stack 0]
+ Dot {
+  name Dot430
+  xpos 830
+  ypos 638
+ }
+set N386f0700 [stack 0]
+ Dot {
+  name Dot1
+  xpos 940
+  ypos 638
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle1
+  tile_color 0xffffffff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 906
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityA_1}}
+  name Multiply4
+  label "value: \[value value]"
+  xpos 906
+  ypos 844
+ }
+ Remove {
+  name Remove4
+  xpos 906
+  ypos 880
+  disable {{!Alpha_1}}
+ }
+push $N386f0700
+ Shuffle {
+  red black
+  green black
+  alpha blue
+  name Shuffle112
+  tile_color 0x274d9cff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 796
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityB_1}}
+  name Multiply3
+  label "value: \[value value]"
+  xpos 796
+  ypos 844
+ }
+ Remove {
+  name Remove3
+  xpos 796
+  ypos 880
+  disable {{!Blue_1}}
+ }
+push 0
+push $N386eb7e0
+ Dot {
+  name Dot365
+  xpos 610
+  ypos 638
+ }
+set N38862400 [stack 0]
+ Shuffle {
+  red black
+  blue black
+  alpha green
+  name Shuffle111
+  tile_color 0x2e9c27ff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 576
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityG_1}}
+  name Multiply2
+  label "value: \[value value]"
+  xpos 576
+  ypos 844
+ }
+ Remove {
+  name Remove2
+  xpos 576
+  ypos 880
+  disable {{!Green_1}}
+ }
+push $N38862400
+ Dot {
+  name Dot366
+  xpos 500
+  ypos 638
+ }
+ Shuffle {
+  green black
+  blue black
+  alpha red
+  name Shuffle110
+  tile_color 0x9c2828ff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 466
+  ypos 698
+ }
+ Multiply {
+  channels rgba
+  value {{opacityR_1}}
+  name Multiply1
+  label "value: \[value value]"
+  xpos 466
+  ypos 844
+ }
+ Remove {
+  name Remove1
+  xpos 466
+  ypos 880
+  disable {{!Red_1}}
+ }
+ Merge2 {
+  inputs 4+1
+  operation max
+  name Max
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 686
+  ypos 1072
+ }
+ Merge2 {
+  inputs 2
+  operation max
+  name Max2
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 686
+  ypos 1329
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle22
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 686
+  ypos 1466
+  disable {{!swhite}}
+ }
+ Clamp {
+  channels rgba
+  name Clamp12
+  xpos 686
+  ypos 1671
+ }
+push $N321dee00
+ Remove {
+  name Remove25
+  xpos -150
+  ypos 417
+  disable {{!keepChannels}}
+ }
+ Copy {
+  inputs 2
+  from0 -rgba.alpha
+  to0 -rgba.alpha
+  channels rgba
+  name Copy1
+  xpos -150
+  ypos 1658
+ }
+ Output {
+  name Output1
+  xpos -150
+  ypos 1911
+ }
+end_group
