@@ -1,0 +1,78 @@
+Group {
+ name Lift1
+ help "Any pixels that are black are set to this color."
+ onCreate "nuke.thisNode().knob(\"value\").setValue(0)\nnuke.thisNode().knob(\"onCreate\").setValue(\"\")"
+ tile_color 0x7aa9ffff
+ selected true
+ addUserKnob {20 lift l Lift}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION Lift
+ addUserKnob {41 channels T Add11.channels}
+ addUserKnob {19 value t "Blacks is turned into this color" R -1 1}
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannelMask l mask t "\nEnables the associated mask channel to the right. Disabling this checkbox is the same as setting the channel to none. \n\n\n\nThe channel to use as a mask. By default, the filter effect is limited to the non-black areas of this channel." T Add11.maskChannelMask}
+ addUserKnob {41 inject t "Copies the mask input to the predefined mask.a channel. Injecting the mask allows you to use the same mask further downstream." -STARTLINE T Add11.inject}
+ addUserKnob {41 invert_mask l invert t "Inverts the use of the mask channel, so that the merge is limited to the non-white areas of the mask.\n" -STARTLINE T Add11.invert_mask}
+ addUserKnob {41 fringe t "When enabled, only apply the effect to the edge of the mask. \nWhen disabled, the effect is applied to the entire mask." -STARTLINE T Add11.fringe}
+ addUserKnob {41 mix t "Dissolves between the original image at 0 and the full effect at 1." T Add11.mix}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" t "Node version info, for more information look at version log" +STARTLINE T "<br><font size='5'>Lift</font><font color=#7AA9FF> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 overview l "" t "Overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>Lift</b> turns Blacks into this color\n</i>\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#7AA9FF;\">John Toth <b>© 2025 <br>\n"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#7AA9FF\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#7AA9FF\">Version Log</span></a>" t "Contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nversion_number = \"1.0.0\"\ncontext = \"Color\"\nmodified_date = \"22th February 2025\"\ndeveloper = \"John Toth © 2025\"\nsite = \"<a href='website linke here'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n-  Turns Blacks into this color\n\"\"\"\nthank_you = \"thanks message here\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"</i>\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}
+ Input {
+  inputs 0
+  name mask
+  label "\[value number]"
+  selected true
+  xpos -370
+  ypos -373
+  number 1
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -336
+  ypos -294
+ }
+set N4c2db200 [stack 0]
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -336
+  ypos -222
+ }
+push $N4c2db200
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos -495
+  ypos -373
+ }
+ Multiply {
+  inputs 1+1
+  channels {{{parent.Add11.channels}}}
+  value {{(1-parent.value)}}
+  name Multiply183
+  xpos -495
+  ypos -301
+ }
+ Add {
+  inputs 1+1
+  value {{parent.value}}
+  name Add11
+  xpos -495
+  ypos -229
+ }
+ Output {
+  name Output1
+  xpos -495
+  ypos -153
+ }
+end_group

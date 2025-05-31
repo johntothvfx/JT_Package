@@ -1,0 +1,207 @@
+Group {
+ name DeepToPosition1
+ help "Generates a position pass using the deep/camera information."
+ knobChanged "k = nuke.thisKnob()\nn = nuke.thisNode()\n\nif k.name() == 'inputChange':\n    c_cls = set(\['Camera'] + \[f'Camera\{i\}' for i in range(1, 100)])\n    g_cls = \{'Group', 'NoOp', 'Gizmo', 'Dot'\}\n    s_cls = set(\['ScanlineRender'] + \[f'ScanlineRender\{i\}' for i in range(1, 100)])\n    a_cls_0 = g_cls.union(s_cls, \{'Deep'\})\n    d_cls = set(\['DeepToImage'] + \[f'DeepToImage\{i\}' for i in range(1, 100)])\n\n    for i in range(2):\n        inp = n.input(i)\n        if inp:\n            cls = inp.Class()\n            if i == 0 and (not any(d in cls for d in d_cls) and (cls.startswith('Deep') or cls in a_cls_0)):\n                continue\n            elif i == 1 and (cls in g_cls or cls in c_cls):\n                continue\n            n.setInput(i, None)\n"
+ tile_color 0x60ff
+ selected true
+ addUserKnob {20 deepToPosition l "Deep To Position"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION DeepToPosition
+ addUserKnob {1 output l INVISIBLE +INVISIBLE}
+ output "\[expr \{\[numvalue positionOut] ? \"camera\" : \"world\" \}]"
+ addUserKnob {41 channels l output t "The generated position pass will be output to the selected channel." T ShuffleCopy1.out}
+ addUserKnob {4 positionOut l position t "The position generated will be either:\n\n<b>• World space</b> - is the coordinate system for the entire scene. Its origin is at the center of the scene. The grid you see in 3D is in the world space.\n\n<b>• Camera space</b> -  is the coordinate system from the camera's point of view.\n\n\n<i>Note:</i> The generated pass is unpremultiplied" M {world camera "" "" "" "" "" ""}}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" t "Node version info, for more information look at version log" +STARTLINE T "<br><font size='5'>Deep To Position</font><font color=#000060> v1.0</font>"}
+ addUserKnob {26 divider_001 l "" +STARTLINE}
+ addUserKnob {26 bulletpoints l "" t "Overview of the node" +STARTLINE T "<br><strong>•</strong><b>Deep To Position</b> - generates a position pass<br>using the deep/camera information.</b>\n<br><br>\n\n<i>\n<b>• World space</b> -\nis the coordinate system for the<br>entire scene. \n<br>\n<b>• Camera space</b> -  is the coordinate system from<br>the camera's point of view.\n\n</i><br><br>\n<b><a href=\"https://johntothvfx.com\" style=\"color:#000060;\">John Toth © 2024</a></b><br>"}
+ addUserKnob {26 divider_002 l "" +STARTLINE}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#000060\">Tool Demo</span></a>" t "Launches the web page where it will have more documentation or a video about the node." -STARTLINE +INVISIBLE T "nuke.message(\"coming soon\")"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#000060\">Version Log</span></a>" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "version_number = \"1.0.1\"\ncontext = \"Deep\"\nmodified_date = \"30th July 2024\"\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- generates a position layer using deep/camera information\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)\n\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos -100
+  ypos -85
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -66
+  ypos 114
+ }
+set N1b4e4a00 [stack 0]
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 154
+  ypos 114
+ }
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 154
+  ypos 235
+ }
+set N1b201e00 [stack 0]
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 264
+  ypos 235
+ }
+ DeepToImage2 {
+  name DeepToImage3
+  xpos 230
+  ypos 299
+ }
+ Shuffle {
+  red white
+  green white
+  blue white
+  alpha white
+  name Shuffle7
+  tile_color 0xddddddff
+  label "<center><b>\[value in]</b> &rarr; \[value out]\n\nrgba to 1\nto crate rgba\nchannels in the\ndeep pass"
+  xpos 230
+  ypos 358
+ }
+ Dot {
+  name Dot18
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 264
+  ypos 522
+ }
+push $N1b201e00
+ DeepRecolor {
+  inputs 2
+  name DeepRecolor2
+  label "\[expr \{ \[value targetInputAlpha] ?  \"(target input alpha)\" : \"\"\}]"
+  xpos 120
+  ypos 519
+ }
+ DeepExpression {
+  chans1 none
+  rgba.red "(((x / input.width) * 2) - 1)"
+  rgba.green "(((y / input.height) * 2) - 1) * (input.height / input.width) / input.pixel_aspect"
+  rgba.blue deep.front
+  rgba.alpha 1
+  name DeepExpression1
+  label "screenspace\n-1 , 1"
+  xpos 120
+  ypos 630
+ }
+ DeepExpression {
+  chans1 none
+  rgba.red "rgba.red + \[value CameraInput.win_translate.0]"
+  rgba.green "rgba.green + \[value CameraInput.win_translate.1]"
+  rgba.blue deep.front
+  rgba.alpha 1
+  name DeepExpression2
+  label "window translate\nx"
+  xpos 120
+  ypos 702
+ }
+ DeepExpression {
+  chans1 none
+  rgba.red "rgba.red / (2 * \[value CameraInput.focal] / \[value CameraInput.haperture])"
+  rgba.green "rgba.green / (2 * \[value CameraInput.focal] / \[value CameraInput.haperture])"
+  rgba.blue -1
+  rgba.alpha -rgba.blue
+  name DeepExpression3
+  label "inverted matrix"
+  xpos 120
+  ypos 779
+ }
+ DeepExpression {
+  chans1 none
+  rgba.red "(rgba.red * -deep.front) / rgba.blue"
+  rgba.green "(rgba.green * -deep.front) / rgba.blue"
+  rgba.blue -deep.front
+  rgba.alpha 1
+  name DeepExpression4
+  label normalize
+  xpos 120
+  ypos 851
+ }
+ DeepExpression {
+  chans1 none
+  rgba.red "\[value CameraInput.world_matrix.0] * rgba.red + \[value CameraInput.world_matrix.1] * rgba.green + \[value CameraInput.world_matrix.2] * rgba.blue + \[value CameraInput.world_matrix.3] * rgba.alpha"
+  rgba.green "\[value CameraInput.world_matrix.4] * rgba.red + \[value CameraInput.world_matrix.5] * rgba.green + \[value CameraInput.world_matrix.6] * rgba.blue + \[value CameraInput.world_matrix.7] * rgba.alpha"
+  rgba.blue "\[value CameraInput.world_matrix.8] * rgba.red + \[value CameraInput.world_matrix.9] * rgba.green + \[value CameraInput.world_matrix.10] * rgba.blue + \[value CameraInput.world_matrix.11] * rgba.alpha"
+  rgba.alpha 1
+  name DeepExpression5
+  label "cam to world"
+  xpos 120
+  ypos 923
+  disable {{positionOut}}
+ }
+ DeepToImage2 {
+  name DeepToImage2
+  xpos 120
+  ypos 999
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 154
+  ypos 1194
+ }
+push $N1b4e4a00
+ DeepToImage2 {
+  name DeepToImage1
+  xpos -100
+  ypos 999
+ }
+ ShuffleCopy {
+  inputs 2
+  red red
+  green green
+  blue blue
+  name ShuffleCopy1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -100
+  ypos 1181
+ }
+ Output {
+  name Output
+  xpos -100
+  ypos 1383
+ }
+ Input {
+  inputs 0
+  name Camera
+  label "\[value number]"
+  xpos -370
+  ypos -85
+  number 1
+ }
+ Axis2 {
+  name CameraInput
+  tile_color 0xffff
+  xpos -360
+  ypos 42
+  addUserKnob {20 User}
+  addUserKnob {7 focal}
+  focal {{"\[expr \{\n  \[catch \{\n    set cam \[value code]\n    expr \{\[string length \$cam] > 0 ? \[value \$\{cam\}.focal] : 0\}\n  \} r] == 0 ? \$r : 0\n\}]\n"}}
+  addUserKnob {7 haperture}
+  haperture {{"\[expr \{\n  \[catch \{\n    set cam \[value code]\n    expr \{\[string length \$cam] > 0 ? \[value \$\{cam\}.haperture] : 0\}\n  \} r] == 0 ? \$r : 0\n\}]\n"}}
+  addUserKnob {26 ""}
+  addUserKnob {30 win_translate l "window translate"}
+  win_translate {{"\[expr \{\n  \[catch \{\n    set cam \[value code]\n    expr \{\[string length \$cam] > 0 ? \[value \$\{cam\}.win_translate.u] : 0\}\n  \} r] == 0 ? \$r : 0\n\}]\n"} {"\[expr \{\n  \[catch \{\n    set cam \[value code]\n    expr \{\[string length \$cam] > 0 ? \[value \$\{cam\}.win_translate.v] : 0\}\n  \} r] == 0 ? \$r : 0\n\}]\n"}}
+  addUserKnob {30 win_scale l "window scale"}
+  win_scale {{"\[expr \{\n  \[catch \{\n    set cam \[value code]\n    expr \{\[string length \$cam] > 0 ? \[value \$\{cam\}.win_scale.u] : 0\}\n  \} r] == 0 ? \$r : 0\n\}]\n"} {"\[expr \{\n  \[catch \{\n    set cam \[value code]\n    expr \{\[string length \$cam] > 0 ? \[value \$\{cam\}.win_scale.v] : 0\}\n  \} r] == 0 ? \$r : 0\n\}]\n"}}
+  addUserKnob {7 winroll l "window roll"}
+  winroll {{"\[expr \{\n  \[catch \{\n    set cam \[value code]\n    expr \{\[string length \$cam] > 0 ? \[value \$\{cam\}.winroll.u] : 0\}\n  \} r] == 0 ? \$r : 0\n\}]\n"}}
+  addUserKnob {43 code +INVISIBLE}
+  code "\[expr \{\n    \[catch \{\n        set n \[topnode parent.input1]\n        if \{\[string match \"Camera*\" \[class \$n]]\} \{\n            set r \$n\n        \} else \{\n            set r \"\"\n        \}\n    \}] == 0 ? \$r : \"\"\n\}]\n"
+ }
+end_group
