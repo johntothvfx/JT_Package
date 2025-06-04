@@ -1,8 +1,8 @@
 """
 =======================================================================
 DEVELOPER = 'John Toth'
-VERSION   = '1.2.7'
-UPDATED   = '3rd June, 2025'
+VERSION   = '1.2.9'
+UPDATED   = '5th June, 2025'
 
 
 Keyframe Animator
@@ -85,78 +85,6 @@ except ImportError:
 _keyframe_animator_window = None  # Prevent garbage collection
 
 
-# --- Helper function to detect if color knob is expanded ---
-def is_color_knob_expanded(knob):
-    """
-    Detect if a color knob is showing individual RGBA sliders or collapsed as a color picker.
-    Returns True if expanded (showing individual sliders), False if collapsed.
-    """
-    try:
-        print(f"=== CHECKING EXPANSION STATE FOR '{knob.name()}' ===")
-        print(f"Knob class: {knob.Class()}")
-
-        # Use the official Nuke API method for Color_Knob and AColor_Knob
-        if hasattr(knob, 'singleValue'):
-            try:
-                # singleValue() returns True if the knob is collapsed (single color picker)
-                # singleValue() returns False if the knob is expanded (individual RGBA sliders)
-                # So we need to invert it: expanded = NOT singleValue
-                is_single = knob.singleValue()
-                is_expanded = not is_single
-                
-                # Clear status messages
-                if is_single:
-                    print(f"  -> Channel Selector: NOT PRESSED (collapsed mode)")
-                    print(f"  -> UI State: Color picker/swatch only")
-                else:
-                    print(f"  -> Channel Selector: PRESSED (expanded mode)")
-                    print(f"  -> UI State: Individual RGBA sliders visible")
-                
-                print(f"  -> singleValue() API: singleValue={is_single}, expanded={is_expanded}")
-                
-                # Additional debugging - check other possible methods/properties
-                print(f"  -> ADDITIONAL DEBUG INFO:")
-                print(f"     - arraySize(): {knob.arraySize() if hasattr(knob, 'arraySize') else 'N/A'}")
-                print(f"     - dimensions(): {knob.dimensions() if hasattr(knob, 'dimensions') else 'N/A'}")
-                
-                # Check if there are other methods that might indicate expansion state
-                if hasattr(knob, 'expanded'):
-                    try:
-                        expanded_method = knob.expanded()
-                        print(f"     - expanded() method: {expanded_method}")
-                    except:
-                        print(f"     - expanded() method: Failed to call")
-                else:
-                    print(f"     - expanded() method: Not available")
-                
-                # Check current values to see if they're all the same (might indicate collapsed)
-                try:
-                    values = []
-                    for i in range(knob.arraySize()):
-                        values.append(knob.getValue(i))
-                    print(f"     - Current values: {values}")
-                    all_same = len(set(values)) <= 1
-                    print(f"     - All values same: {all_same}")
-                except:
-                    print(f"     - Current values: Failed to read")
-                
-                return is_expanded
-            except Exception as e:
-                print(f"  -> singleValue() method failed: {e}")
-        else:
-            print(f"  -> No singleValue() method available (not a Color_Knob)")
-
-        # Fallback: If it's not a Color_Knob/AColor_Knob, assume it's always expanded
-        # (since only true Color_Knob classes have the collapse/expand behavior)
-        print(f"  -> Not a Color_Knob class - assuming EXPANDED")
-        return True
-
-    except Exception as e:
-        print(f"ERROR detecting color knob state for '{knob.name()}': {e}")
-        # Default to expanded if we can't determine the state
-        return True
-
-
 # --- Key sequence button using ShortcutEditor technique ---
 class KeySequenceButton(QPushButton):
    """Button that records and displays a Qt key sequence, using shortcuteditor technique for formatting."""
@@ -227,6 +155,7 @@ class KeyframeRow(QWidget):
        self.knob_obj = knob_obj
        self.knob_name = knob_obj.name() if knob_obj else ""
        self.is_collapsed_color = is_collapsed_color
+       
        layout = QHBoxLayout(self)
        layout.setContentsMargins(0, 0, 0, 0)
 
@@ -241,48 +170,31 @@ class KeyframeRow(QWidget):
 
        # Ensure values is a list
        if values is None:
-           if is_collapsed_color and component_count > 1:
-               # For collapsed color knobs, we still store all components but show as one
-               values = [0.0] * component_count
-           else:
-               values = [0.0] * component_count
+           values = [0.0] * component_count
        elif not isinstance(values, (list, tuple)):
            values = [values] * component_count
 
-       if is_collapsed_color:
-           # Show as single color value (but we'll handle all components internally)
-           layout.addWidget(QLabel("Color:"))
-           print(f"  -> Creating COLLAPSED color field for '{self.knob_name}'")
-           # For display, we'll show the first value or an average/representative value
-           display_value = values[0] if values and len(values) > 0 else 0.0
-           value_edit = QLineEdit(str(display_value))
-           value_edit.setFixedWidth(80)
-           # Store all component values in a single edit field (we'll parse this differently)
-           actual_count = getattr(self, 'actual_component_count', len(values) if values else 4)
-           value_edit.setToolTip(f"Collapsed color knob - applies to all {actual_count} components")
-           self.value_edits.append(value_edit)
-           # Store the original values for internal use
-           self._color_components = values
-           layout.addWidget(value_edit)
-       elif component_count == 1:
-           # Single value
-           layout.addWidget(QLabel("Value:"))
-           print(f"  -> Creating SINGLE value field for '{self.knob_name}'")
-           value = values[0] if values and len(values) > 0 else 0.0
-           value_edit = QLineEdit(str(value))
-           value_edit.setFixedWidth(80)
-           self.value_edits.append(value_edit)
-           layout.addWidget(value_edit)
+       # Set actual component count properly - this is crucial for toggles
+       if hasattr(self, 'actual_component_count'):
+           # If it was passed from parent, keep it
+           pass
        else:
-           # Multiple values with appropriate labels
-           labels = self.get_component_labels(self.knob_obj, component_count)
-           for i in range(component_count):
-               layout.addWidget(QLabel(f"{labels[i]}:"))
-               value = values[i] if values and len(values) > i else 0.0
-               value_edit = QLineEdit(str(value))
-               value_edit.setFixedWidth(70)
-               self.value_edits.append(value_edit)
-               layout.addWidget(value_edit)
+           # Calculate it based on knob or values
+           if knob_obj and hasattr(knob_obj, 'arraySize'):
+               self.actual_component_count = knob_obj.arraySize()
+           else:
+               self.actual_component_count = max(len(values), component_count)
+
+       # Build value fields
+       self.build_value_fields(layout, values)
+
+       # Add toggle button for toggleable knobs (next to remove button)
+       if knob_obj and self.is_toggleable_knob(knob_obj):
+           self.toggle_btn = QPushButton()
+           self.toggle_btn.setFixedWidth(60)
+           self.update_toggle_button_text()
+           self.toggle_btn.clicked.connect(self.toggle_mode)
+           layout.addWidget(self.toggle_btn)
 
        # Remove button
        self.remove_btn = QPushButton("-")
@@ -290,6 +202,232 @@ class KeyframeRow(QWidget):
        self.remove_btn.clicked.connect(self._remove_self)
        layout.addWidget(self.remove_btn)
        layout.addItem(QSpacerItem(1, 1, QSizePolicy.Expanding, QSizePolicy.Minimum))
+
+   def is_toggleable_knob(self, knob):
+       """Check if this knob supports toggle functionality"""
+       if not knob:
+           return False
+       
+       knob_class = knob.Class()
+       return knob_class in ['Color_Knob', 'AColor_Knob', 'WH_Knob']
+
+   def update_toggle_button_text(self):
+       """Update toggle button text based on current mode and knob type"""
+       if not hasattr(self, 'toggle_btn'):
+           return
+           
+       knob_class = self.knob_obj.Class() if self.knob_obj else ""
+       
+       if self.is_collapsed_color:
+           # Currently in single value mode
+           if knob_class in ['Color_Knob', 'AColor_Knob']:
+               self.toggle_btn.setText("→ RGBA")
+               self.toggle_btn.setToolTip("Switch to individual R,G,B,A fields")
+           elif knob_class == 'WH_Knob':
+               self.toggle_btn.setText("→ W,H")
+               self.toggle_btn.setToolTip("Switch to individual W,H fields")
+       else:
+           # Currently in individual component mode
+           if knob_class in ['Color_Knob', 'AColor_Knob']:
+               self.toggle_btn.setText("→ Single")
+               self.toggle_btn.setToolTip("Switch to single value field")
+           elif knob_class == 'WH_Knob':
+               self.toggle_btn.setText("→ Size")
+               self.toggle_btn.setToolTip("Switch to single size field")
+
+   def build_value_fields(self, layout, values):
+       """Build the value input fields based on current mode"""
+       if self.is_collapsed_color:
+           # Show as single value (applies to all components)
+           knob_class = self.knob_obj.Class() if self.knob_obj else ""
+           
+           if knob_class in ['Color_Knob', 'AColor_Knob']:
+               layout.addWidget(QLabel("value:"))
+               tooltip_text = f"Single value - applies to all {self.actual_component_count} components"
+           elif knob_class == 'WH_Knob':
+               layout.addWidget(QLabel("size:"))
+               tooltip_text = f"Single size - applies to both W and H"
+           else:
+               layout.addWidget(QLabel("value:"))
+               tooltip_text = f"Single value - applies to all {self.actual_component_count} components"
+           
+           display_value = values[0] if values and len(values) > 0 else 0.0
+           value_edit = QLineEdit(str(display_value))
+           value_edit.setFixedWidth(80)
+           value_edit.setToolTip(tooltip_text)
+           self.value_edits.append(value_edit)
+           layout.addWidget(value_edit)
+       elif self.component_count == 1:
+           # Single value
+           layout.addWidget(QLabel("Value:"))
+           value = values[0] if values and len(values) > 0 else 0.0
+           value_edit = QLineEdit(str(value))
+           value_edit.setFixedWidth(80)
+           self.value_edits.append(value_edit)
+           layout.addWidget(value_edit)
+       else:
+           # Multiple values with appropriate labels
+           labels = self.get_component_labels(self.knob_obj, self.component_count)
+           for i in range(self.component_count):
+               label_widget = QLabel(f"{labels[i]}:")
+               layout.addWidget(label_widget)
+               value = values[i] if values and len(values) > i else 0.0
+               value_edit = QLineEdit(str(value))
+               value_edit.setFixedWidth(70)
+               self.value_edits.append(value_edit)
+               layout.addWidget(value_edit)
+
+   def toggle_mode(self):
+       """Toggle between single value and individual component modes for this row"""
+       try:
+           print(f"\n=== TOGGLE DEBUG ===")
+           print(f"Before toggle - is_collapsed_color: {self.is_collapsed_color}")
+           print(f"Before toggle - component_count: {self.component_count}")
+           print(f"Before toggle - actual_component_count: {self.actual_component_count}")
+           
+           # Get current values before switching
+           current_values = []
+           if self.is_collapsed_color:
+               # Currently collapsed - get the single value and apply to all components
+               try:
+                   single_value = float(self.value_edits[0].text())
+                   current_values = [single_value] * self.actual_component_count
+               except:
+                   current_values = [0.0] * self.actual_component_count
+           else:
+               # Currently expanded - get all individual values
+               for value_edit in self.value_edits:
+                   try:
+                       current_values.append(float(value_edit.text()))
+                   except:
+                       current_values.append(0.0)
+               
+               # Ensure we have enough values for all components
+               while len(current_values) < self.actual_component_count:
+                   current_values.append(current_values[0] if current_values else 0.0)
+           
+           print(f"Current values: {current_values}")
+           
+           # Toggle the mode
+           self.is_collapsed_color = not self.is_collapsed_color
+           
+           # Update component count for display BEFORE rebuilding
+           if self.is_collapsed_color:
+               self.component_count = 1
+           else:
+               self.component_count = self.actual_component_count
+           
+           print(f"After toggle - is_collapsed_color: {self.is_collapsed_color}")
+           print(f"After toggle - component_count: {self.component_count}")
+           print(f"After toggle - actual_component_count: {self.actual_component_count}")
+           
+           # Update toggle button text
+           self.update_toggle_button_text()
+           
+           # Rebuild the UI for this row
+           self.rebuild_row_ui(current_values)
+           
+           print(f"=== TOGGLE COMPLETE ===\n")
+           
+       except Exception as e:
+           print(f"Failed to toggle row mode: {e}")
+
+   def rebuild_row_ui(self, values):
+       """Rebuild this row's UI while preserving values"""
+       layout = self.layout()
+       
+       # Store references to toggle and remove buttons before clearing
+       toggle_btn = getattr(self, 'toggle_btn', None)
+       remove_btn = getattr(self, 'remove_btn', None)
+       
+       # Remove only value-related widgets (labels and input fields between frame and buttons)
+       items_to_remove = []
+       
+       # Find the positions of the toggle and remove buttons to know where to stop
+       toggle_index = -1
+       remove_index = -1
+       spacer_index = -1
+       
+       for i in range(layout.count()):
+           item = layout.itemAt(i)
+           if item and item.widget():
+               widget = item.widget()
+               if widget == toggle_btn:
+                   toggle_index = i
+               elif widget == remove_btn:
+                   remove_index = i
+           elif item and item.spacerItem():
+               spacer_index = i
+       
+       # Remove widgets between frame field (index 2) and buttons
+       end_index = min([idx for idx in [toggle_index, remove_index, spacer_index] if idx > 0])
+       
+       for i in range(2, end_index):  # Start after frame field, stop before buttons
+           item = layout.itemAt(2)  # Always remove item at index 2 as items shift down
+           if item and item.widget():
+               widget = item.widget()
+               layout.removeWidget(widget)
+               widget.setParent(None)
+               widget.deleteLater()
+           elif item:
+               layout.removeItem(item)
+       
+       # Clear value edits list since we're rebuilding them
+       self.value_edits = []
+       
+       # Build new value fields directly into the main layout at position 2
+       insert_index = 2
+       
+       if self.is_collapsed_color:
+           # Show as single value (applies to all components)
+           knob_class = self.knob_obj.Class() if self.knob_obj else ""
+           
+           if knob_class in ['Color_Knob', 'AColor_Knob']:
+               label_widget = QLabel("value:")
+               tooltip_text = f"Single value - applies to all {self.actual_component_count} components"
+           elif knob_class == 'WH_Knob':
+               label_widget = QLabel("size:")
+               tooltip_text = f"Single size - applies to both W and H"
+           else:
+               label_widget = QLabel("value:")
+               tooltip_text = f"Single value - applies to all {self.actual_component_count} components"
+           
+           layout.insertWidget(insert_index, label_widget)
+           insert_index += 1
+           
+           display_value = values[0] if values and len(values) > 0 else 0.0
+           value_edit = QLineEdit(str(display_value))
+           value_edit.setFixedWidth(80)
+           value_edit.setToolTip(tooltip_text)
+           self.value_edits.append(value_edit)
+           layout.insertWidget(insert_index, value_edit)
+           
+       elif self.component_count == 1:
+           # Single value
+           label_widget = QLabel("Value:")
+           layout.insertWidget(insert_index, label_widget)
+           insert_index += 1
+           
+           value = values[0] if values and len(values) > 0 else 0.0
+           value_edit = QLineEdit(str(value))
+           value_edit.setFixedWidth(80)
+           self.value_edits.append(value_edit)
+           layout.insertWidget(insert_index, value_edit)
+           
+       else:
+           # Multiple values with appropriate labels
+           labels = self.get_component_labels(self.knob_obj, self.component_count)
+           for i in range(self.component_count):
+               label_widget = QLabel(f"{labels[i]}:")
+               layout.insertWidget(insert_index, label_widget)
+               insert_index += 1
+               
+               value = values[i] if values and len(values) > i else 0.0
+               value_edit = QLineEdit(str(value))
+               value_edit.setFixedWidth(70)
+               self.value_edits.append(value_edit)
+               layout.insertWidget(insert_index, value_edit)
+               insert_index += 1
 
    def get_component_labels(self, knob, component_count):
        """Get appropriate labels based on knob class and component count"""
@@ -299,144 +437,92 @@ class KeyframeRow(QWidget):
        knob_class = knob.Class()
        knob_name_lower = knob.name().lower()
        
-       print(f"Getting labels for knob: '{knob.name()}' (class: {knob_class}, count: {component_count})")
-       
-       # =================================================================
-       # COLOR KNOBS - Always use RGBA regardless of name
-       # =================================================================
+       # Color knobs - Always use RGBA regardless of name
        if knob_class in ['Color_Knob', 'AColor_Knob']:
            if component_count == 1:
-               print(f"  -> Color knob with 1 component: ['Value']")
                return ['Value']
            elif component_count == 3:
-               print(f"  -> Color knob with 3 components: ['R', 'G', 'B']")
                return ['R', 'G', 'B']
            elif component_count == 4:
-               print(f"  -> Color knob with 4 components: ['R', 'G', 'B', 'A']")
                return ['R', 'G', 'B', 'A']
            else:
-               print(f"  -> Color knob with unusual component count: generic")
                return [str(i) for i in range(component_count)]
        
-       # =================================================================
-       # POSITION/TRANSFORM KNOBS
-       # =================================================================
+       # Position/Transform knobs
        elif knob_class in ['XY_Knob', 'Double2_Knob']:
-           print(f"  -> XY/Double2 knob: ['X', 'Y']")
            return ['X', 'Y']
        
        elif knob_class in ['XYZ_Knob', 'Double3_Knob']:
-           print(f"  -> XYZ/Double3 knob: ['X', 'Y', 'Z']")
            return ['X', 'Y', 'Z']
        
        elif knob_class == 'UV_Knob':
-           print(f"  -> UV knob: ['U', 'V']")
            return ['U', 'V']
        
        elif knob_class == 'WH_Knob':
-           print(f"  -> WH knob: ['W', 'H']")
            return ['W', 'H']
        
-       # =================================================================
-       # SINGLE VALUE KNOBS
-       # =================================================================
+       # Single value knobs
        elif knob_class in ['Double_Knob', 'Int_Knob', 'Float_Knob', 'Range_Knob', 
                            'Log2_Knob', 'Exponential_Knob', 'Scale_Knob']:
-           print(f"  -> Single value knob: ['Value']")
            return ['Value']
        
-       # =================================================================
-       # BBOX/FORMAT KNOBS
-       # =================================================================
+       # BBox/Format knobs
        elif knob_class == 'BBox_Knob':
            if component_count == 4:
-               print(f"  -> BBox knob: ['X', 'Y', 'R', 'T']")
                return ['X', 'Y', 'R', 'T']  # left, bottom, right, top
            else:
-               print(f"  -> BBox knob with unusual count: generic")
                return [str(i) for i in range(component_count)]
        
        elif knob_class == 'Format_Knob':
            if component_count == 2:
-               print(f"  -> Format knob: ['W', 'H']")
                return ['W', 'H']  # width, height
            else:
-               print(f"  -> Format knob with unusual count: generic")
                return [str(i) for i in range(component_count)]
        
-       # =================================================================
-       # PATTERN-BASED DETECTION FOR SPECIAL CASES
-       # (Only for knobs that don't have specific classes)
-       # =================================================================
-       
-       # Size/Scale related (when not caught by specific knob classes)
+       # Pattern-based detection for special cases
        elif component_count == 2:
            size_patterns = ['size', 'scale', 'translate', 'center', 'offset', 'blur']
            if any(pattern in knob_name_lower for pattern in size_patterns):
-               print(f"  -> 2D size/transform pattern detected: ['X', 'Y']")
                return ['X', 'Y']
            
-           # UV/ST texture coordinates
            uv_patterns = ['uv', 'st', 'texture']
            if any(pattern in knob_name_lower for pattern in uv_patterns):
-               print(f"  -> UV/texture pattern detected: ['U', 'V']")
                return ['U', 'V']
            
-           # Width/Height
            wh_patterns = ['width', 'height', 'resolution']
            if any(pattern in knob_name_lower for pattern in wh_patterns):
-               print(f"  -> Width/Height pattern detected: ['W', 'H']")
                return ['W', 'H']
            
-           print(f"  -> Generic 2D: ['X', 'Y']")
            return ['X', 'Y']
        
        elif component_count == 3:
-           # 3D Transform patterns
            transform_3d_patterns = ['translate', 'rotate', 'scale', 'center', 'pivot']
            if any(pattern in knob_name_lower for pattern in transform_3d_patterns):
-               print(f"  -> 3D transform pattern detected: ['X', 'Y', 'Z']")
                return ['X', 'Y', 'Z']
            
-           # RGB patterns (for knobs that aren't Color_Knob class but are color-related)
            rgb_patterns = ['color', 'colour', 'rgb', 'tint', 'grade', 'lift', 'gain', 
                           'gamma', 'offset', 'multiply', 'add', 'blackpoint', 'whitepoint']
            if any(pattern in knob_name_lower for pattern in rgb_patterns):
-               print(f"  -> RGB pattern detected: ['R', 'G', 'B']")
                return ['R', 'G', 'B']
            
-           print(f"  -> Generic 3D: ['X', 'Y', 'Z']")
            return ['X', 'Y', 'Z']
        
        elif component_count == 4:
-           # RGBA patterns (for knobs that aren't Color_Knob class but are color-related)
            rgba_patterns = ['color', 'colour', 'rgba', 'tint', 'grade', 'lift', 'gain',
                            'gamma', 'offset', 'multiply', 'add', 'blackpoint', 'whitepoint']
            if any(pattern in knob_name_lower for pattern in rgba_patterns):
-               print(f"  -> RGBA pattern detected: ['R', 'G', 'B', 'A']")
                return ['R', 'G', 'B', 'A']
            
-           # XYZW for 4D transforms
            transform_4d_patterns = ['matrix', 'quaternion', 'transform']
            if any(pattern in knob_name_lower for pattern in transform_4d_patterns):
-               print(f"  -> 4D transform pattern detected: ['X', 'Y', 'Z', 'W']")
                return ['X', 'Y', 'Z', 'W']
            
-           print(f"  -> Generic 4D: ['R', 'G', 'B', 'A']")
            return ['R', 'G', 'B', 'A']  # Default 4-component to RGBA
        
-       # =================================================================
-       # SINGLE COMPONENT OR FALLBACK
-       # =================================================================
        elif component_count == 1:
-           print(f"  -> Single component: ['Value']")
            return ['Value']
        
-       # =================================================================
-       # FALLBACK TO GENERIC NUMBERS
-       # =================================================================
        else:
-           print(f"  -> Fallback to generic labels: {[str(i) for i in range(component_count)]}")
            return [str(i) for i in range(component_count)]
 
    def _remove_self(self):
@@ -452,16 +538,12 @@ class KeyframeRow(QWidget):
        values = []
 
        if self.is_collapsed_color:
-           # For collapsed color knobs, apply the single value to all components
+           # For collapsed knobs, apply the single value to all components
            try:
                single_value = float(self.value_edits[0].text())
-               # Apply this value to all actual components
-               actual_count = getattr(self, 'actual_component_count', self.component_count)
-               values = [single_value] * actual_count
-               print(f"Collapsed color: applying value {single_value} to {actual_count} components")
+               values = [single_value] * self.actual_component_count
            except Exception:
-               actual_count = getattr(self, 'actual_component_count', self.component_count)
-               values = [0.0] * actual_count
+               values = [0.0] * self.actual_component_count
        else:
            # Normal multi-component handling
            for value_edit in self.value_edits:
@@ -469,7 +551,7 @@ class KeyframeRow(QWidget):
                    value = float(value_edit.text())
                    values.append(value)
                except Exception:
-                   values.append(0.0)  # Default to 0 instead of None
+                   values.append(0.0)
 
        return frame, values
 
@@ -482,20 +564,16 @@ class KeyframeAnimatorPreferences(QWidget):
        self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
        self.setMinimumWidth(420)
 
-
        self.on_save = on_save
        self.on_cancel = on_cancel
 
-
        vlayout = QVBoxLayout(self)
        vlayout.setSpacing(8)
-
 
        # Version info
        version_label = QLabel(f"<b>Version:</b> {VERSION}<br><b>Developer:</b> {DEVELOPER}<br><b>Updated:</b> {UPDATED}")
        vlayout.addWidget(version_label)
        vlayout.addSpacing(8)
-
 
        # Shortcut row (label + button, button stretches to edge)
        sh_row = QHBoxLayout()
@@ -506,14 +584,12 @@ class KeyframeAnimatorPreferences(QWidget):
        vlayout.addLayout(sh_row)
        vlayout.addSpacing(2)
 
-
        # Reset to default, edge to edge
        self.reset_btn = QPushButton("Reset to Default")
        self.reset_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
        self.reset_btn.clicked.connect(self.reset_to_default)
        vlayout.addWidget(self.reset_btn)
        vlayout.addSpacing(4)
-
 
        # Save/Cancel row, both buttons same width, aligned
        btn_row = QHBoxLayout()
@@ -526,14 +602,11 @@ class KeyframeAnimatorPreferences(QWidget):
        btn_row.addWidget(self.cancel_btn)
        vlayout.addLayout(btn_row)
 
-
        self.save_btn.clicked.connect(self.save)
        self.cancel_btn.clicked.connect(self.cancel)
 
-
    def reset_to_default(self):
        self.shortcut_btn.setKeySequence(QKeySequence(DEFAULT_SHORTCUT))
-
 
    def save(self):
        shortcut = self.shortcut_btn.keySequence().toString(QKeySequence.NativeText) or DEFAULT_SHORTCUT
@@ -549,7 +622,6 @@ class KeyframeAnimatorPreferences(QWidget):
            self.on_save()
        else:
            self.close()
-
 
    def cancel(self):
        if self.on_cancel:
@@ -576,12 +648,10 @@ class KeyframeAnimatorUI(QWidget):
        "show_group_view", "disable_group_view"
    ]
 
-   # Add list of excluded node types
    EXCLUDED_NODE_TYPES = [
        "Viewer", "Viewer3D", "ViewerProcess", "CurveEditor", "DopeSheet",
        "Histogram", "Vectorfield", "Waveform", "BackgroundRender"
    ]
-
 
    def __init__(self, node, parent=None):
        super(KeyframeAnimatorUI, self).__init__(parent)
@@ -592,7 +662,7 @@ class KeyframeAnimatorUI(QWidget):
        self.rows = []
        self.pref_widget = None
 
-       # Set parent to Nuke's main window and smart stay-on-top behavior
+       # Set parent to Nuke's main window
        self.nuke_main_window = None
        try:
            import nukescripts
@@ -606,12 +676,8 @@ class KeyframeAnimatorUI(QWidget):
        except:
            pass
 
-       # Use Tool flag with StaysOnTop - but we'll manage the behavior with events
-       self.setWindowFlags(Qt.Tool | Qt.WindowStaysOnTopHint)
-
-       # Install event filter on the main window to detect when Nuke loses focus
-       if self.nuke_main_window:
-           self.nuke_main_window.installEventFilter(self)
+       # Use Tool flag - stays on top of Nuke only, not other applications
+       self.setWindowFlags(Qt.Tool)
 
        self.main_widget = QWidget(self)
        self._build_main_ui()
@@ -621,26 +687,11 @@ class KeyframeAnimatorUI(QWidget):
        main_layout.addWidget(self.main_widget)
        self.setLayout(main_layout)
 
-   def eventFilter(self, obj, event):
-       # When Nuke's main window loses focus (user switches to another app)
-       if obj == self.nuke_main_window and event.type() == event.WindowDeactivate:
-           # Temporarily remove stay on top behavior
-           self.setWindowFlags(self.windowFlags() & ~Qt.WindowStaysOnTopHint)
-           self.show()  # Need to show after changing flags
-       elif obj == self.nuke_main_window and event.type() == event.WindowActivate:
-           # When Nuke regains focus, restore stay on top behavior
-           self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
-           self.show()  # Need to show after changing flags
-
-       return super(KeyframeAnimatorUI, self).eventFilter(obj, event)
-
-
    def _build_main_ui(self):
        main_layout = QVBoxLayout(self.main_widget)
        main_layout.setContentsMargins(10, 10, 10, 10)
 
-
-       # Knob row with toggle button
+       # Knob row (no global toggle button)
        knob_row = QHBoxLayout()
        knob_row.addWidget(QLabel("Knob:"))
        self.knob_combo = QComboBox()
@@ -648,24 +699,14 @@ class KeyframeAnimatorUI(QWidget):
        self.knob_combo.addItems(self.knobs)
        self.knob_combo.currentTextChanged.connect(self.on_knob_changed)
        knob_row.addWidget(self.knob_combo)
-       
-       # Add toggle button for color knobs
-       self.toggle_btn = QPushButton("Toggle R,G,B,A")
-       self.toggle_btn.setToolTip("Toggle between single color field and individual R,G,B,A fields")
-       self.toggle_btn.clicked.connect(self.toggle_color_knob_mode)
-       self.toggle_btn.setVisible(False)  # Hidden by default
-       knob_row.addWidget(self.toggle_btn)
-       
        knob_row.addStretch(1)
        main_layout.addLayout(knob_row)
-
 
        # Divider after knob
        divider1 = QFrame()
        divider1.setFrameShape(QFrame.HLine)
        divider1.setFrameShadow(QFrame.Sunken)
        main_layout.addWidget(divider1)
-
 
        # SCROLL AREA SETUP
        self.scroll_area = QScrollArea()
@@ -676,13 +717,11 @@ class KeyframeAnimatorUI(QWidget):
        self.scroll_area.setWidget(self.rows_widget)
        main_layout.addWidget(self.scroll_area, stretch=1)
 
-
        # Divider before Add
        divider2 = QFrame()
        divider2.setFrameShape(QFrame.HLine)
        divider2.setFrameShadow(QFrame.Sunken)
        main_layout.addWidget(divider2)
-
 
        # Add button styled to full width
        self.add_btn = QPushButton("Add")
@@ -690,7 +729,6 @@ class KeyframeAnimatorUI(QWidget):
        self.add_btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
        self.add_btn.clicked.connect(self.add_row)
        main_layout.addWidget(self.add_btn)
-
 
        btn_row = QHBoxLayout()
        self.ok_btn = QPushButton("Apply")
@@ -701,14 +739,19 @@ class KeyframeAnimatorUI(QWidget):
        btn_row.addWidget(self.pref_btn)
        main_layout.addLayout(btn_row)
 
-
        self.ok_btn.clicked.connect(self.apply_all_keyframes)
        self.cancel_btn.clicked.connect(self.close)
        self.pref_btn.clicked.connect(self.show_preferences)
 
-       # Start with initial row
-       self.add_row()
+       # Initialize the interface properly
+       self.initialize_interface()
 
+   def initialize_interface(self):
+       """Initialize the interface properly on startup"""
+       if self.knobs:
+           self.on_knob_changed()
+       else:
+           self.add_row()
 
    def get_animatable_knobs(self):
        result = []
@@ -728,82 +771,31 @@ class KeyframeAnimatorUI(QWidget):
        return result
 
    def get_knob_components(self, knob_name):
-       """Return the number of components for a knob, considering dynamic color knob state"""
+       """Return the number of components for a knob"""
        if not knob_name:
            return 1
        knob = self.node.knob(knob_name)
        if not knob:
            return 1
 
-       # Always return actual array size - we'll handle the collapsed state in the UI
        if hasattr(knob, 'arraySize'):
            return knob.arraySize()
        return 1
 
-   def is_color_knob(self, knob):
-       """Check if a knob is a color knob - ONLY by class, not by name patterns"""
+   def is_toggleable_knob(self, knob):
+       """Check if a knob supports toggle between single value and individual components"""
        if not knob:
            return False
-
-       # Check knob class - this is the ONLY reliable method
-       knob_class = knob.Class()
-       print(f"Checking knob '{knob.name()}' class: {knob_class}")
-
-       # ONLY detect Color_Knob and AColor_Knob classes as color knobs
-       if knob_class in ['Color_Knob', 'AColor_Knob']:
-           print(f"  -> Detected as color knob by class '{knob_class}'")
-           return True
-
-       print(f"  -> Not a Color_Knob or AColor_Knob class")
-       return False
-
-   def is_color_knob_visually_expanded(self, knob):
-       """
-       Determine if a color knob should show individual RGBA fields based on its actual state.
-       This now RESPECTS the singleValue() API state rather than overriding it.
-       """
-       if not knob or knob.Class() not in ['Color_Knob', 'AColor_Knob']:
-           return True  # Non-color knobs are always "expanded"
        
-       try:
-           print(f"=== DETECTING COLOR KNOB STATE FOR '{knob.name()}' ===")
-           
-           # Primary: Check the API state (this is what actually matters)
-           api_says_single = knob.singleValue()
-           api_says_expanded = not api_says_single
-           print(f"  API singleValue(): {api_says_single}")
-           print(f"  API indicates: {'COLLAPSED (single color picker)' if api_says_single else 'EXPANDED (individual RGBA sliders)'}")
-           
-           # Secondary: Check current values for additional context
-           try:
-               values = [knob.getValue(i) for i in range(knob.arraySize())]
-               all_values_same = len(set([round(v, 6) for v in values])) <= 1  # Round to avoid floating point issues
-               print(f"  Current values: {values}")
-               print(f"  All values same: {all_values_same}")
-           except:
-               all_values_same = True
-               print(f"  Current values: Could not read")
-           
-           # DECISION: Respect the API state (this is the actual internal state)
-           # The API knows better than our heuristics
-           decision = api_says_expanded
-           
-           if api_says_single:
-               reason = "API reports singleValue=True (collapsed state)"
-               ui_mode = "SINGLE COLOR field"
-           else:
-               reason = "API reports singleValue=False (expanded state)"
-               ui_mode = "INDIVIDUAL R,G,B,A fields"
-           
-           print(f"  DECISION: {ui_mode}")
-           print(f"  REASON: {reason}")
-           
-           return decision
-           
-       except Exception as e:
-           print(f"  ERROR in detection: {e}")
-           # Default to collapsed (single color) to be safe
+       knob_class = knob.Class()
+       return knob_class in ['Color_Knob', 'AColor_Knob', 'WH_Knob']
+
+   def is_color_knob(self, knob):
+       """Check if a knob is a color knob"""
+       if not knob:
            return False
+       knob_class = knob.Class()
+       return knob_class in ['Color_Knob', 'AColor_Knob']
 
    def get_current_knob_values(self, knob_name):
        """Get current values from the knob to use as defaults"""
@@ -831,7 +823,7 @@ class KeyframeAnimatorUI(QWidget):
    def on_knob_changed(self):
        """Called when knob selection changes - rebuild all rows with appropriate components"""
        # Clear existing rows
-       for row in self.rows[:]:  # Create a copy of the list to iterate over
+       for row in self.rows[:]:
            self.remove_row(row)
 
        # Get current knob info
@@ -839,77 +831,8 @@ class KeyframeAnimatorUI(QWidget):
        current_knob_obj = self.node.knob(current_knob)
        current_values = self.get_current_knob_values(current_knob)
 
-       # Show/hide toggle button for color knobs with simple state display
-       if current_knob_obj and self.is_color_knob(current_knob_obj):
-           self.toggle_btn.setVisible(True)
-           
-           # Simple check: is it currently collapsed?
-           if current_knob_obj.singleValue():
-               self.toggle_btn.setText("→ R,G,B,A")
-               self.toggle_btn.setToolTip("Switch to individual R,G,B,A fields")
-               print(f"💡 '{current_knob}' is COLLAPSED - showing 'value' field")
-           else:
-               self.toggle_btn.setText("→ Single Value")
-               self.toggle_btn.setToolTip("Switch to single value field")
-               print(f"💡 '{current_knob}' is EXPANDED - showing R,G,B,A fields")
-       else:
-           self.toggle_btn.setVisible(False)
-
        # Add a new row with the current knob values as defaults
        self.add_row(frame=nuke.frame(), values=current_values)
-
-   def toggle_color_knob_mode(self):
-       """Toggle the Keyframe Animator between single value and individual R,G,B,A fields"""
-       current_knob_name = self.knob_combo.currentText()
-       current_knob_obj = self.node.knob(current_knob_name)
-       
-       if not current_knob_obj or not self.is_color_knob(current_knob_obj):
-           return
-       
-       try:
-           # Check current mode from the actual knob state
-           is_currently_collapsed = current_knob_obj.singleValue()
-           
-           # Clear existing rows
-           for row in self.rows[:]:
-               self.remove_row(row)
-           
-           # Get current values to preserve them
-           current_values = self.get_current_knob_values(current_knob_name)
-           actual_component_count = self.get_knob_components(current_knob_name)
-           
-           # Toggle the mode
-           new_collapsed_mode = not is_currently_collapsed
-           
-           if new_collapsed_mode:
-               # Switch to single "value" field
-               display_component_count = 1
-               self.toggle_btn.setText("→ R,G,B,A")
-               self.toggle_btn.setToolTip("Switch to individual R,G,B,A fields")
-               print(f"✅ Switched '{current_knob_name}' to single 'value' field")
-           else:
-               # Switch to individual R,G,B,A fields
-               display_component_count = actual_component_count
-               self.toggle_btn.setText("→ Single Value")
-               self.toggle_btn.setToolTip("Switch to single value field")
-               print(f"✅ Switched '{current_knob_name}' to individual R,G,B,A fields")
-           
-           # Create new row with toggled mode
-           row = KeyframeRow(
-               frame=nuke.frame(),
-               values=current_values,
-               remove_callback=self.remove_row,
-               component_count=display_component_count,
-               knob_obj=current_knob_obj,
-               is_collapsed_color=new_collapsed_mode
-           )
-           row.actual_component_count = actual_component_count
-           self.rows.append(row)
-           self.rows_layout.addWidget(row)
-           
-       except Exception as e:
-           print(f"❌ Failed to toggle animation mode: {e}")
-           QMessageBox.warning(self, "Toggle Failed", f"Could not toggle animation mode:\n{e}")
 
    def add_row(self, frame=None, values=None):
        if frame is None:
@@ -919,22 +842,21 @@ class KeyframeAnimatorUI(QWidget):
        current_knob_name = self.knob_combo.currentText()
        current_knob_obj = self.node.knob(current_knob_name)
 
-       # Simple logic: Check if color knob is collapsed
+       # Determine display mode based on knob type
        actual_component_count = self.get_knob_components(current_knob_name)
        
        if self.is_color_knob(current_knob_obj) and current_knob_obj.singleValue():
            # COLLAPSED color knob -> single "value" field
            display_component_count = 1
            is_collapsed_color = True
-           print(f"💡 COLLAPSED Color_Knob '{current_knob_name}': showing 1 'value' field")
+       elif current_knob_obj and current_knob_obj.Class() == 'WH_Knob':
+           # WH knobs default to individual W,H fields (can be toggled)
+           display_component_count = actual_component_count
+           is_collapsed_color = False
        else:
            # EXPANDED color knob or regular knob -> individual component fields
            display_component_count = actual_component_count
            is_collapsed_color = False
-           if self.is_color_knob(current_knob_obj):
-               print(f"💡 EXPANDED Color_Knob '{current_knob_name}': showing {display_component_count} R,G,B,A fields")
-           else:
-               print(f"Regular knob '{current_knob_name}': showing {display_component_count} components")
 
        # If no values provided, get current knob values or use defaults
        if values is None:
@@ -950,8 +872,8 @@ class KeyframeAnimatorUI(QWidget):
            frame=frame,
            values=values,
            remove_callback=self.remove_row,
-           component_count=display_component_count,  # This controls UI display
-           knob_obj=current_knob_obj,  # Pass the actual knob object
+           component_count=display_component_count,
+           knob_obj=current_knob_obj,
            is_collapsed_color=is_collapsed_color
        )
        # Store the actual component count for keyframe application
@@ -959,13 +881,11 @@ class KeyframeAnimatorUI(QWidget):
        self.rows.append(row)
        self.rows_layout.addWidget(row)
 
-
    def remove_row(self, row_widget):
        self.rows.remove(row_widget)
        self.rows_layout.removeWidget(row_widget)
        row_widget.setParent(None)
        row_widget.deleteLater()
-
 
    def apply_all_keyframes(self):
        knob_name = self.knob_combo.currentText()
@@ -991,6 +911,17 @@ class KeyframeAnimatorUI(QWidget):
        knob_obj = self.node.knob(knob_name)
        actual_components = knob_obj.arraySize() if hasattr(knob_obj, 'arraySize') else 1
 
+       # Print animation summary to console
+       print(f"\n=== KEYFRAME ANIMATOR - APPLYING ANIMATION ===")
+       print(f"Node: {self.node.name()} ({self.node.Class()})")
+       print(f"Knob: {knob_name} ({actual_components} component{'s' if actual_components != 1 else ''})")
+       
+       if self.is_color_knob(knob_obj):
+           mode = "single value" if (self.rows and self.rows[0].is_collapsed_color) else "individual RGBA"
+           print(f"Color knob mode: {mode}")
+       
+       print(f"Keyframes to apply: {len(data)}")
+       
        for frame, values in data:
            try:
                if actual_components == 1:
@@ -998,23 +929,27 @@ class KeyframeAnimatorUI(QWidget):
                    value = values[0] if values else 0.0
                    knob.setValueAt(value, frame)
                    knob.setKeyAt(frame)
+                   print(f"  Frame {frame}: {value}")
                else:
                    # Multi-component knob
                    for i in range(min(actual_components, len(values))):
                        knob.setValueAt(values[i], frame, i)
                        knob.setKeyAt(frame, i)
+                   # Print all component values for this frame
+                   component_str = ", ".join([f"{values[i]:.3f}" for i in range(min(actual_components, len(values)))])
+                   print(f"  Frame {frame}: [{component_str}]")
                count += 1
            except Exception as e:
-               print("Skipping frame {}: {}".format(frame, e))
+               print(f"  Frame {frame}: FAILED - {e}")
 
-       # Create appropriate success message
-       is_true_color_knob = self.is_color_knob(knob_obj)
-       is_collapsed_color = self.is_collapsed_color_knob(knob_name) if is_true_color_knob else False
+       print(f"Successfully applied {count} keyframes")
+       print(f"=== ANIMATION COMPLETE ===\n")
+
+       # Create success message for user
+       is_color_knob = self.is_color_knob(knob_obj)
        
-       if is_collapsed_color:
-           message = "Set {} keyframe(s) on collapsed color knob '{}' (applied to all {} components).".format(count, knob_name, actual_components)
-       elif is_true_color_knob and actual_components > 1:
-           message = "Set {} keyframe(s) on expanded color knob '{}' (individual {} components).".format(count, knob_name, actual_components)
+       if is_color_knob and actual_components > 1:
+           message = "Set {} keyframe(s) on color knob '{}' ({} components).".format(count, knob_name, actual_components)
        elif actual_components > 1:
            message = "Set {} keyframe(s) on all {} components of knob '{}'.".format(count, actual_components, knob_name)
        else:
@@ -1022,7 +957,6 @@ class KeyframeAnimatorUI(QWidget):
 
        QMessageBox.information(self, "Done", message)
        self.close()
-
 
    def show_preferences(self):
        prefs = load_preferences()
@@ -1040,7 +974,6 @@ class KeyframeAnimatorUI(QWidget):
        self.layout().addWidget(self.pref_widget)
        self.main_widget.setVisible(False)
        self.pref_widget.setVisible(True)
-
 
    def show_main_ui(self):
        if self.pref_widget:
@@ -1066,7 +999,7 @@ def is_node_supported(node):
 
 # ----- Live shortcut updater -----
 def update_existing_shortcut(shortcut):
-   """Try to update the menu shortcut live (ShortcutEditor method). Returns True if live update works."""
+   """Try to update the menu shortcut live. Returns True if live update works."""
    try:
        menubar = nuke.menu("Nuke")
        utilities_menu = menubar.findItem("Utilities")
@@ -1119,7 +1052,6 @@ def register_menu():
     utilities_menu = menubar.addMenu("JT Package")
     prefs = load_preferences()
     shortcut = prefs.get("shortcut", DEFAULT_SHORTCUT)
-    print("Keyframe Animator: registering menu with shortcut:", shortcut)
     utilities_menu.addCommand(
         "Keyframe Animator",
         lambda: keyframe_animator_launch(),
