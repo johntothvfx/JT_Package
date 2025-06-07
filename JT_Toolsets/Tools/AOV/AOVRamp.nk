@@ -23,6 +23,7 @@ Group {
  opacity 1
  addUserKnob {26 ""}
  addUserKnob {4 direction t "The axis direction that the ramp will be generated on:\n\n<b>• start to end:</b> ramp along the vector that goes from start to end points\n<b>• X:</b> ramp along the X axis\n<b>• Y:</b> ramp along the Y axis\n<b>• Z:</b> ramp along the Z axis\n" M {"start to end" X Y Z "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+ direction Y
  addUserKnob {6 invert t "Inverts the start and end selection position with eachother." -STARTLINE}
  addUserKnob {41 start t "Used to select the start point of the ramp." T Picker.start}
  addUserKnob {41 end t "Used to select the end point of the ramp." T Picker.end}
@@ -144,7 +145,7 @@ Group {
   xpos 144
   ypos 785
  }
-set N84f63200 [stack 0]
+set N333fc200 [stack 0]
  Dot {
   name Dot13
   note_font_size 35
@@ -175,7 +176,7 @@ set N84f63200 [stack 0]
   xpos 544
   ypos 977
  }
-set N84d2ea00 [stack 0]
+set N34319600 [stack 0]
  Dot {
   name Dot3
   note_font_size 35
@@ -183,7 +184,7 @@ set N84d2ea00 [stack 0]
   xpos 544
   ypos 1458
  }
-set N84c06200 [stack 0]
+set N344ad400 [stack 0]
  Dot {
   name Dot7
   note_font_size 35
@@ -191,7 +192,7 @@ set N84c06200 [stack 0]
   xpos 1088
   ypos 1461
  }
-set N84a99600 [stack 0]
+set N342a5200 [stack 0]
  Dot {
   name Dot15
   note_font_size 35
@@ -207,7 +208,7 @@ set N84a99600 [stack 0]
   xpos 1274
   ypos 5278
  }
-push $N84c06200
+push $N344ad400
  Dot {
   name Dot19
   note_font_size 35
@@ -215,7 +216,7 @@ push $N84c06200
   xpos 544
   ypos 1554
  }
-set N8488d600 [stack 0]
+set N34316000 [stack 0]
  Dot {
   name Dot18
   note_font_size 35
@@ -240,7 +241,7 @@ set N8488d600 [stack 0]
   xpos 978
   ypos 2792
  }
-push $N8488d600
+push $N34316000
  Expression {
   expr0 "r == 0 && g == 0 && b == 0 ? 0 : rotatePivot == 0 ? r - parent.Picker.start.r : rotatePivot == 1 ? r -(parent.Picker.start.r+parent.Picker.end.r)/2 : r - parent.Picker.end.r"
   expr1 "r == 0 && g == 0 && b == 0 ? 0 :rotatePivot == 0 ? g - parent.Picker.start.g : rotatePivot == 1 ? g -(parent.Picker.start.g+parent.Picker.end.g)/2 : g- parent.Picker.end.g"
@@ -256,7 +257,7 @@ push $N8488d600
   xpos 544
   ypos 1722
  }
-set N7f144800 [stack 0]
+set N34458800 [stack 0]
  Dot {
   name Dot2
   note_font_size 35
@@ -264,7 +265,7 @@ set N7f144800 [stack 0]
   xpos 621
   ypos 1722
  }
-set N7f100a00 [stack 0]
+set N34458e00 [stack 0]
  Dot {
   name Dot24
   note_font_size 35
@@ -272,7 +273,7 @@ set N7f100a00 [stack 0]
   xpos 731
   ypos 1722
  }
-set N7f12da00 [stack 0]
+set N342cb200 [stack 0]
  Dot {
   name Dot26
   note_font_size 35
@@ -322,7 +323,7 @@ set N7f12da00 [stack 0]
   addUserKnob {7 angle R 0 360}
   angle {{parent.rotate.x}}
  }
-push $N7f12da00
+push $N342cb200
  ColorMatrix {
   matrix {
       {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
@@ -365,7 +366,7 @@ push $N7f12da00
   addUserKnob {7 angle R 0 360}
   angle {{parent.rotate.y}}
  }
-push $N7f100a00
+push $N34458e00
  ColorMatrix {
   matrix {
       {{cos(radians(angle))} 0 {sin(radians(angle))}}
@@ -408,7 +409,7 @@ push $N7f100a00
   addUserKnob {7 angle R 0 360}
   angle {{parent.rotate.x}}
  }
-push $N7f144800
+push $N34458800
  Dot {
   name Dot28
   note_font_size 35
@@ -416,7 +417,7 @@ push $N7f144800
   xpos 469
   ypos 1722
  }
-set N7ac62400 [stack 0]
+set N34478e00 [stack 0]
  ColorMatrix {
   matrix {
       {{cos(radians(angle))} 0 {sin(radians(angle))}}
@@ -459,7 +460,7 @@ set N7ac62400 [stack 0]
   addUserKnob {7 angle R 0 360}
   angle {{parent.rotate.z}}
  }
-push $N7ac62400
+push $N34478e00
  Dot {
   name Dot29
   note_font_size 35
@@ -467,7 +468,7 @@ push $N7ac62400
   xpos 359
   ypos 1722
  }
-set N4c1e0a00 [stack 0]
+set N3447a600 [stack 0]
  ColorMatrix {
   matrix {
       {1 0 0}
@@ -510,7 +511,7 @@ set N4c1e0a00 [stack 0]
   addUserKnob {7 angle R 0 360}
   angle {{parent.rotate.y}}
  }
-push $N4c1e0a00
+push $N3447a600
  Dot {
   name Dot30
   note_font_size 35
@@ -583,7 +584,7 @@ push $N4c1e0a00
   xpos 544
   ypos 2250
  }
-set N7a911800 [stack 0]
+set N78c9b200 [stack 0]
  Dot {
   name Dot32
   note_font_size 35
@@ -642,7 +643,7 @@ set N7a911800 [stack 0]
   xpos 654
   ypos 2466
  }
-push $N7a911800
+push $N78c9b200
  Switch {
   inputs 2
   which {{"parent.direction == 0 ? 1 : 0"}}
@@ -658,7 +659,7 @@ push $N7a911800
   name Reformat1
   label "x2 over sampling"
   xpos 510
-  ypos 2554
+  ypos 2555
   disable {{!parent.sampling}}
  }
  Expression {
@@ -669,12 +670,13 @@ push $N7a911800
   temp_name2 z_direction
   temp_expr2 clamp((b-parent.Picker.start.b)/(parent.Picker.end.b-parent.Picker.start.b),0,1)
   temp_name3 direction
-  temp_expr3 "clamp( parent.direction == 0 ? y_direction : parent.direction == 1 ? x_direction : parent.direction == 2 ? y_direction : z_direction)"
+  temp_expr3 "clamp( parent.direction == 0 ? g : parent.direction == 1 ? x_direction : parent.direction == 2 ? y_direction : z_direction)"
   expr3 "r == 0 && g == 0 && b == 0 ? 0 : parent.invert == 0 ? direction : 1 - direction"
   name Ramp
   xpos 510
-  ypos 2654
+  ypos 2631
  }
+set N332ddc00 [stack 0]
  Expression {
   temp_name0 falloff_math
   temp_expr0 "alpha * (1/ clamp( parent.gain ,0.00001,1) )"
@@ -689,7 +691,7 @@ push $N7a911800
   white_clamp true
   name Grade3
   xpos 510
-  ypos 2699
+  ypos 2723
  }
  Copy {
   inputs 2
@@ -741,7 +743,6 @@ push $N7a911800
     }
   name Z2
   label "rotate noise z"
-  selected true
   xpos 510
   ypos 3006
   disable {{"parent.rotateNoise.x== 0 ? parent.rotateNoise.y == 0 ? parent.rotateNoise.z == 0 ? 1 : 0 : 0 : 0"}}
@@ -816,7 +817,7 @@ push $N7a911800
   xpos 544
   ypos 3510
  }
-set Nf4c76000 [stack 0]
+set N3447c000 [stack 0]
  Shuffle {
   red alpha
   green alpha
@@ -842,7 +843,7 @@ set Nf4c76000 [stack 0]
   xpos 544
   ypos 4134
  }
-set N7fc60a00 [stack 0]
+set N34432800 [stack 0]
  Dot {
   name Dot9
   note_font_size 35
@@ -850,7 +851,7 @@ set N7fc60a00 [stack 0]
   xpos 544
   ypos 4494
  }
-set N38b67a00 [stack 0]
+set N34432e00 [stack 0]
  Dot {
   name Dot25
   note_font_size 35
@@ -858,8 +859,8 @@ set N38b67a00 [stack 0]
   xpos 544
   ypos 4560
  }
-push $N38b67a00
-push $N7fc60a00
+push $N34432e00
+push $N34432800
  Dot {
   name Dot23
   note_font_size 35
@@ -906,7 +907,7 @@ push $N7fc60a00
   xpos 978
   ypos 4425
  }
-push $N84a99600
+push $N342a5200
  Shuffle {
   red alpha
   green alpha
@@ -984,8 +985,8 @@ push $N84a99600
   xpos 1088
   ypos 5000
  }
-push $Nf4c76000
-push $N84f63200
+push $N3447c000
+push $N333fc200
  Shuffle {
   in none
   alpha black
@@ -1019,7 +1020,7 @@ push $N84f63200
   xpos 144
   ypos 4829
  }
-set Nf58f8e00 [stack 0]
+set N34485c00 [stack 0]
  Dot {
   name Dot5
   note_font_size 35
@@ -1043,7 +1044,7 @@ set Nf58f8e00 [stack 0]
   xpos 302
   ypos 5141
  }
-push $Nf58f8e00
+push $N34485c00
  Switch {
   inputs 2
   which {{parent.visualizeOutput}}
@@ -1058,7 +1059,7 @@ push $Nf58f8e00
   xpos 144
   ypos 5285
  }
-set N49576400 [stack 0]
+set N34488200 [stack 0]
  Shuffle {
   alpha white
   name Shuffle5
@@ -1107,13 +1108,7 @@ set N49576400 [stack 0]
   addUserKnob {6 replace +STARTLINE}
   replace true
  }
-push $N49576400
- Output {
-  name Output1
-  xpos 110
-  ypos 5607
- }
-push $N84d2ea00
+push $N34319600
  Dot {
   name Dot11
   note_font_size 35
@@ -1134,5 +1129,20 @@ push $N84d2ea00
   end {0 0 0}
   addUserKnob {6 end_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
   addUserKnob {6 color_rgb_1_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ }
+push $N34488200
+ Output {
+  name Output1
+  xpos 110
+  ypos 5607
+ }
+push $N332ddc00
+ Viewer {
+  frame_range 1-100
+  monitorOutNDISenderName "NukeX - untitled - Viewer1"
+  monitorOutOutputTransform rec709
+  name Viewer1
+  xpos 840
+  ypos 2487
  }
 end_group
