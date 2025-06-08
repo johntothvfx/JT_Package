@@ -1,0 +1,47 @@
+Group {
+ name DeepSoften1
+ help "Softens the deep front/back based on the alpha channels black and white map. White gets pushed in z less.\n\n<b>Example:</b>\nThis is perfect for wrapping atmospherics which is on a card around deep renders."
+ knobChanged "import re\n\nn = nuke.thisNode()\nk = nuke.thisKnob()\n\nclassList = \['NoOp', 'Group', 'Dot', 'Gizmo', 'Switch']\ndeniedList = \['DeepToImage']\n\nacceptedClass_compile = \[re.compile(r'ScanlineRender\\d*'), re.compile(r'DeepToImage\\d*')]\n\nif k.name() == 'inputChange':\n    inp = n.input(0)\n    if inp:\n        in_class = inp.Class()\n        if in_class is not None:\n            if not any(pattern.match(in_class) for pattern in acceptedClass_compile) and 'Deep' not in in_class and in_class not in classList:\n                n.setInput(0, None)\n            elif any(pattern.match(in_class) for pattern in acceptedClass_compile if pattern.pattern.startswith('DeepToImage')):\n                n.setInput(0, None)\n"
+ tile_color 0x6000
+ selected true
+ addUserKnob {20 DeepSoftenTab l "Deep Soften"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION DeepSoften
+ addUserKnob {1 output +INVISIBLE}
+ output "\[expr \{\[value front] +\[value soften]\}],\[expr \{\[value back] +\[value soften]\}]"
+ addUserKnob {7 soften t "Adds volume to the deep front and back evenly.\n\nThe volume is added based on the alpha channel. Consider it as a black and white map of transparency that gets pushed in the front/back.\nWhite gets pushed less." R 0 100}
+ addUserKnob {26 ""}
+ addUserKnob {7 front t "Adds volume to the deep front only.\n\nThe volume is added based on the alpha channel. Consider it as a black and white map of transparency that gets pushed in the front.\nWhite gets pushed less." R 0 100}
+ addUserKnob {7 back t "Adds volume to the deep back only.\n\nThe volume is added based on the alpha channel. Consider it as a black and white map of transparency that gets pushed in the back.\nWhite gets pushed less." R 0 100}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Deep Soften</font><font color=#000060> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br> \n<b>Deep Soften</b> adds volume to the front and<br>back of the deep.\n<br>\n</b><i>\n<br><strong>•</br> usually this is used on atmospheric elements <br>after the  scanlineRender node and then merged<br>with deeprender to create fake atmospherics with <br>correct intersections.\n</i>\n<br>\n<br>\n<b><a href=\"https://johntothvfx.com\" style=\"color:#000060;\">John Toth <b>© 2020 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#000060\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#000060\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nversion_number = \"1.0.3\"\ncontext = \"Deep\"\nmodified_date = \"30th July 2024\"\ndeveloper = \"John Toth © 2020\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- add volume to the deep front/back\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos -590
+  ypos 440
+ }
+ DeepExpression {
+  chans0 deep
+  chans1 alpha
+  rgba.alpha "alpha * 0.9999999"
+  deep.front "deep.front -( \[value parent.front]  + \[value parent.soften] )"
+  deep.back "deep.back + (\[value parent.back] +  \[value parent.soften] )"
+  name DeepExpression1
+  selected true
+  xpos -590
+  ypos 494
+ }
+ Output {
+  name Output1
+  xpos -590
+  ypos 542
+ }
+end_group

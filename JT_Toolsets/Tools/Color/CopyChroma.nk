@@ -1,0 +1,422 @@
+Group {
+ inputs 3
+ name CopyChroma1
+ help "Copies the hue,saturation or luminance from A to B or from B to A based on a mix."
+ knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\n\n\n\nif k.name() == 'inputChange':\n    classList = \['DeepToImage','DeepToImage2','DeepToImage3','ReLight']\n#    classListDenied = \['Scene','Scene1','Axis','Axis2','Axis3','Axis4','Card','Card2','Card3','Cube','Cube2','Cube3','Cylinder','Cylinder2','Cylinder3','DepthToPoints','ModelBuilder','PointCloudGenerator','PositionToPoints','PositionToPoints2','PositionToPoints3','PoissonMesh','Sphere','Sphere2','Sphere3']\n    if n.input(0) is not None:\n        if 'Deep' in n.input(0).Class() not in classList:\n           n.setInput(0, None)\n\n    if n.input(1) is not None:\n        if 'Deep' in n.input(1).Class() not in classList:\n           n.setInput(1, None)\n\n    if n.input(2) is not None:\n        if 'Deep' in n.input(2).Class() not in classList:\n           n.setInput(2, None)"
+ tile_color 0x7aa9ffff
+ note_font_color 0xffffffff
+ selected true
+ addUserKnob {20 copyChroma l CopyChroma}
+ addUserKnob {1 operation +INVISIBLE}
+ operation "\[value copy]"
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION CopyHSL
+ addUserKnob {4 copy t "<b>A to B:</b> transfers data from A input to B.\n\n<b>B to A:</b> transfers data from A input to B " M {"A to B" "B to A" "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+ addUserKnob {4 bbox l "set bbox to" t "Output bounding box. Any data out of this region is clipped off" M {union A B "" "" "" "" ""}}
+ addUserKnob {4 colorspace l math t "<b>none:</b> uses no colorspace methods to transfer data from A to B or B to A\n\n<b>HSV:</b> uses legacy method HSV (hue, saturation & value) colorspace method to transfer data from A to B or B to A." M {none HSV "" "" "" "" ""}}
+ addUserKnob {26 space001 l "" +STARTLINE T "\t "}
+ addUserKnob {7 color t "The color in an image, represented as an angle on the color wheel including the intesnity and purity of that color determining how vivid or dull the color appears."}
+ color 1
+ addUserKnob {7 luminance t "The brightness or lightness of an image, representing the amount of light emitted or reflected."}
+ addUserKnob {26 ""}
+ addUserKnob {41 mask t "\nEnables the associated mask channel to the right. Disabling this checkbox is the same as setting the channel to none. \n\n\nThe channel to use as a mask. By default, the merge is limited to the non-black areas of this channel.\n" T Merge1.maskChannelMask}
+ addUserKnob {41 inject t "Copy mask to output mask.a channel." -STARTLINE T Merge1.inject}
+ addUserKnob {41 invert_mask l invert t "Inverts the use of the mask channel, so that the merge is limited to the non-white areas of the mask." -STARTLINE T Merge1.invert_mask}
+ addUserKnob {41 fringe t "When enabled, only apply the effect to the edge of the mask. \nWhen disabled, the effect is applied to the entire mask.\n\nuse 4*(1-mask)*mask to mix\n\n" -STARTLINE T Merge1.fringe}
+ addUserKnob {7 mix t "Dissolves between the original image at 0 and the full effect at 1."}
+ mix 1
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" t "Node version info, for more information look at version log" +STARTLINE T "<br><font size='5'>CopyChroma</font><font color=#7AA9FF> v1.1"}
+ addUserKnob {26 ""}
+ addUserKnob {26 steps l "" t "Overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>CopyChroma</b> transfers the color or<br>luminance from <b>A</b> to <b>B</b> or from<b> B</b> to <b>A</b><br>based on a mix.\n\n<br></b><i>\n<br><strong>•</br> This is perfect for transfering RGB color and<br>luminance data.\n</i>\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#7AA9FF;\">John Toth <b>© 2021 <br>\n"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#7AA9FF\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#7AA9FF\">Version Log</a>\n" t "Contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nversion_number = \"1.1.0\"\ncontext = \"Color\"\nmodified_date = \"12th September 2024\"\ndeveloper = \"John Toth © 2021\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- copies Color or Luminance from either A to B / B to A\n<br></i><b> v 1.1 </b><i>\n- interface was rebuilt\n- legacy mode was kept using colorspace but a new divide/multiply was added in math under \"none\"\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)\n"}
+}
+ Input {
+  inputs 0
+  name mask
+  label "\[value number]"
+  xpos 840
+  ypos -1092
+  number 2
+ }
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 874
+  ypos 1074
+ }
+ Input {
+  inputs 0
+  name B
+  label "\[value number]"
+  xpos 620
+  ypos -1092
+ }
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 654
+  ypos -941
+ }
+set N6290dc00 [stack 0]
+ Input {
+  inputs 0
+  name A
+  label "\[value number]"
+  xpos 16
+  ypos -1092
+  number 1
+ }
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 50
+  ypos -941
+ }
+set N224d5e00 [stack 0]
+ Switch {
+  inputs 2
+  which {{parent.copy}}
+  name Switch2
+  xpos 16
+  ypos -849
+ }
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 50
+  ypos -653
+ }
+set N84e19200 [stack 0]
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -746
+  ypos -653
+ }
+set N2e9bf200 [stack 0]
+ Dot {
+  name Dot22
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -996
+  ypos -653
+ }
+push $N224d5e00
+push $N6290dc00
+ Switch {
+  inputs 2
+  which {{parent.copy}}
+  name Switch3
+  xpos 620
+  ypos -848
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 654
+  ypos -510
+ }
+set N2274f000 [stack 0]
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -520
+  ypos -510
+ }
+set N98261c00 [stack 0]
+ Switch {
+  inputs 2
+  which {{"parent.bbox == 1 ? 1 : 0"}}
+  name Switch4
+  label "\n"
+  xpos -1030
+  ypos -513
+ }
+ Dot {
+  name Dot23
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -996
+  ypos 451
+ }
+push $N2e9bf200
+ Colorspace {
+  colorspace_out HSV
+  name Colorspace1
+  xpos -780
+  ypos -441
+ }
+ Dot {
+  name Dot17
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -746
+  ypos -366
+ }
+set N881db800 [stack 0]
+ Dot {
+  name Dot19
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -850
+  ypos -366
+ }
+ Dot {
+  name Dot18
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -850
+  ypos -126
+ }
+push $N881db800
+push $N98261c00
+ Colorspace {
+  colorspace_out HSV
+  name Colorspace2
+  xpos -554
+  ypos -441
+ }
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -520
+  ypos -294
+ }
+set N209d6000 [stack 0]
+ ShuffleCopy {
+  inputs 2
+  red red
+  green green
+  alpha alpha2
+  name ShuffleCopy1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -780
+  ypos -307
+ }
+push $N209d6000
+ Dot {
+  name Dot20
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -520
+  ypos -222
+ }
+ Dissolve {
+  inputs 2
+  channels {rgba.red rgba.green -rgba.blue none}
+  which {{parent.color}}
+  name Dissolve3
+  xpos -780
+  ypos -229
+ }
+ Dissolve {
+  inputs 2
+  channels {-rgba.red -rgba.green rgba.blue none}
+  which {{parent.luminance}}
+  name Dissolve4
+  xpos -780
+  ypos -133
+ }
+ Colorspace {
+  colorspace_in HSV
+  name Colorspace3
+  xpos -780
+  ypos -9
+ }
+ CopyBBox {
+  inputs 2
+  name CopyBBox1
+  xpos -780
+  ypos 448
+  disable {{"parent.bbox == 0 ? 1 : 0"}}
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -746
+  ypos 954
+ }
+push $N84e19200
+ Dot {
+  name Dot84
+  xpos 50
+  ypos -418
+ }
+set N46013200 [stack 0]
+ Dot {
+  name Dot97
+  xpos -226
+  ypos -418
+ }
+ Dot {
+  name Dot98
+  xpos -226
+  ypos 293
+ }
+push $N46013200
+ Saturation {
+  saturation 0
+  mode Maximum
+  name Saturation1
+  label "\[value saturation] (\[string tolower \[value mode]])"
+  xpos 16
+  ypos -305
+ }
+ Dot {
+  name Dot99
+  xpos 50
+  ypos 86
+ }
+set N209eb400 [stack 0]
+ Merge2 {
+  inputs 2
+  operation divide
+  output rgb
+  name Merge3
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 16
+  ypos 286
+ }
+ Dot {
+  name Dot9
+  xpos 50
+  ypos 426
+ }
+push $N2274f000
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 654
+  ypos -418
+ }
+set N20afa400 [stack 0]
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 490
+  ypos -418
+ }
+set N20b2a600 [stack 0]
+ Dot {
+  name Dot103
+  xpos 214
+  ypos -418
+ }
+ Dot {
+  name Dot104
+  xpos 214
+  ypos -54
+ }
+push $N20b2a600
+ Saturation {
+  saturation 0
+  mode Maximum
+  name Saturation6
+  label "\[value saturation] (\[string tolower \[value mode]])"
+  xpos 456
+  ypos -329
+ }
+ Dot {
+  name Dot10
+  xpos 490
+  ypos -154
+ }
+set N1d9f6600 [stack 0]
+ Dot {
+  name Dot118
+  xpos 312
+  ypos -154
+ }
+ Merge2 {
+  inputs 2
+  operation divide
+  output rgb
+  name Merge2
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 278
+  ypos -61
+ }
+ Dissolve {
+  inputs 2
+  channels rgb
+  which {{parent.color}}
+  name Dissolve1
+  label "\[value which]"
+  xpos 278
+  ypos 419
+ }
+ Dot {
+  name Dot11
+  xpos 312
+  ypos 594
+ }
+push $N209eb400
+push $N1d9f6600
+ Dissolve {
+  inputs 2
+  channels rgb
+  which {{parent.luminance}}
+  name Dissolve2
+  label "\[value which]"
+  xpos 456
+  ypos 79
+ }
+ Merge2 {
+  inputs 2
+  operation multiply
+  output rgb
+  name Merge4
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 456
+  ypos 587
+ }
+ Switch {
+  inputs 2
+  which {{parent.colorspace}}
+  name Switch1
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  xpos 456
+  ypos 947
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 490
+  ypos 1074
+ }
+push $N20afa400
+ Merge2 {
+  inputs 2+1
+  operation copy
+  bbox {{"parent.bbox == 0 ? 0 : parent.bbox == 1 ? 2 : 3"}}
+  Achannels rgb
+  Bchannels rgb
+  output rgb
+  mix {{parent.mix}}
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  selected true
+  xpos 620
+  ypos 1067
+ }
+ Output {
+  name Output
+  xpos 620
+  ypos 1191
+ }
+end_group

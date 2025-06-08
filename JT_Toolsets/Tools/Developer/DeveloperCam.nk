@@ -1,0 +1,34 @@
+Camera3 {
+ matrix {
+     {{curve} {curve} {curve} {curve}}
+     {{curve} {curve} {curve} {curve}}
+     {{curve} {curve} {curve} {curve}}
+     {{curve} {curve} {curve} {curve}}
+   }
+ focal {{"\[expr \{\[string length \[value code]] > 0 ? \[value \[value code].focal] : 0\}]"}}
+ haperture {{"\[expr \{\[string length \[value code]] > 0 ? \[value \[value code].haperture] : 0\}]"}}
+ vaperture {{"\[expr \{\[string length \[value code]] > 0 ? \[value \[value code].vaperture] : 0\}]"}}
+ near {{"\[expr \{\[string length \[value code]] > 0 ? \[value \[value code].near] : 0\}]"}}
+ far {{"\[expr \{\[string length \[value code]] > 0 ? \[value \[value code].far] : 0\}]"}}
+ win_translate {{"\[expr \{\[string length \[value code]] > 0 ? \[value \[value code].win_translate.u] : 0\}]"} {"\[expr \{\[string length \[value code]] > 0 ? \[value \[value code].win_translate.v] : 0\}]"}}
+ win_scale {{"\[expr \{\[string length \[value code]] > 0 ? \[value \[value code].win_scale.u] : 0\}]"} {"\[expr \{\[string length \[value code]] > 0 ? \[value \[value code].win_scale.v] : 0\}]"}}
+ winroll {{"\[expr \{\[string length \[value code]] > 0 ? \[value \[value code].winroll] : 0\}]"}}
+ focal_point {{"\[expr \{\[string length \[value code]] > 0 ? \[value \[value code].focal_point] : 0\}]"}}
+ fstop {{"\[expr \{\[string length \[value code]] > 0 ? \[value \[value code].fstop] : 0\}]"}}
+ name DeveloperCam1
+ tile_color 0xaaaaaaff
+ selected true
+ addUserKnob {20 developer l Developer}
+ addUserKnob {1 class_type l "class type" t "Pattern used to identify the upstream node type.\nSupports wildcards (e.g. 'Camera*', 'Axis*') and comma-separated lists for multiple types.\n\nThe expression will traverse upstream until it finds the first node that matches one of these class patterns."}
+ class_type Camera*
+ addUserKnob {3 input_number l "input no." t "Specifies which external input to trace when this node is used inside a Group.\n\nFor example, if DeveloperCam is connected to 'Input1' inside a Group, set this to 1 to follow the correct upstream connection.\n\nHas no effect when used outside a Group."}
+ addUserKnob {43 code t "custom code field"}
+ code "\[expr \{\n    \[catch \{\n        # Determine correct entry point\n        set test \[node this.input0]\n        if \{\[string match \"Input*\" \[class \$test]]\} \{\n            set idx \[value input_number]\n            set connected \[node parent.input\$idx]\n        \} else \{\n            set connected \$test\n        \}\n\n        # Walk upstream to find a matching class\n        set n \$connected\n        set found 0\n        set patterns \[split \[value class_type] \",\"]\n        while \{\n            !(\$found) &&\n            \[class \$n] != \"Input\" &&\n            \$n != \[topnode \$n]\n        \} \{\n            set found 0\n            foreach p \$patterns \{\n                if \{\[string match \[string trim \$p] \[class \$n]]\} \{\n                    set found 1\n                \}\n            \}\n            if \{!\$found\} \{\n                # Try to get the next upstream node\n                set next_n \"\"\n                catch \{set next_n \[node \$n.input0]\}\n                if \{\$next_n == \"\"\} \{\n                    break\n                \}\n                set n \$next_n\n            \}\n        \}\n\n        # Final validation\n        set r \"\"\n        foreach p \$patterns \{\n            if \{\[string match \[string trim \$p] \[class \$n]]\} \{\n                set r \$n\n            \}\n        \}\n        set r\n    \}] == 0 ? \$r : \"\"\n\}]"
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version_1 l "" +STARTLINE T "<br><font size='5'>Developer Cam</font><font color=#AAAAAA> v1.0</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "Overview of the node" +STARTLINE T "<strong>•</strong><b>DeveloperCam</b> is a flexible camera node<br>designed for internal tool-building or group use.<br>\nIt dynamically inherits camera data (focal length,<br>matrix, etc.) from upstream connections—whether<br>inside or outside a Group.<br>\nIdeal for automation, or procedural setups.\n\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#AAAAAA;\">John Toth © 2025</a></b><br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#AAAAAA\">Tool Demo</span></a>" t "Launches the web page where it will have more documentation or a video about the node." T "nuke.message(\"coming soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#AAAAAA\">Version Log</span></a>" t "Contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "# Constants\nversion_number = \"1.0.1\"\ncontext = \"DeveloperCam\"\nmodified_date = \"19th May 2025\"\ndeveloper = \"John Toth © 2025\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b>v 1.0</b><i>\n- Dynamic upstream class detection\n- Group-safe camera traversal\n- Toggleable world matrix integration\n- Multiple class type support via class_type knob\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode().name()\n\n# Message components\nheader = \"Version Log:\"\ndlm = f\"<b>Date Last Modified: </b>\{modified_date\}\"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Node: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    f\"</i>\{upper\}\{site\}\{developer\}\{lower\}</span></a><br><br>\"\n    #f\"<i>\{thank_you\}</i>\"\n)\n\n# Display the message\nnuke.message(message)\n"}
+}

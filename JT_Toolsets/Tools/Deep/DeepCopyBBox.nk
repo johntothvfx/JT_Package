@@ -1,0 +1,43 @@
+Group {
+ inputs 2
+ name DeepCopyBBox1
+ help "Copies the bounding box from the A input onto the B stream. The bounding box defines the area of the frame that Nuke sees as having valid image data. The larger the bounding box is, the longer it takes Nuke to process and render the images."
+ knobChanged "import re\n\nn = nuke.thisNode()\nk = nuke.thisKnob()\n\nclassList = \['NoOp', 'Group', 'Dot', 'Gizmo', 'Switch']\ndeniedList = \['DeepToImage']\n\nacceptedClass_compile = \[re.compile(r'ScanlineRender\\d*'), re.compile(r'DeepToImage\\d*')]\n\nif k.name() == 'inputChange':\n    inp = n.input(0)\n    if inp:\n        in_class = inp.Class()\n        if in_class is not None:\n            if not any(pattern.match(in_class) for pattern in acceptedClass_compile) and 'Deep' not in in_class and in_class not in classList:\n                n.setInput(0, None)\n            elif any(pattern.match(in_class) for pattern in acceptedClass_compile if pattern.pattern.startswith('DeepToImage')):\n                n.setInput(0, None)\n"
+ tile_color 0x66ff
+ selected true
+ addUserKnob {20 info l Info}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION DeepCopyBBox
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Deep CopyBBox</font><font color=#000060> v1.1"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br> \n<b>Deep CopyBBox</b> Copies the bounding box<br> from the <b>A</b> input onto the <b>B</b> stream.\n<br>\n</b><i>\n<br><strong>•</br> You can grab the bounding box from normal<br>2D nodes using the A stream.\n</i>\n<br>\n<br>\n<b><a href=\"https://johntothvfx.com\" style=\"color:#000060;\">John Toth <b>© 2019 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#000060\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#000060\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "version_number = \"1.1.3\"\ncontext = \"Deep\"\nmodified_date = \"30th July 2024\"\ndeveloper = \"John Toth © 2019\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- copied the bbox from A to the B stream\n<br></i><b> v 1.1 </b><i>\n- user interface was updated to match set package\n- B Input should function like a deep node\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}
+ Input {
+  inputs 0
+  name B
+  xpos -491
+  ypos -490
+ }
+ DeepCrop {
+  use_zfar false
+  bbox {{A.bbox.x} {A.bbox.y} {A.bbox.r} {A.bbox.t}}
+  name DeepCrop1
+  xpos -491
+  ypos -417
+ }
+ Output {
+  name Output1
+  xpos -491
+  ypos -326
+ }
+ Input {
+  inputs 0
+  name A
+  xpos -676
+  ypos -489
+  number 1
+ }
+end_group

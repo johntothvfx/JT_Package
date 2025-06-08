@@ -1,0 +1,165 @@
+Group {
+ name Falloff1
+ help "Applies a mathethical falloff to each pixel. This is usually used for soft alpha channels."
+ selected true
+ addUserKnob {20 falloff l Falloff}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION Falloff
+ addUserKnob {7 blur +HIDDEN}
+ addUserKnob {3 quality +HIDDEN}
+ quality 15
+ addUserKnob {4 filter +HIDDEN M {box triangle quadratic gaussian "" "" ""}}
+ addUserKnob {1 operation l INVISIBLE +INVISIBLE}
+ operation "\[value math]"
+ addUserKnob {41 channels t "The mathematic falloff effect is only applied to these channels. \nIf you set this to something other than all or none, you can use the checkboxes on the right to select individual channels." T Merge1.Achannels}
+ addUserKnob {41 math t "Mathematic falloff operations will be applied to the selected channel." T Menu.math}
+ addUserKnob {26 space000 l "" +STARTLINE T "\t"}
+ addUserKnob {6 clamp t "Makes sure when applying the mathematics any pixels changed will be clamped to 0 -1.\n\nVery usualy for alpha channel." +STARTLINE}
+ clamp true
+ addUserKnob {6 invert t "When disabled, the mathematics be applied which may cause the image to go brighter. \n\nEnabling this will do the opposite and go darker based on the math falloff." +STARTLINE}
+ addUserKnob {7 limit t "The threshold of the math applied to the input channel selected."}
+ addUserKnob {7 exponent +HIDDEN}
+ exponent 1
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannelMask l mask t "Enables the associated mask channel to the right. Disabling this checkbox is the same as setting the channel to none. \n\n\nThe channel to use as a mask. By default, the merge is limited to the non-black areas of this channel.\n" T Merge1.maskChannelMask}
+ addUserKnob {41 inject t "Copies the mask input to the predefined mask.a channel. Injecting the mask allows you to use the same mask further downstream." -STARTLINE T Merge1.inject}
+ addUserKnob {41 invert_mask l invert t "Inverts the use of the mask channel, so that the merge is limited to the non-white areas of the mask.\n" -STARTLINE T Merge1.invert_mask}
+ addUserKnob {41 fringe t "When enabled, only apply the effect to the edge of the mask. \nWhen disabled, the effect is applied to the entire mask." -STARTLINE T Merge1.fringe}
+ addUserKnob {7 mix t "Dissolves between the original image at 0 and the full merge at 1."}
+ mix 1
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Falloff</font><font color=#747474> v1.1"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>Falloff</b> applies a mathematic falloff<br> to each pixel.\n\n<br></b><i>\n<br><strong>•</br> usually used on the alpha channel only.\n\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#747474;\">John Toth <b>© 2020 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#747474\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message(\"Coming Soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#747474\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nversion_number = \"1.1.0\"\ncontext = \"Color/Math\"\nmodified_date = \"16th September 2024\"\ndeveloper = \"John Toth © 2020\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- applies a mathematic falloff to the image\n<br></i><b> v 1.1 </b><i>\n- clamp feature was added\n- user interface update\n- invert of the limit was added\n- channels knob updated\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x23232301
+  label "<center>Don't Touch\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  note_font_color 0xee453cff
+  xpos 129
+  ypos -144
+  bdwidth 185
+  bdheight 288
+ }
+ Input {
+  inputs 0
+  name mask
+  label "\[value number]"
+  xpos 620
+  ypos -136
+  number 1
+ }
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 654
+  ypos 540
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 400
+  ypos -136
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 434
+  ypos 205
+ }
+set N23845e00 [stack 0]
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos 205
+ }
+ Shuffle {
+  in {{{parent.Merge1.Achannels}}}
+  name Shuffle3
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 180
+  ypos 268
+ }
+ Invert {
+  name Invert1
+  xpos 180
+  ypos 320
+  disable {{!parent.invert}}
+ }
+ Expression {
+  temp_name0 falloff_r
+  temp_expr0 "(red * (1 / clamp( (1 - parent.limit) , 0.0000001, 1) ) )"
+  temp_name1 falloff_g
+  temp_expr1 "green * (1 / clamp( (1 - parent.limit) , 0.0000001, 1) )"
+  temp_name2 falloff_b
+  temp_expr2 "blue * (1 / clamp( (1 - parent.limit) , 0.0000001, 1) )"
+  temp_name3 falloff_a
+  temp_expr3 "alpha * (1 / clamp( (1 - parent.limit) , 0.0000001, 1) )"
+  expr0 "parent.clamp == 0 ? parent.math == 0 ? falloff_r : parent.math == 1 ? smoothstep( 0 , 1 , falloff_r ) : parent.math == 2 ? clamp( pow2 ( falloff_r ) ) : parent.math == 3 ? clamp( falloff_r ** 3 ) : pow( 1 - pow( 1 - falloff_r ,  clamp( parent.exponent + 0.0000001)  ),  4) :  (clamp( parent.math == 0 ? falloff_r : parent.math == 1 ? smoothstep( 0 , 1 , falloff_r ) : parent.math == 2 ? clamp( pow2 ( falloff_r ) ) : parent.math == 3 ? clamp( falloff_r ** 3 ) : pow( 1 - pow( 1 - falloff_r ,  clamp( parent.exponent + 0.0000001)  ),  4) ))"
+  expr1 "parent.clamp == 0 ? parent.math == 0 ? falloff_g : parent.math == 1 ? smoothstep( 0 , 1 , falloff_g ) : parent.math == 2 ? clamp( pow2 ( falloff_g ) ) : parent.math == 3 ? clamp( falloff_g ** 3 ) : pow( 1 - pow( 1 - falloff_g ,  clamp( parent.exponent + 0.0000001)  ),  4) : clamp (parent.math == 0 ? falloff_g : parent.math == 1 ? smoothstep( 0 , 1 , falloff_g ) : parent.math == 2 ? clamp( pow2 ( falloff_g ) ) : parent.math == 3 ? clamp( falloff_g ** 3 ) : pow( 1 - pow( 1 - falloff_g ,  clamp( parent.exponent + 0.0000001)  ),  4))"
+  expr2 "parent.clamp == 0 ? parent.math == 0 ? falloff_b : parent.math == 1 ? smoothstep( 0 , 1 , falloff_b ) : parent.math == 2 ? clamp( pow2 ( falloff_b ) ) : parent.math == 3 ? clamp( falloff_b ** 3 ) : pow( 1 - pow( 1 - falloff_b ,  clamp( parent.exponent + 0.0000001)  ),  4) : clamp (parent.math == 0 ? falloff_b : parent.math == 1 ? smoothstep( 0 , 1 , falloff_b ) : parent.math == 2 ? clamp( pow2 ( falloff_b ) ) : parent.math == 3 ? clamp( falloff_b ** 3 ) : pow( 1 - pow( 1 - falloff_b ,  clamp( parent.exponent + 0.0000001)  ),  4))"
+  expr3 "parent.clamp == 0 ? parent.math == 0 ? falloff_a : parent.math == 1 ? smoothstep( 0 , 1 , falloff_a ) : parent.math == 2 ? clamp( pow2 ( falloff_a ) ) : parent.math == 3 ? clamp( falloff_a ** 3 ) : pow( 1 - pow( 1 - falloff_a ,  clamp( parent.exponent + 0.0000001)  ),  4) : clamp (parent.math == 0 ? falloff_a : parent.math == 1 ? smoothstep( 0 , 1 , falloff_a ) : parent.math == 2 ? clamp( pow2 ( falloff_a ) ) : parent.math == 3 ? clamp( falloff_a ** 3 ) : pow( 1 - pow( 1 - falloff_a ,  clamp( parent.exponent + 0.0000001)  ),  4)) "
+  name Expression
+  xpos 180
+  ypos 358
+ }
+ Invert {
+  name Invert2
+  xpos 180
+  ypos 384
+  disable {{!parent.invert}}
+ }
+ Shuffle {
+  out {{{parent.Merge1.Achannels}}}
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 180
+  ypos 452
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos 540
+ }
+push $N23845e00
+ Merge2 {
+  inputs 2+1
+  operation copy
+  Achannels {none none none rgba.alpha}
+  Bchannels none
+  output {{{Achannels}}}
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 400
+  ypos 530
+ }
+ Output {
+  name Output1
+  xpos 400
+  ypos 734
+ }
+ NoOp {
+  inputs 0
+  name Menu
+  knobChanged "n = nuke.thisGroup()\nk = nuke.thisKnob()\n\nif k.name() in ('math', 'showPanel'):\n    CONTROLS_type = n\['math'].value()\n    if CONTROLS_type == 'linear':\n        n\['exponent'].setVisible(False)\n    elif CONTROLS_type == 'smooth':\n        n\['exponent'].setVisible(False)\n    elif CONTROLS_type == 'quadratic':\n        n\['exponent'].setVisible(False)\n    elif CONTROLS_type == 'cubic':\n        n\['exponent'].setVisible(False)\n    elif CONTROLS_type == 'exponential':\n        n\['exponent'].setVisible(True)"
+  label "Do Not Touch"
+  xpos 180
+  ypos 32
+  addUserKnob {20 menu l Menu}
+  addUserKnob {4 math M {linear smooth quadratic cubic exponential ""}}
+ }
+end_group

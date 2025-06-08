@@ -1,0 +1,58 @@
+Group {
+ name ChannelExists1
+ tile_color 0x9e3c63ff
+ selected true
+ addUserKnob {20 channelExists l "Channel Exists"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION ChannelExists
+ addUserKnob {41 channels t "Will check if selected channel exists or not." T Shuffle1.in1}
+ addUserKnob {3 if_exists l "if exists" t "If channel exist the value will be 0 otherwise make it 1.\n"}
+ if_exists {{"! (\[string first \[value channels] \[channels Input]]>-1)"}}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Channel Exists</font><font color=#9E3C63> v1.0"}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br> \n<b>Channel Exists</b> will check if the selected channel<br>layer exist and make the value 0 otherwise it will be 1.\n</b>\n\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#9E3C63;\">John Toth <b>© 2024 <br>\n\n\n"}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#9E3C63\">Tool Demo" t "Opens a web page that will take you to a demo video about this nuke tool." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#9E3C63\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.0.0\"\ncontext = \"Channel\"\n\n\ndate = \"27th February\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- checks if the selected channel layer exists.\n\"\"\"\n\n\n\n\nthankyou = \"\"\"\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" +  \"<br>\" + UPPER + site + developer + ENTER + \"</a>\") \n\n\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 0
+  ypos -16
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 34
+  ypos 66
+ }
+set Neca464e0 [stack 0]
+ Output {
+  name Output1
+  xpos 0
+  ypos 254
+ }
+push $Neca464e0
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -83
+  ypos 66
+ }
+ Shuffle2 {
+  fromInput1 {{0} B}
+  in1 alpha
+  fromInput2 {{0} B}
+  mappings "4 black -1 -1 rgba.red 0 0 black -1 -1 rgba.green 0 1 black -1 -1 rgba.blue 0 2 black -1 -1 rgba.alpha 0 3"
+  name Shuffle1
+  label "<b>\[value in1]</b> &rarr; \[value out1]"
+  selected true
+  xpos -117
+  ypos 124
+ }
+end_group

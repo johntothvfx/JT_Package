@@ -1,0 +1,119 @@
+Group {
+ name HueRotate1
+ help "Rotates the hue using a difference colorspace."
+ tile_color 0x7aa9ffff
+ selected true
+ addUserKnob {20 hueRotate l "Hue Rotate"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION HueRotate
+ addUserKnob {41 channels t "The effect is only applied to these channels. \nIf you set this to something other than all or none, you can use the checkboxes on the right to select individual channels." T Merge1.also_merge}
+ addUserKnob {4 math t "Colorspace the rotation is adjusted in.\n\n<b>• HSL:</b> hue, saturation & luminance.\n<b>• HSV:</b> hue, saturation & value \n" M {HSL HSV "" "" "" "" ""}}
+ addUserKnob {7 rotation t "Rotates the hue in a 0-360 degrees." R -180 180}
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannelMask l mask t "Enables the associated mask channel to the right. Disabling this checkbox is the same as setting the channel to none. \n\n\n\nThe channel to use as a mask. By default, the filter effect is limited to the non-black areas of this channel.\n" T Merge1.maskChannelMask}
+ addUserKnob {41 inject t "Copies the mask input to the predefined mask.a channel. Injecting the mask allows you to use the same mask further downstream." -STARTLINE T Merge1.inject}
+ addUserKnob {41 invert_mask l invert t "Inverts the use of the mask channel, so that the merge is limited to the non-white areas of the mask.\n" -STARTLINE T Merge1.invert_mask}
+ addUserKnob {41 fringe t "When enabled, only apply the effect to the edge of the mask. \nWhen disabled, the effect is applied to the entire mask." -STARTLINE T Merge1.fringe}
+ addUserKnob {41 mix t "Dissolves between the original image at 0 and the full effect at 1." T Merge1.mix}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Hue Rotate</font><font color=#7AA9FF> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>Hue Rotate</b> converts the image into<br>a different colorspace then rotates it <br>from 0 - 360 degrees.\n\n<br></b>\n\n\n\n</i>\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#7AA9FF;\">John Toth <b>© 2024 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#7AA9FF\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#7AA9FF\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nversion_number = \"1.0.1\"\ncontext = \"Color\"\nmodified_date = \"16th September 2024\"\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- Rotates the hue\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x23232301
+  label "<center>Don't Touch\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  note_font_color 0xee453cff
+  xpos -231
+  ypos -170
+  bdwidth 243
+  bdheight 149
+ }
+ Input {
+  inputs 0
+  name mask
+  label "\[value number]"
+  xpos 180
+  ypos -253
+  number 1
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos 190
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 1
+  ypos -253
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 35
+  ypos 42
+ }
+set Na6e20800 [stack 0]
+ Colorspace {
+  channels {{{Merge1.also_merge}}}
+  colorspace_out HSV
+  name Colorspace1
+  xpos -150
+  ypos 35
+ }
+ Add {
+  channels {{{Merge1.also_merge}}}
+  value {{parent.rotation/360} 0 0 0}
+  name Add1
+  selected true
+  xpos -150
+  ypos 107
+ }
+ Colorspace {
+  channels {{{Merge1.also_merge}}}
+  colorspace_in HSV
+  name Colorspace2
+  xpos -150
+  ypos 183
+ }
+push $Na6e20800
+ Merge2 {
+  inputs 2+1
+  operation copy
+  Achannels none
+  Bchannels none
+  output none
+  also_merge all
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 1
+  ypos 178
+ }
+ Output {
+  name Output1
+  xpos 1
+  ypos 423
+ }
+ NoOp {
+  inputs 0
+  name menu
+  knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\n\nmath = int(n.knob('math').getValue())\nprint(math)\n\nif math == 0:\n    nuke.toNode('Colorspace1').knob('colorspace_out').setValue('HSL')\n    nuke.toNode('Colorspace2').knob('colorspace_in').setValue('HSL')\nelse:\n    nuke.toNode('Colorspace1').knob('colorspace_out').setValue('HSV') \n    nuke.toNode('Colorspace2').knob('colorspace_in').setValue('HSV') "
+  xpos -150
+  ypos -105
+  addUserKnob {20 menu}
+  addUserKnob {4 math M {HSL HSV ""}}
+  math HSV
+ }
+end_group

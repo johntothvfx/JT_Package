@@ -1,0 +1,983 @@
+Group {
+ inputs 2
+ name DepthToNormals1
+ help "Generates a normals pass using the depth information."
+ knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\n\n\n\nif k.name() == 'inputChange':\n    classList = \['Camera','Camera2','Camera3','Axis','Axis2','Axis3','Group','Light','Light2','Light3','Light4','DirectLight','Spotlight','Environment','Gizmo','NoOp','Dot']\n\n    if n.input(1) is not None:\n        if n.input(1).Class() not in classList:\n           n.setInput(1, None)\n"
+ tile_color 0x802380ff
+ selected true
+ addUserKnob {20 depthToNormals l "Depth To Normals"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION DepthToNormals
+ addUserKnob {1 output l INVISIBLE +INVISIBLE}
+ output "\[expr \{\[numvalue positionOut] ? \"camera\" : \"world\" \}]"
+ addUserKnob {41 channels t "Select your position channel that you want to use to generate a depth channel." T Shuffle1.in}
+ addUserKnob {26 space001 l "" -STARTLINE T "   "}
+ addUserKnob {4 depthInfo l "" t "Select what kind of depth information you are using.\n\n<b>• (1/z) Normalize depth</b> - values between 0-1. <br><i>it is Nuke's default format.</i>\n\n<b>• (Z) Real World Units</b> -  is distance from camera<br> <i>(e.g CG renders).</i>" -STARTLINE M {"normalized (1/z)" "real world units (Z)" "" "" "" "" "" "" "" "" "" "" ""}}
+ depthInfo "real world units (Z)"
+ addUserKnob {41 out l output t "The effect is rendered into these output channels. \nIf you set this to something other than none, you can use the checkboxes on the right to select individual channels." T Merge2.Achannels}
+ addUserKnob {26 space002 l "" +STARTLINE T "\t"}
+ addUserKnob {4 positionOut l position t "The position generated will be either:\n\n<b>• World space</b> - is the coordinate system for the entire scene. \n\n<b>• Camera space</b> -  is the coordinate system from the camera's point of view.\n" M {world camera "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Depth to Normals</font><font color=#943794> v1.1"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>Depth to Normals</b> - generates a normals pass<br>using the depth channel.</b>\n\n<br><br>\n<i>\n<b>• World space</b> -\nis the coordinate system for the<br>entire scene. \n<br>\n<b>• Camera space</b> -  is the coordinate system from<br>the camera's point of view.\n\n\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#943794;\">John Toth <b>© 2020 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#943794\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message(\"Coming Soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#943794\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.2.1\"\ncontext = \"AOV\"\n\n\ndate = \"30th January\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2020\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- generates a normals pass using the depth data\n<br></i><b> v 1.1 </b><i>\n- user interface updated to match the package in this set\n- information tab was re-written\n- output channel was added\n- input (Z)/(1/z) is now selectable\n\"\"\"\n\n\n\nthankyou = \"\"\"- Daniel Velikov for the help of the calculation of the conversion from depth to normals\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + \"<b>Thankyou:</b><br>\" + thankyou + \"<br>\" + UPPER + site + developer + ENTER + \"</a>\") \n\n\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 290
+  ypos -88
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 324
+  ypos 54
+ }
+set N21674380 [stack 0]
+ Dot {
+  name Dot2
+  xpos -956
+  ypos 54
+ }
+ Shuffle {
+  in depth
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -990
+  ypos 100
+ }
+ Expression {
+  channel0 rgb
+  expr0 1/r
+  channel1 none
+  expr1 1/g
+  channel2 none
+  expr2 1/b
+  expr3 1/a
+  name Expression1
+  label "1/z conversion"
+  xpos -990
+  ypos 176
+  disable {{!parent.depthInfo}}
+ }
+ Dot {
+  name Dot1
+  xpos -956
+  ypos 293
+ }
+set N2240f700 [stack 0]
+ Dot {
+  name Dot9
+  xpos -811
+  ypos 293
+ }
+set N21522440 [stack 0]
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -701
+  ypos 293
+ }
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -701
+  ypos 628
+ }
+set N2154d1f0 [stack 0]
+ Expression {
+  expr0 "isinf(r) || isnan(r) ? 0 : r"
+  expr1 "isinf(g) || isnan(g) ? 0 : g"
+  expr2 "isinf(b) || isnan(b) ? 0 : b"
+  channel3 alpha
+  expr3 "isinf(a) || isnan(a) ? 0 : a"
+  name Expression4
+  label "infinity/nan To Black"
+  xpos -735
+  ypos 714
+ }
+ Expression {
+  temp_name0 maxR
+  temp_expr0 r==0?r:r/r
+  temp_name1 maxG
+  temp_expr1 g==0?g:g/g
+  temp_name2 maxB
+  temp_expr2 b==0?b:b/b
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 0
+  expr1 0
+  expr2 0
+  expr3 max(maxR,maxG,maxB)
+  name Expression5
+  label "generate alpha of position"
+  xpos -735
+  ypos 752
+ }
+push $N2154d1f0
+push $N21522440
+ Expression {
+  expr0 "( (x+.5) - width *.5  )"
+  expr1 "( ( (y+.5)  - height *.5 ) /  pixel_aspect )"
+  name Expression2
+  label stmap_pixelsspect
+  xpos -845
+  ypos 392
+ }
+push $N2240f700
+ MergeExpression {
+  inputs 2
+  temp_name0 srow
+  temp_expr0 "sin( radians(-Camera_INPUT.winroll ) )"
+  temp_name1 crow
+  temp_expr1 "cos( radians(-Camera_INPUT.winroll) )"
+  temp_name2 RATIO
+  temp_expr2 "1.0 / ( - width * ( Camera_INPUT.focal / Camera_INPUT.haperture ) )"
+  temp_name3 Z
+  temp_expr3 "( 1.0 / Br )"
+  expr0 "( ( ( crow * Ar ) - ( srow * Ag ) ) * Camera_INPUT.winscale.u + ( Camera_INPUT.wintranslate.u * width * 0.5 ) ) * -RATIO * Z"
+  expr1 "( ( ( srow * Ar ) + ( crow * Ag ) ) * Camera_INPUT.winscale.v  + ( Camera_INPUT.wintranslate.v * width * 0.5 ) ) * -RATIO  * Z"
+  expr2 -Z
+  name MergeExpression
+  label Camera_Space
+  xpos -990
+  ypos 392
+ }
+ Expression {
+  expr0 "Camera_INPUT.world_matrix.0 * r + Camera_INPUT.world_matrix.1 * g +Camera_INPUT.world_matrix.2 * b + Camera_INPUT.world_matrix.3 "
+  expr1 "Camera_INPUT.world_matrix.4 * r + Camera_INPUT.world_matrix.5* g + Camera_INPUT.world_matrix.6 * b + Camera_INPUT.world_matrix.7"
+  expr2 "Camera_INPUT.world_matrix.8 * r + Camera_INPUT.world_matrix.9 * g + Camera_INPUT.world_matrix.10 * b + Camera_INPUT.world_matrix.11"
+  channel3 alpha
+  expr3 "Camera_INPUT.world_matrix.12 * r + Camera_INPUT.world_matrix.13 * g + Camera_INPUT.world_matrix.14 * b + Camera_INPUT.world_matrix.15"
+  name Expression3
+  label "World out"
+  xpos -990
+  ypos 488
+  disable {{parent.positionOut}}
+ }
+ Expression {
+  expr0 isnan(r)?-inf:r
+  expr1 isnan(g)?-inf:g
+  expr2 isnan(b)?-inf:b
+  channel3 {-rgba.red -rgba.green -rgba.blue rgba.alpha}
+  expr3 isnan(a)?-inf:a
+  name Expression34
+  label inf_killer
+  xpos -990
+  ypos 536
+ }
+ Expression {
+  expr0 isnan(r)?0:r
+  expr1 isnan(g)?0:g
+  expr2 isnan(b)?0:b
+  channel3 {-rgba.red -rgba.green -rgba.blue rgba.alpha}
+  expr3 isnan(a)?0:a
+  name Expresssion122
+  label nan_killer
+  xpos -990
+  ypos 574
+ }
+ CopyBBox {
+  inputs 2
+  name CopyBBox1
+  xpos -990
+  ypos 624
+ }
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy3
+  xpos -990
+  ypos 752
+ }
+ Dot {
+  name Dot388
+  xpos -956
+  ypos 934
+ }
+set N22421d60 [stack 0]
+ Dot {
+  name Dot389
+  xpos -956
+  ypos 1017
+ }
+set N1a1bf370 [stack 0]
+ Dot {
+  name Dot10
+  xpos -956
+  ypos 1607
+ }
+set N1bfb27c0 [stack 0]
+ Dot {
+  name Dot32
+  xpos -956
+  ypos 1713
+ }
+set N2366cdb0 [stack 0]
+ Dot {
+  name Dot13
+  xpos -956
+  ypos 2268
+ }
+set N1bf3b680 [stack 0]
+ Dot {
+  name Dot11
+  xpos -956
+  ypos 2361
+ }
+set N1bf27ea0 [stack 0]
+ Dot {
+  name Dot19
+  xpos -956
+  ypos 2920
+ }
+set N192077f0 [stack 0]
+ Dot {
+  name Dot21
+  xpos -735
+  ypos 2920
+ }
+set N1915ecb0 [stack 0]
+ Dot {
+  name Dot23
+  xpos -585
+  ypos 2920
+ }
+ Transform {
+  translate {0 1}
+  center {1024 778}
+  name Transform8
+  label Up
+  xpos -619
+  ypos 2948
+ }
+push $N192077f0
+ Dot {
+  name Dot14
+  xpos -956
+  ypos 3015
+ }
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -846
+  ypos 3015
+ }
+set N1bffda20 [stack 0]
+ Dot {
+  name Dot20
+  xpos -685
+  ypos 3015
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 x
+  temp_expr0 Br-Ar
+  temp_name1 y
+  temp_expr1 Bg-Ag
+  temp_name2 z
+  temp_expr2 Bb-Ab
+  temp_name3 Len
+  temp_expr3 "sqrt((x*x) + (y*y) + (z*z))"
+  expr0 x/Len
+  expr1 y/Len
+  expr2 z/Len
+  name MergeExpression10
+  label Base_Vector_Y
+  xpos -619
+  ypos 3068
+ }
+ Dot {
+  name Dot22
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -585
+  ypos 3152
+ }
+push $N1915ecb0
+ Transform {
+  translate {-1 0}
+  center {1024 778}
+  name Transform7
+  label Left
+  xpos -769
+  ypos 2948
+ }
+push $N1bffda20
+ MergeExpression {
+  inputs 2
+  temp_name0 x
+  temp_expr0 Br-Ar
+  temp_name1 y
+  temp_expr1 Bg-Ag
+  temp_name2 z
+  temp_expr2 Bb-Ab
+  temp_name3 Len
+  temp_expr3 "sqrt((x*x) + (y*y) + (z*z))"
+  expr0 x/Len
+  expr1 y/Len
+  expr2 z/Len
+  name MergeExpression11
+  label Base_Vector_X
+  xpos -769
+  ypos 3068
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 x
+  temp_expr0 "Ag*Bb - Ab*Bg"
+  temp_name1 y
+  temp_expr1 "Ab*Br - Ar*Bb"
+  temp_name2 z
+  temp_expr2 "Ar*Bg - Ag*Br"
+  expr0 x
+  expr1 y
+  expr2 z
+  name MergeExpression12
+  label "Normals_Solver\nCross_X_Y"
+  xpos -769
+  ypos 3136
+ }
+ Expression {
+  temp_name0 l
+  temp_expr0 1/sqrt(r*r+g*g+b*b)
+  expr0 r*l
+  expr1 g*l
+  expr2 b*l
+  channel3 none
+  name Expression7
+  label Normalize
+  xpos -769
+  ypos 3236
+ }
+ Dot {
+  name Dot25
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -735
+  ypos 3314
+ }
+set N1915d960 [stack 0]
+ Dot {
+  name Dot41
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -625
+  ypos 3314
+ }
+ Expression {
+  channel0 rgba
+  expr0 "isnan(r) && a"
+  channel1 none
+  channel2 none
+  channel3 none
+  name Expression8
+  xpos -659
+  ypos 3356
+ }
+push $N1915d960
+ Multiply {
+  inputs 1+1
+  channels rgb
+  value 0
+  name Multiply1
+  label "value: \[value value]"
+  xpos -769
+  ypos 3350
+ }
+ Premult {
+  name Premult3
+  xpos -769
+  ypos 3404
+ }
+push $N1bf3b680
+ Dot {
+  name Dot15
+  xpos -735
+  ypos 2269
+ }
+set N191de790 [stack 0]
+ Dot {
+  name Dot17
+  xpos -585
+  ypos 2269
+ }
+ Transform {
+  translate {0 1}
+  center {1024 778}
+  name Transform6
+  label Up
+  xpos -619
+  ypos 2302
+ }
+push $N1bf27ea0
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -846
+  ypos 2361
+ }
+set N20160680 [stack 0]
+ Dot {
+  name Dot27
+  xpos -685
+  ypos 2361
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 x
+  temp_expr0 Br-Ar
+  temp_name1 y
+  temp_expr1 Bg-Ag
+  temp_name2 z
+  temp_expr2 Bb-Ab
+  temp_name3 Len
+  temp_expr3 "sqrt((x*x) + (y*y) + (z*z))"
+  expr0 x/Len
+  expr1 y/Len
+  expr2 z/Len
+  name MergeExpression7
+  label Base_Vector_Y
+  xpos -619
+  ypos 2414
+ }
+ Dot {
+  name Dot38
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -585
+  ypos 2498
+ }
+push $N20160680
+push $N191de790
+ Transform {
+  translate {1 0}
+  center {1024 778}
+  name Transform5
+  label Right
+  xpos -769
+  ypos 2302
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 x
+  temp_expr0 Br-Ar
+  temp_name1 y
+  temp_expr1 Bg-Ag
+  temp_name2 z
+  temp_expr2 Bb-Ab
+  temp_name3 Len
+  temp_expr3 "sqrt((x*x) + (y*y) + (z*z))"
+  expr0 x/Len
+  expr1 y/Len
+  expr2 z/Len
+  name MergeExpression8
+  label Base_Vector_X
+  xpos -769
+  ypos 2414
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 x
+  temp_expr0 "Ag*Bb - Ab*Bg"
+  temp_name1 y
+  temp_expr1 "Ab*Br - Ar*Bb"
+  temp_name2 z
+  temp_expr2 "Ar*Bg - Ag*Br"
+  expr0 x
+  expr1 y
+  expr2 z
+  name MergeExpression9
+  label "Normals_Solver\nCross_X_Y"
+  xpos -769
+  ypos 2482
+ }
+ Expression {
+  temp_name0 l
+  temp_expr0 1/sqrt(r*r+g*g+b*b)
+  expr0 r*l
+  expr1 g*l
+  expr2 b*l
+  channel3 none
+  name Expression10
+  label Normalize
+  xpos -769
+  ypos 2582
+ }
+ Dot {
+  name Dot39
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -735
+  ypos 2660
+ }
+set N2249be00 [stack 0]
+ Dot {
+  name Dot40
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -625
+  ypos 2660
+ }
+ Expression {
+  channel0 rgba
+  expr0 "isnan(r) && a"
+  channel1 none
+  channel2 none
+  channel3 none
+  name Expression14
+  xpos -659
+  ypos 2702
+ }
+push $N2249be00
+ Multiply {
+  inputs 1+1
+  channels rgb
+  value 0
+  name Multiply3
+  label "value: \[value value]"
+  xpos -769
+  ypos 2696
+ }
+ Premult {
+  name Premult5
+  xpos -769
+  ypos 2756
+ }
+push $N2366cdb0
+ Dot {
+  name Dot33
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -846
+  ypos 1713
+ }
+set N19153d20 [stack 0]
+ Dot {
+  name Dot34
+  xpos -685
+  ypos 1713
+ }
+push $N1bfb27c0
+ Dot {
+  name Dot24
+  xpos -735
+  ypos 1607
+ }
+set N19262430 [stack 0]
+ Dot {
+  name Dot26
+  xpos -585
+  ypos 1607
+ }
+ Transform {
+  translate {0 -1}
+  center {1024 778}
+  name Transform4
+  label Down
+  xpos -619
+  ypos 1646
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 x
+  temp_expr0 Br-Ar
+  temp_name1 y
+  temp_expr1 Bg-Ag
+  temp_name2 z
+  temp_expr2 Bb-Ab
+  temp_name3 Len
+  temp_expr3 "sqrt((x*x) + (y*y) + (z*z))"
+  expr0 x/Len
+  expr1 y/Len
+  expr2 z/Len
+  name MergeExpression4
+  label Base_Vector_Y
+  xpos -619
+  ypos 1766
+ }
+ Dot {
+  name Dot35
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -585
+  ypos 1850
+ }
+push $N19153d20
+push $N19262430
+ Transform {
+  translate {1 0}
+  center {1024 778}
+  name Transfor3
+  label Right
+  xpos -769
+  ypos 1638
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 x
+  temp_expr0 Br-Ar
+  temp_name1 y
+  temp_expr1 Bg-Ag
+  temp_name2 z
+  temp_expr2 Bb-Ab
+  temp_name3 Len
+  temp_expr3 "sqrt((x*x) + (y*y) + (z*z))"
+  expr0 x/Len
+  expr1 y/Len
+  expr2 z/Len
+  name MergeExpression5
+  label Base_Vector_X
+  xpos -769
+  ypos 1766
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 x
+  temp_expr0 "Ag*Bb - Ab*Bg"
+  temp_name1 y
+  temp_expr1 "Ab*Br - Ar*Bb"
+  temp_name2 z
+  temp_expr2 "Ar*Bg - Ag*Br"
+  expr0 x
+  expr1 y
+  expr2 z
+  name MergeExpression6
+  label "Normals_Solver\nCross_X_Y"
+  xpos -769
+  ypos 1834
+ }
+ Expression {
+  temp_name0 l
+  temp_expr0 1/sqrt(r*r+g*g+b*b)
+  expr0 r*l
+  expr1 g*l
+  expr2 b*l
+  channel3 none
+  name Expression6
+  label Normalize
+  xpos -769
+  ypos 1934
+ }
+ Dot {
+  name Dot36
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -735
+  ypos 2012
+ }
+set N224a0f50 [stack 0]
+ Dot {
+  name Dot37
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -625
+  ypos 2012
+ }
+ Expression {
+  channel0 rgba
+  expr0 "isnan(r) && a"
+  channel1 none
+  channel2 none
+  channel3 none
+  name Expression13
+  xpos -659
+  ypos 2054
+ }
+push $N224a0f50
+ Multiply {
+  inputs 1+1
+  channels rgb
+  value 0
+  name Multiply4
+  label "value: \[value value]"
+  xpos -769
+  ypos 2048
+ }
+ Premult {
+  name Premult6
+  xpos -769
+  ypos 2108
+ }
+push $N1a1bf370
+ Dot {
+  name Dot31
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -846
+  ypos 1017
+ }
+set N192190d0 [stack 0]
+ Dot {
+  name Dot391
+  xpos -685
+  ypos 1017
+ }
+push $N22421d60
+ Dot {
+  name Dot390
+  xpos -735
+  ypos 934
+ }
+set N192e2b80 [stack 0]
+ Dot {
+  name Dot392
+  xpos -585
+  ypos 934
+ }
+ Transform {
+  translate {0 -1}
+  center {1024 778}
+  filter impulse
+  name Transform1
+  label Down
+  xpos -619
+  ypos 952
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 x
+  temp_expr0 Br-Ar
+  temp_name1 y
+  temp_expr1 Bg-Ag
+  temp_name2 z
+  temp_expr2 Bb-Ab
+  temp_name3 Len
+  temp_expr3 "sqrt((x*x) + (y*y) + (z*z))"
+  expr0 x/Len
+  expr1 y/Len
+  expr2 z/Len
+  name MergeExpression2
+  label Base_Vector_Y
+  xpos -619
+  ypos 1064
+ }
+ Dot {
+  name Dot30
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -585
+  ypos 1154
+ }
+push $N192e2b80
+ Transform {
+  translate {-1 0}
+  center {1024 778}
+  filter impulse
+  name Transform
+  label left
+  xpos -769
+  ypos 952
+ }
+push $N192190d0
+ MergeExpression {
+  inputs 2
+  temp_name0 x
+  temp_expr0 Br-Ar
+  temp_name1 y
+  temp_expr1 Bg-Ag
+  temp_name2 z
+  temp_expr2 Bb-Ab
+  temp_name3 Len
+  temp_expr3 "sqrt((x*x) + (y*y) + (z*z))"
+  expr0 x/Len
+  expr1 y/Len
+  expr2 z/Len
+  name MergeExpression1
+  label Base_Vector_X
+  xpos -769
+  ypos 1064
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 x
+  temp_expr0 "Ag*Bb - Ab*Bg"
+  temp_name1 y
+  temp_expr1 "Ab*Br - Ar*Bb"
+  temp_name2 z
+  temp_expr2 "Ar*Bg - Ag*Br"
+  expr0 x
+  expr1 y
+  expr2 z
+  name MergeExpression3
+  label "Normals_Solver\nCross_X_Y"
+  xpos -769
+  ypos 1138
+ }
+ Expression {
+  temp_name0 l
+  temp_expr0 1/sqrt(r*r+g*g+b*b)
+  expr0 r*l
+  expr1 g*l
+  expr2 b*l
+  channel3 none
+  name Expression33
+  label Normalize
+  xpos -769
+  ypos 1232
+ }
+ Dot {
+  name Dot28
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -735
+  ypos 1316
+ }
+set N19177310 [stack 0]
+ Dot {
+  name Dot29
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -625
+  ypos 1316
+ }
+ Expression {
+  channel0 rgba
+  expr0 "isnan(r) && a"
+  channel1 none
+  channel2 none
+  channel3 none
+  name Expression9
+  xpos -659
+  ypos 1358
+ }
+push $N19177310
+ Multiply {
+  inputs 1+1
+  channels rgb
+  value 0
+  name Multiply6
+  label "value: \[value value]"
+  xpos -769
+  ypos 1352
+ }
+ Premult {
+  name Premult2
+  xpos -769
+  ypos 1406
+ }
+ Dot {
+  name Dot18
+  xpos -273
+  ypos 1410
+ }
+ Merge2 {
+  inputs 2
+  operation average
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -307
+  ypos 2102
+ }
+ Merge2 {
+  inputs 2
+  operation average
+  name Merge3
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -307
+  ypos 2750
+ }
+ Merge2 {
+  inputs 2
+  operation average
+  name Merge4
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -307
+  ypos 3398
+  disable true
+ }
+ Multiply {
+  channels rgb
+  value 2
+  name Multiply5
+  xpos -307
+  ypos 3494
+ }
+ Expression {
+  temp_name0 l
+  temp_expr0 1/sqrt(r*r+g*g+b*b)
+  expr0 r*l
+  expr1 g*l
+  expr2 b*l
+  channel3 none
+  name Expression21
+  label NORMALIZE
+  xpos -307
+  ypos 3560
+ }
+ Expression {
+  expr0 "isinf(r) || isnan(r) ? 0 : r"
+  expr1 "isinf(g) || isnan(g) ? 0 : g"
+  expr2 "isinf(b) || isnan(b) ? 0 : b"
+  channel3 alpha
+  expr3 "isinf(a) || isnan(a) ? 0 : a"
+  name Expression15
+  label "infinity/nan To Black"
+  xpos -307
+  ypos 3800
+ }
+ Shuffle {
+  out {{{parent.Merge2.Achannels}}}
+  name Shuffle2
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -307
+  ypos 3916
+ }
+push $N21674380
+ Merge2 {
+  inputs 2
+  operation copy
+  Achannels rgb
+  Bchannels none
+  output {{{Achannels}}}
+  invert_mask {{parent.invertMask}}
+  name Merge2
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 290
+  ypos 3920
+  disable {{"\[string match -nocase \"none\" \[value Shuffle1.in] ] ? 1 : 0"}}
+ }
+ Output {
+  name Output1
+  xpos 290
+  ypos 4178
+ }
+ Input {
+  inputs 0
+  name camera
+  label "\[value number]"
+  xpos 510
+  ypos -88
+  number 1
+ }
+ Axis2 {
+  display off
+  selectable false
+  name Camera_INPUT
+  tile_color 0xffff
+  xpos 520
+  ypos 18
+  addUserKnob {20 User}
+  addUserKnob {7 focal}
+  focal {{"\[exists parent.input1] > 1 ? 0 : \[value \[topnode parent.input1].focal] "}}
+  addUserKnob {7 haperture}
+  haperture {{"\[exists parent.input1] > 1 ? 0 : \[value \[topnode parent.input1].haperture]"}}
+  addUserKnob {26 ""}
+  addUserKnob {7 winroll}
+  winroll {{"\[exists parent.input1] > 1 ? 0 : \[value \[topnode parent.input1].winroll]"}}
+  addUserKnob {30 wintranslate}
+  wintranslate {{"\[exists parent.input1] > 1 ? 0 : \[value \[topnode parent.input1].win_translate.u]"} {"\[exists parent.input1] > 1 ? 0 : \[value \[topnode parent.input1].win_translate.v]"}}
+  addUserKnob {30 winscale}
+  winscale {{"\[exists parent.input1] > 1 ? 0 : \[value \[topnode parent.input1].win_scale.u]"} {"\[exists parent.input1] > 1 ? 0 : \[value \[topnode parent.input1].win_scale.v]"}}
+ }
+end_group

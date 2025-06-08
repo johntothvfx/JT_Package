@@ -1,0 +1,66 @@
+Group {
+ name ChannelSampler1
+ help "Allows the user to sample a channel using the picker which will then display that sampled value."
+ onCreate "n = nuke.thisNode()\nk = 'sample'\nt = nuke.thisKnob()\nflag = nuke.NO_ANIMATION\n\n\nn.knob(k).setFlag(flag)"
+ knobChanged "n=nuke.thisNode()\nk = nuke.thisKnob()\n\nif k.Class() == 'XY_Knob' and k.isAnimated() == False:\n    i = k.value()\n    nm = '3D' + k.name()\n    inp = n.node('Shuffle1')\n    px = int(i\[0])\n    py = int(i\[1])\n    r = inp.sample('red', px, py)\n    g = inp.sample('green', px,py)\n    b = inp.sample('blue', px, py)\n\n    n\[nm].setValue(\[r,g,b])\n\n\n\n"
+ tile_color 0x9e3c63ff
+ label "\n"
+ note_font "Bitstream Vera Sans"
+ note_font_color 0x2ff
+ selected true
+ addUserKnob {20 ChannelSampler l "Channel Sampler"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION ChannelSampler
+ addUserKnob {41 channels T Shuffle1.in}
+ addUserKnob {12 sample}
+ addUserKnob {6 3Dsample_panelDropped l "panel dropped state" +HIDDEN +STARTLINE}
+ addUserKnob {6 3Dpicker_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {18 3Dsample l color}
+ 3Dsample {0 0 0}
+ addUserKnob {6 3Dsample_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {26 ""}
+ addUserKnob {6 color_rgb_panelDropped l "panel dropped state" +HIDDEN +STARTLINE}
+ addUserKnob {4 createNode l "              " M {Axis Card Cube Sphere "" "" "" "" "" "" "" "" "" ""}}
+ addUserKnob {4 function l "" -STARTLINE M {"set value" "set expression" "" "" "" "" "" "" "" ""}}
+ addUserKnob {22 create l "   create   " -STARTLINE T "\nnode = nuke.thisNode()\nnode.knob('selected').setValue(False)\n\nname = node.knob('name').getValue()\n\n#creation poition\n\n#get 3Dpicker\npicker = '3Dsample'\n\nxPos = node.knob('3Dsample').getValue(0)\nyPos= node.knob('3Dsample').getValue(1)\nzPos = node.knob('3Dsample').getValue(2)\n\n\n#get mode\nmode = node.knob('createNode').value()\n\n#3D Nodes\nif mode == 'Axis':\n    nodeClass = 'Axis3'\n\nelif mode == 'Card':\n    nodeClass = 'Card2'\n    \nelif mode == 'Cube':\n    nodeClass = 'Cube'\n\nelif mode == 'Sphere':\n    nodeClass = 'Sphere'   \n\n\n#get function\noperation = node.knob('function').value()\n\n#check whether gizmo inside group\nroot = 'root'\nnodeRoot = node.fullName()\nif nodeRoot.count('.') > 0:\n    root = '.'.join(nodeRoot.split('.')\[:-1])\n\n#create node based on function\nif operation == 'set value':   \n    #create\n    with nuke.toNode(root):\n        createNode = nuke.createNode(nodeClass, inpanel = False)\n        createNode.setXpos(node.xpos() + 150)\n        createNode.setYpos(node.ypos() + 100)\n        createNode\['translate'].setValue((float(xPos)), 0)\n        createNode\['translate'].setValue((float(yPos)), 1)\n        createNode\['translate'].setValue((float(zPos)), 2)\n    \nelif operation == 'set expression':\n    with nuke.toNode(root):\n        createNode = nuke.createNode(nodeClass, inpanel = False)\n        createNode.setXpos(node.xpos() + 150)\n        createNode.setYpos(node.ypos() + 100)\n        createNode\['translate'].setExpression(name + '.' + picker, 0)\n        createNode\['translate'].setExpression(name + '.' + picker, 1)\n        createNode\['translate'].setExpression(name + '.' + picker, 2)\n"}
+ addUserKnob {22 sampler l "   Create ColorSampler   " +INVISIBLE T "node = nuke.thisNode()\nnode.knob('selected').setValue(False)\n\n\n#check whether gizmo inside group\nroot = 'root'\nnodeRoot = node.fullName()\nif nodeRoot.count('.') > 0:\n    root = '.'.join(nodeRoot.split('.')\[:-1])\n\nwith nuke.toNode(root):\n    Sampler = nuke.createNode('NoOp', inpanel = False)\n    Sampler.setXpos(node.xpos() + 100)\n    Sampler.setYpos(node.ypos() + 100)\n\n    #set callbacks/onCreate\n    Sampler\['onCreate'].setValue(\"\"\"nuke.thisNode().knob('sample').setFlag(nuke.NO_ANIMATION)\"\"\")\n    Sampler\['knobChanged'].setValue(\"\"\"n=nuke.thisNode()\nk = nuke.thisKnob()\n\nif k.name() == 'sample' and k.isAnimated() == False:\n \n    i = k.value()\n        \n    px = int(i\[0])\n    py = int(i\[1])\n    \n    r = n.sample('red', px, py)\n    g = n.sample('green', px,py)\n    b = n.sample('blue', px, py)\n    \n    \n    n\['color'].setValue(\[r,g,b])\n\"\"\")\n    \n    #adding Knobs\n    Sampler.addKnob(nuke.XY_Knob ('sample', 'sample'))\n    Sampler.addKnob(nuke.Color_Knob ('color', 'color'))\n    \n    #set name/color\n    Sampler.setName('ColorSampler')\n    Sampler\['tile_color'].setValue(2057961471)\n\n\n    for n in nuke.selectedNodes():\n        n\['selected'].setValue(False) \n        \n    Sampler\['selected'].setValue(True)\n\n\n    nuke.duplicateSelectedNodes()\n    new = nuke.selectedNode()\n    new.setXpos(node.xpos() + 100)\n    new.setYpos(node.ypos() + 100)\n    new.showControlPanel()\n    nuke.delete(Sampler) \n    \n        \n        \n    " +STARTLINE}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Channel Sampler</font><font color=#9E3C63> v1.2"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br> \n<b>Channel Sampler</b> will sample a pixel coordinate<br>in a certain channel layer.\n<br>\n<br><strong>•</br> <i> The pixel value of that coordinate will be displayed in color.\n<br></b></i>\n\n\n\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#9E3C63;\">John Toth <b>© 2021 <br>\n"}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#9E3C63\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#9E3C63\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.2.3\"\ncontext = \"Channel\"\n\n\ndate = \"22th June\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2021\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- samples a pixel based on a coordinate in a channel layer\n<br></i><b> v 1.1 </b><i>\n- user interface update\n<br></i><b> v 1.2 </b><i>\n- create options were added\n\"\"\"\n\n\n\n\nthankyou = \"\"\"\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" +  \"<br>\" + UPPER + site + developer + ENTER + \"</a>\") \n\n\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  label "input \[value number]"
+  xpos 320
+  ypos -1503
+ }
+set N17650d30 [stack 0]
+ Output {
+  name Output1
+  xpos 320
+  ypos -1354
+ }
+push $N17650d30
+ Shuffle {
+  in none
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 510
+  ypos -1507
+ }
+ NoOp {
+  inputs 0
+  name ColorSampler
+  selected true
+  addUserKnob {20 User}
+  addUserKnob {12 sample}
+  addUserKnob {18 color}
+  color {0 0 0}
+  addUserKnob {6 color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ }
+end_group

@@ -1,0 +1,657 @@
+Group {
+ name DepthDrawDistance1
+ help "The purpose of this node is to help reduce the artefacts you may have during defocusing your composite.\n\nThis node is usually put right before your defocus node.\n\nThis will extend the edges of your depth and add data to anything that is black in the selected channel.\n\n\n\n\n"
+ tile_color 0x802380ff
+ selected true
+ addUserKnob {20 depthDrawDistance l "Depth Draw Distance"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION DepthDrawDistance
+ addUserKnob {41 channels t "The Depth Draw distance is only applied to the selected input channel.\n" T Shuffle3.in}
+ addUserKnob {6 view t "Toggle to view the selected channel input.\n\nThis is usual to see what is happening under the hood to the depth channel however this is only for display purposes only.\n" -STARTLINE}
+ addUserKnob {26 space000 l "" +STARTLINE T " \t"}
+ addUserKnob {14 extend l "extend edges" t "Generates an alpha based on the incoming input depth channel which will then extrude the depth edges as a simple blur/unpremult operation." R 0 100}
+ addUserKnob {7 max_distance l "draw distance" t "Draw distance is the back end of the image or a lens. <b> Example: infinity</b>\n\nThis node is used to help add value to something that is black and should be an extremely high value which is in the far distance of your composite image.\nThis is to stop artefacts happening when doing defocus.\n\n<i><b>Tip:</b>\nIf you are unsure what the value should be simply type <b>\"inf\"</b> into the slider to be safe." R 0 1000}
+ addUserKnob {6 crop l "crop to format" t "When enabled, the bounding box cannot grow past its incoming bounding/format size. This avoids creating oversized bounding boxes that can take longer to compute." +STARTLINE}
+ crop true
+ addUserKnob {20 warning l Warning}
+ addUserKnob {6 warningLabel l "warning overlay if \"view\" is enabled" +STARTLINE}
+ warningLabel true
+ addUserKnob {6 color_rgb_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {2 font t "Full pahtname of font file. Text supports a large number of formats for scalable fonts including TrueType and PostScript by using the FreeType library."}
+ font "\[python nuke.defaultFontPathname()]"
+ addUserKnob {18 warningColor l "warning color" t "color of the warning label"}
+ warningColor {1 1 0}
+ addUserKnob {6 warningColor_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Depth Draw Distance</font><font color=#943794> v1.1"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>Depth Draw Distance</b> allows the user to<br>quickly fix any artefacts that may occur when<br>defocusing<i> (by putting this node before defocusing)</i>.\n<i><br><br><strong>•</br> \nThe user can extend edges of the depth input. <br> They may also make anything that is value of 0<br>in the selected input channel to a custom value<br>(usually a high value)\n<i><br><br><strong>•</br> \n<b>Tip:</b> If unsure what value the draw distance should<br>be you can type <b> inf</b> to be safe.\n</i>\n\n\n\n\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#943794;\">John Toth <b>© 2020 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#943794\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message(\"Coming Soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#943794\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.2.1\"\ncontext = \"AOV\"\n\n\ndate = \"30th January\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2020\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n-  extrudes the depth values or add data where the value is 0 (black)\n<br></i><b> v 1.1 </b><i>\n- user interface updated to match the package in this set\n- view button was added\n- warning label was added to display over image when 'view' is enabled\n\"\"\"\n\n\n\nthankyou = \"\"\"\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + UPPER + site + developer + \"</a>\") \n\n\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos 90
+  ypos -106
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 124
+  ypos 186
+ }
+set N12723a00 [stack 0]
+ Shuffle {
+  in depth
+  name Shuffle3
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 469
+  ypos 172
+ }
+ Expression {
+  expr3 a==0?a:a/a
+  name Expression11
+  label "Divide Alpha by itself"
+  xpos 469
+  ypos 320
+ }
+set N13a28790 [stack 0]
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 324
+  ypos 330
+ }
+ Invert {
+  channels alpha
+  name Invert2
+  xpos 290
+  ypos 1400
+ }
+push $N13a28790
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 503
+  ypos 421
+ }
+set N139b81a0 [stack 0]
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 674
+  ypos 421
+ }
+ Invert {
+  channels alpha
+  name Invert1
+  xpos 640
+  ypos 459
+ }
+ Grade {
+  channels alpha
+  whitepoint 0.5
+  black_clamp false
+  white_clamp true
+  name Grade6
+  xpos 640
+  ypos 512
+ }
+ Dot {
+  name Dot1
+  xpos 674
+  ypos 577
+ }
+push $N139b81a0
+ Merge2 {
+  inputs 2
+  operation stencil
+  name Merge2
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 469
+  ypos 567
+ }
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 503
+  ypos 679
+ }
+set N139d3780 [stack 0]
+ Dot {
+  name Dot66
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 715
+  ypos 679
+ }
+set N13a0d920 [stack 0]
+ Dot {
+  name Dot57
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 874
+  ypos 679
+ }
+set N13962170 [stack 0]
+ Dot {
+  name Dot56
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 984
+  ypos 679
+ }
+set N13927600 [stack 0]
+ Dot {
+  name Dot58
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1094
+  ypos 679
+ }
+set N1360e6c0 [stack 0]
+ Dot {
+  name Dot59
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1204
+  ypos 679
+ }
+set N1398cfb0 [stack 0]
+ Dot {
+  name Dot60
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1314
+  ypos 679
+ }
+ Blur {
+  channels rgba
+  size {{extend} {extend}}
+  crop {{parent.crop}}
+  name Blur6
+  label "size: \[value size]"
+  xpos 1280
+  ypos 728
+ }
+ Unpremult {
+  name Unpremult6
+  xpos 1280
+  ypos 806
+ }
+ Expression {
+  expr3 a==0?0:1
+  name Expression6
+  xpos 1280
+  ypos 849
+ }
+ FilterErode {
+  size {{extend/2} {extend/2}}
+  filter gaussian
+  name FilterErode6
+  xpos 1280
+  ypos 896
+ }
+ Premult {
+  name Premult6
+  xpos 1280
+  ypos 964
+ }
+ Dot {
+  name Dot65
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1314
+  ypos 1184
+ }
+push $N1398cfb0
+ Blur {
+  channels rgba
+  size {{extend/2}}
+  crop {{parent.crop}}
+  name Blur5
+  label "size: \[value size]"
+  xpos 1170
+  ypos 728
+ }
+ Unpremult {
+  name Unpremult5
+  xpos 1170
+  ypos 806
+ }
+ Expression {
+  expr3 a==0?0:1
+  name Expression5
+  xpos 1170
+  ypos 849
+ }
+ FilterErode {
+  size {{extend/2/2} {extend/2/2}}
+  filter gaussian
+  name FilterErode5
+  xpos 1170
+  ypos 896
+ }
+ Premult {
+  name Premult5
+  xpos 1170
+  ypos 964
+ }
+ Dot {
+  name Dot63
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1204
+  ypos 1146
+ }
+push $N1360e6c0
+ Blur {
+  channels rgba
+  size {{extend/3} {extend/3}}
+  crop {{parent.crop}}
+  name Blur4
+  label "size: \[value size]"
+  xpos 1060
+  ypos 728
+ }
+ Unpremult {
+  name Unpremult4
+  xpos 1060
+  ypos 806
+ }
+ Expression {
+  expr3 a==0?0:1
+  name Expression4
+  xpos 1060
+  ypos 849
+ }
+ FilterErode {
+  size {{extend/3/2} {extend/3/2}}
+  filter gaussian
+  name FilterErode4
+  xpos 1060
+  ypos 896
+ }
+ Premult {
+  name Premult4
+  xpos 1060
+  ypos 964
+ }
+ Dot {
+  name Dot62
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1094
+  ypos 1108
+ }
+push $N13927600
+ Blur {
+  channels rgba
+  size {{extend/4} {extend/4}}
+  crop {{parent.crop}}
+  name Blur3
+  label "size: \[value size]"
+  xpos 950
+  ypos 728
+ }
+ Unpremult {
+  name Unpremult3
+  xpos 950
+  ypos 806
+ }
+ Expression {
+  expr3 a==0?0:1
+  name Expression2
+  xpos 950
+  ypos 849
+ }
+ FilterErode {
+  size {{extend/4/2} {extend/4/2}}
+  filter gaussian
+  name FilterErode3
+  xpos 950
+  ypos 896
+ }
+ Premult {
+  name Premult3
+  xpos 950
+  ypos 964
+ }
+ Dot {
+  name Dot61
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 984
+  ypos 1070
+ }
+push $N13962170
+ Blur {
+  channels rgba
+  size {{extend/5} {extend/5}}
+  crop {{parent.crop}}
+  name Blur2
+  label "size: \[value size]"
+  xpos 840
+  ypos 728
+ }
+ Unpremult {
+  name Unpremult7
+  xpos 840
+  ypos 806
+ }
+ Expression {
+  expr3 a==0?0:1
+  name Expression1
+  xpos 840
+  ypos 854
+ }
+ FilterErode {
+  size {{extend/5/2} {extend/5/2}}
+  filter gaussian
+  name FilterErode1
+  xpos 840
+  ypos 896
+ }
+ Premult {
+  name Premult2
+  xpos 840
+  ypos 964
+ }
+ Merge2 {
+  inputs 2
+  operation under
+  name Merge5
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 840
+  ypos 1060
+ }
+ Merge2 {
+  inputs 2
+  operation under
+  name Merge6
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 840
+  ypos 1098
+ }
+ Merge2 {
+  inputs 2
+  operation under
+  name Merge7
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 840
+  ypos 1136
+ }
+ Merge2 {
+  inputs 2
+  operation under
+  name Merge9
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 840
+  ypos 1174
+ }
+push $N13a0d920
+ Merge2 {
+  inputs 2
+  operation under
+  name Merge4
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 681
+  ypos 1174
+ }
+push $N139d3780
+ Switch {
+  inputs 2
+  which {{"extend > 0 ? 1 : 0"}}
+  name Switch2
+  xpos 469
+  ypos 1180
+ }
+ Unpremult {
+  name Unpremult1
+  xpos 469
+  ypos 1257
+ }
+ Expression {
+  expr3 a<=0.000001?0:1
+  name Expression8
+  xpos 469
+  ypos 1329
+ }
+ Expression {
+  inputs 1+1
+  channel0 rgb
+  expr0 r==0?max_distance:r
+  name Expression3
+  xpos 469
+  ypos 1406
+ }
+ Shuffle {
+  green red
+  blue red
+  alpha red
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 469
+  ypos 1492
+ }
+ Crop {
+  box {{"min(0, Input.bbox.x)"} {"min(0, Input.bbox.y)"} {"max(width, Input.bbox.r)"} {"max(height, Input.bbox.t)"}}
+  intersect true
+  crop false
+  name Crop3
+  xpos 469
+  ypos 1574
+  disable {{!parent.crop}}
+ }
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 503
+  ypos 1650
+ }
+set N13b54f30 [stack 0]
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 503
+  ypos 1890
+ }
+push $N13b54f30
+push $N12723a00
+ ShuffleCopy {
+  inputs 2
+  red red
+  green green
+  blue blue
+  out {{{parent.Shuffle3.in}}}
+  name ShuffleCopy1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 90
+  ypos 1636
+ }
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 124
+  ypos 1794
+ }
+set N13c468c0 [stack 0]
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 364
+  ypos 1794
+ }
+ Copy {
+  inputs 2
+  channels rgba
+  name Copy1
+  xpos 330
+  ypos 1874
+ }
+ Dot {
+  name Dot183
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 364
+  ypos 2076
+ }
+set N13b37a00 [stack 0]
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 364
+  ypos 2554
+ }
+set N13b3c600 [stack 0]
+push $N13b37a00
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 644
+  ypos 2076
+ }
+ Remove {
+  name Remove1
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 610
+  ypos 2128
+ }
+ CopyBBox {
+  name CopyBBox1
+  xpos 610
+  ypos 2196
+ }
+ Text {
+  cliptype none
+  message "\[value parent.name] \n\"view\" is Enabled\n\n"
+  font "\[value parent.font]"
+  size {{"(input.width + input.height)/100"}}
+  leading 0.2
+  xjustify center
+  yjustify top
+  box {{input.width/50} {box.x} {"input.width - box.x"} {"input.height - box.x"}}
+  color {{parent.warningColor} {parent.warningColor} {parent.warningColor} 1}
+  name Text5
+  label "\[basename \[value font]]"
+  note_font_color 0xffffffff
+  selected true
+  xpos 610
+  ypos 2240
+ }
+ Dot {
+  name Dot184
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 644
+  ypos 2330
+ }
+set N13cc5730 [stack 0]
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 788
+  ypos 2330
+ }
+ Multiply {
+  channels rgb
+  value 0
+  name Multiply1
+  label "(\[value value])"
+  xpos 754
+  ypos 2368
+ }
+ Dilate {
+  channels alpha
+  size 4
+  name Dilate2
+  xpos 754
+  ypos 2456
+ }
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 788
+  ypos 2538
+ }
+push $N13cc5730
+ Merge2 {
+  inputs 2
+  operation under
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 610
+  ypos 2528
+ }
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 644
+  ypos 2642
+ }
+push $N13b3c600
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 522
+  ypos 2554
+ }
+ Merge2 {
+  inputs 2
+  name Merge3
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 488
+  ypos 2632
+ }
+ Dot {
+  name Dot17
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 522
+  ypos 2738
+ }
+ Switch {
+  inputs 2
+  which {{"parent.warningLabel== 1 ? (parent.view == 1? 0 : 1) : 1"}}
+  name Switch1
+  xpos 330
+  ypos 2734
+ }
+ Dot {
+  name Dot18
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 364
+  ypos 2868
+ }
+push $N13c468c0
+ Switch {
+  inputs 2
+  which {{parent.view}}
+  name Switch3
+  xpos 94
+  ypos 2864
+ }
+ Output {
+  name Output1
+  xpos 90
+  ypos 3254
+ }
+end_group

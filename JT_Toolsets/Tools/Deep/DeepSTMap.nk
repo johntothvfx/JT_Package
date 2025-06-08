@@ -1,0 +1,311 @@
+Group {
+ name DeepSTMap1
+ tile_color 0x60ff
+ selected true
+ addUserKnob {20 DeepSTMap l "Deep STMap"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION DeepSTMap
+ addUserKnob {41 uv l "UV channels" t "The U and V values represent the absolute position of the source pixel. These values are normalized between 0 and 1, where (0,0) corresponds to the bottom-left corner of the input image and (1,1) corresponds to the top-right corner." T STMap1.uv}
+ addUserKnob {4 filter t "<b>Bilinear:</b> Smooth interpolation between pixels.\n<b>Impulse:</b> No filtering—each output pixel maps directly to an input pixel\n" M {impulse Bilinear "" "" "" "" "" "" ""}}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Deep STMap</font><font color=#000060> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br><b> Deep Stmap</b>  node enables pixel remapping within an<br>image. It utilizes two channels to determine the source<br>location of each pixel in the final image, based on the input<br>provided by the STMap input.\n<br>\n<br><i><b>Note:</b> Please be aware this is not magic and should be<br>avoided if possible\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#c8c8c8;\">John Toth <b>© 2025 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#000060\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message(\"Coming Soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#000060\">Version Log</a>\n" t "Contains information about the node with version log information." -STARTLINE T "\n# Constants\nversion_number = \"1.0.0\"\ncontext = \"Deep\"\nmodified_date = \"6th February 2025\"\ndeveloper = \"John Toth © 2025\"\nsite = \"<a href='website linke here'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- pixel remapping using another inputs image.\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"</i>\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}
+ Input {
+  inputs 0
+  name stmap
+  label "\[value number]"
+  xpos -150
+  ypos -661
+  number 1
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -116
+  ypos 666
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 680
+  ypos -640
+ }
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 714
+  ypos -513
+ }
+set N1c82e800 [stack 0]
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 494
+  ypos -513
+ }
+set N1c810800 [stack 0]
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 350
+  ypos -513
+ }
+ DeepToImage2 {
+  name DeepToImage4
+  xpos 316
+  ypos -445
+ }
+ Shuffle {
+  red white
+  green white
+  blue white
+  alpha white
+  name Shuffle9
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 316
+  ypos -385
+ }
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 350
+  ypos -273
+ }
+push $N1c810800
+ DeepRecolor {
+  inputs 2
+  name DeepRecolor3
+  label "\[expr \{ \[value targetInputAlpha] ?  \"(target input alpha)\" : \"\"\}]"
+  xpos 460
+  ypos -277
+ }
+ DeepExpression {
+  chans1 deep
+  rgba.red deep.front*rgba.alpha
+  rgba.green deep.front*rgba.alpha
+  rgba.blue deep.front*rgba.alpha
+  name DeepExpression3
+  xpos 460
+  ypos -226
+ }
+ DeepToImage {
+  name DeepToImage3
+  xpos 460
+  ypos -130
+ }
+ Unpremult {
+  name Unpremult1
+  xpos 460
+  ypos -36
+ }
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 494
+  ypos 111
+ }
+push $N1c82e800
+ DeepToImage {
+  name DeepToImage1
+  xpos 680
+  ypos -132
+ }
+ ShuffleCopy {
+  inputs 2
+  red red
+  green green
+  blue blue
+  out depth
+  name ShuffleCopy1
+  tile_color 0x802380ff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 680
+  ypos 98
+ }
+ Dot {
+  name Dot9
+  xpos 714
+  ypos 258
+ }
+set N1c0cc000 [stack 0]
+ Dot {
+  name Dot11
+  xpos 570
+  ypos 258
+ }
+ Shuffle {
+  in depth
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 536
+  ypos 316
+ }
+ Expression {
+  expr3 "isinf(r) || isnan(r)"
+  name Expression1
+  label "NaN and inf"
+  xpos 536
+  ypos 392
+ }
+ Dot {
+  name Dot15
+  xpos 570
+  ypos 498
+ }
+push $N1c0cc000
+ Multiply {
+  inputs 1+1
+  channels depth
+  value 0
+  name Multiply1
+  label "\[value value]"
+  xpos 680
+  ypos 486
+ }
+ STMap {
+  inputs 2
+  uv rgb
+  filter {{parent.filter}}
+  name STMap1
+  xpos 680
+  ypos 659
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 714
+  ypos 858
+ }
+set N3c5dde00 [stack 0]
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 544
+  ypos 858
+ }
+set N3c624a00 [stack 0]
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 324
+  ypos 858
+ }
+ Remove {
+  channels depth
+  channels2 deep
+  name Remove2
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 290
+  ypos 962
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 324
+  ypos 1530
+ }
+push $N3c624a00
+ NoOp {
+  name Detect
+  xpos 510
+  ypos 903
+  addUserKnob {20 User}
+  addUserKnob {6 alpha +STARTLINE}
+  alpha {{"\[python \"len(\\\[n for n in nuke.channels(nuke.thisNode().input(0)) if n.find(\\\".a\\\") != -1])>0\"]"}}
+ }
+ Shuffle {
+  in depth
+  red black
+  green black
+  blue black
+  alpha red
+  name Shuffle2
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 510
+  ypos 964
+ }
+ Expression {
+  expr3 a==0?a:a/a
+  name Expression11
+  label "Divide Alpha by itself"
+  xpos 510
+  ypos 1043
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 544
+  ypos 1146
+ }
+push $N3c5dde00
+ Shuffle {
+  in depth
+  out rgb
+  name Shuffle3
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 680
+  ypos 965
+ }
+ Copy {
+  inputs 2
+  channels alpha
+  name Copy1
+  xpos 680
+  ypos 1134
+  disable {{Detect.alpha}}
+ }
+ Unpremult {
+  name Unpremult2
+  xpos 680
+  ypos 1191
+  disable {{!parent.filter}}
+ }
+ DeepFromImage {
+  premult true
+  name DeepFromImage2
+  xpos 680
+  ypos 1286
+ }
+ DeepExpression {
+  chans1 deep
+  rgba.red 0
+  rgba.green 0
+  rgba.blue 0
+  rgba.alpha a
+  deep.front r==0?inf:r
+  deep.back g==0?inf:g
+  name DeepExpression1
+  xpos 680
+  ypos 1334
+ }
+ DeepRecolor {
+  inputs 2
+  channels {{{parent.STMap1.channels}}}
+  name DeepRecolor2
+  label "\[expr \{ \[value targetInputAlpha] ?  \"(target input alpha)\" : \"\"\}]"
+  xpos 680
+  ypos 1518
+ }
+ Output {
+  name Output1
+  xpos 680
+  ypos 1790
+ }
+end_group
