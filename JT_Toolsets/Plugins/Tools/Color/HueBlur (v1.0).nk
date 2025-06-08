@@ -1,0 +1,212 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+name Hue_Blur
+tile_color 0x2a68b5ff
+note_font_color 0xffffffff
+selected true
+addUserKnob {20 Settings}
+addUserKnob {26 "" +STARTLINE}
+addUserKnob {41 ChannelInput l Channels T Shuffle1.in}
+addUserKnob {26 ""}
+addUserKnob {41 Size T Blur18.size}
+addUserKnob {41 Filter T Blur18.filter}
+addUserKnob {41 quality1 l "" -STARTLINE T Blur18.quality}
+addUserKnob {41 crop1 l "crop to format" -STARTLINE T Blur18.crop}
+addUserKnob {26 space l "" +STARTLINE T <br>}
+addUserKnob {7 mix1 l Mix t "Mix between source and result effect"}
+mix1 1
+addUserKnob {26 ""}
+addUserKnob {41 maskChannel l mask T Keymix1.maskChannel}
+addUserKnob {41 invertMask l invert -STARTLINE T Keymix1.invertMask}
+addUserKnob {26 space001 l "" +STARTLINE T <br>}
+addUserKnob {4 output l Output M {Effect "Hue Only" "" "" ""}}
+addUserKnob {26 author l "" +STARTLINE T "<br><font size='5'>Hue Blur</font><font color=#2a68bc> v1.0"}
+addUserKnob {20 Help}
+addUserKnob {26 guide l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+addUserKnob {26 "" +STARTLINE}
+addUserKnob {26 Steps l "" +STARTLINE T "<br><strong>1. </br> \nHue Blur is a simple and fast way to grab<br> the <b>colour and blur it</b> using a normal <br> blur node while <b>keeping original luminace.</b>\n\n<br><br><b>John Toth © 2020<br>"}
+addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#2a68bc\">johntothvfx.com</a>\n"}
+addUserKnob {26 space_1 l "" -STARTLINE T " \t\t"}
+addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#2a68bc\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool</i><br><br></i><b>John Toth © 2020\")\n"}
+}
+Input {
+inputs 0
+name Input
+xpos 412
+ypos -849
+}
+Dot {
+name Dot4
+note_font_size 35
+note_font_color 0xffffff
+xpos 446
+ypos -750
+}
+set N2ed18680 [stack 0]
+Shuffle {
+in rgb
+name Shuffle1
+label "<b>\[value in]</b> &rarr; \[value out]"
+xpos 412
+ypos -598
+}
+Dot {
+name Dot372
+note_font_size 35
+note_font_color 0xffffff
+xpos 446
+ypos -421
+}
+set N3d8717c0 [stack 0]
+Dot {
+name Dot370
+note_font_size 35
+note_font_color 0xffffff
+xpos 284
+ypos -421
+}
+Dot {
+name Dot7
+note_font_size 35
+note_font_color 0xffffff
+xpos 284
+ypos -222
+}
+set N3d81ab50 [stack 0]
+push $N3d8717c0
+Saturation {
+channels all
+saturation 0
+name Saturation11
+label "saturation: \[value saturation]"
+xpos 412
+ypos -358
+}
+Merge2 {
+inputs 2
+operation divide
+also_merge all
+name Merge36
+label "mix: \[value mix] (\[value bbox])"
+xpos 412
+ypos -231
+}
+Blur {
+size 10
+name Blur18
+label "size: \[value size]"
+xpos 412
+ypos -142
+}
+set N2da79050 [stack 0]
+Dot {
+name Dot1
+note_font_size 35
+note_font_color 0xffffff
+xpos 349
+ypos -126
+}
+Dot {
+name Dot3
+note_font_size 35
+note_font_color 0xffffff
+xpos 349
+ypos 474
+}
+Input {
+inputs 0
+name mask
+xpos 980
+ypos 183
+number 1
+}
+Invert {
+name Invert1
+xpos 980
+ypos 273
+}
+push $N2ed18680
+Dot {
+name Dot5
+note_font_size 35
+note_font_color 0xffffff
+xpos 148
+ypos -750
+}
+Dot {
+name Dot2
+note_font_size 35
+note_font_color 0xffffff
+xpos 148
+ypos 282
+}
+push $N2da79050
+push $N3d81ab50
+Dot {
+name Dot6
+note_font_size 35
+note_font_color 0xffffff
+xpos 284
+ypos 42
+}
+Dissolve {
+inputs 2
+which {{mix1}}
+name Dissolve1
+selected true
+xpos 412
+ypos 33
+}
+Colorspace {
+colorspace_out HSV
+name Colorspace1
+xpos 597
+ypos 39
+}
+push $N2ed18680
+Colorspace {
+channels all
+colorspace_out HSV
+name Colorspace2
+xpos 730
+ypos -759
+}
+ShuffleCopy {
+inputs 2
+red red
+green green
+alpha alpha2
+out {{{parent.Shuffle1.in}}}
+name ShuffleCopy1
+label "<b>\[value in]</b> &rarr; \[value out]"
+xpos 730
+ypos 26
+}
+Colorspace {
+channels all
+colorspace_in HSV
+name Colorspace3
+xpos 730
+ypos 135
+}
+Keymix {
+inputs 3
+bbox B
+name Keymix1
+xpos 730
+ypos 273
+}
+Switch {
+inputs 2
+which {{output}}
+name Switch1
+xpos 730
+ypos 471
+}
+Output {
+name Output1
+xpos 730
+ypos 759
+}
+end_group

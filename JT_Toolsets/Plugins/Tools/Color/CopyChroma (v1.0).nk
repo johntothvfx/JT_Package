@@ -1,0 +1,226 @@
+Group {
+ inputs 2
+ name CopyChroma
+ tile_color 0x2a68b5ff
+ note_font_color 0xffffffff
+ selected true
+ addUserKnob {20 Settings}
+ addUserKnob {4 operation l Copy t "This operations allows you to select from which pipe you want to copy the Chrome from." M {"A to B" "B to A" "" "" "" "" "" "" "" ""}}
+ addUserKnob {4 bbox l "set bbox to" t "Croping the bounding box to a certain selected input" M {union A B "" "" ""}}
+ addUserKnob {26 space l "" -STARTLINE T "  \t"}
+ addUserKnob {6 blackoutside l "black outside" t "makes everything outside the bounding box black" -STARTLINE}
+ addUserKnob {26 space001 l "" +STARTLINE T "\t "}
+ addUserKnob {7 mix t "effects taking place. 1 being full effect and 0 being no effect."}
+ mix 1
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannel l mask t "mask the effect by the value input." T Keymix1.maskChannel}
+ addUserKnob {41 invertMask l invert t "inver the mask being applied by." -STARTLINE T Keymix1.invertMask}
+ addUserKnob {26 ""}
+ addUserKnob {26 author l "" +STARTLINE T "<br><font size='5'>Copy Chroma</font><font color=#2a68bc> v1.0"}
+ addUserKnob {20 Help -STARTLINE}
+ addUserKnob {26 guide l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 steps l "" +STARTLINE T "<br><strong>1. </br> \nA simple node that copied Hue,Saturation <br> from RGB values <b> from</b> into the the RGB of <b> to</b> pipe.\n\n\n<br><br><b>John Toth © 2021 <br>\n\n"}
+ addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#2a68bc\">johntothvfx.com</a>\n"}
+ addUserKnob {26 space002 l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#2a68bc\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool<br><br><i> special thanks for Francesco Cadoni as this node is based of his but modified.</i><br><br></i><b>John Toth © 2021\")\n"}
+}
+ Input {
+  inputs 0
+  name mask
+  xpos 771
+  ypos 950
+  number 2
+ }
+ Invert {
+  name Invert1
+  xpos 771
+  ypos 992
+ }
+ Input {
+  inputs 0
+  name A
+  xpos 1060
+  ypos -130
+  number 1
+ }
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1094
+  ypos 42
+ }
+set N2c2d7200 [stack 0]
+ Input {
+  inputs 0
+  name B
+  xpos 606
+  ypos -130
+ }
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 640
+  ypos 42
+ }
+set N2c2d6400 [stack 0]
+ Switch {
+  inputs 2
+  which {{operation}}
+  name Switch3
+  xpos 606
+  ypos 134
+ }
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 640
+  ypos 210
+ }
+set N2c2d5600 [stack 0]
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 434
+  ypos 210
+ }
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 434
+  ypos 762
+ }
+set N2c2d4800 [stack 0]
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 434
+  ypos 1002
+ }
+push $N2c2d6400
+push $N2c2d7200
+ CopyBBox {
+  inputs 2
+  name CopyBBox1
+  xpos 912
+  ypos 566
+ }
+push $N2c2d7200
+push $N2c2d6400
+ CopyBBox {
+  inputs 2
+  name CopyBBox2
+  xpos 792
+  ypos 566
+ }
+push $N2c2d6400
+push $N2c2d7200
+ Switch {
+  inputs 2
+  which {{operation}}
+  name Switch2
+  xpos 1060
+  ypos 134
+ }
+ Colorspace {
+  colorspace_out HSV
+  name Colorspace4
+  selected true
+  xpos 1060
+  ypos 389
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1094
+  ypos 498
+ }
+push $N2c2d5600
+ Colorspace {
+  colorspace_out HSV
+  name Colorspace5
+  xpos 606
+  ypos 398
+ }
+ ShuffleCopy {
+  inputs 2
+  red red
+  green green
+  alpha alpha2
+  name ShuffleCopy3
+  label "\[value in] to \[value out]"
+  xpos 606
+  ypos 488
+ }
+ Colorspace {
+  colorspace_in HSV
+  name Colorspace6
+  xpos 606
+  ypos 581
+ }
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 640
+  ypos 666
+ }
+set N2c2b8100 [stack 0]
+ Switch {
+  inputs 3
+  which {{bbox}}
+  name Switch1
+  xpos 851
+  ypos 662
+ }
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 885
+  ypos 858
+ }
+push $N2c2b8100
+push $N2c2d4800
+ Dissolve {
+  inputs 2
+  channels rgb
+  which {{parent.mix}}
+  name Dissolve1
+  xpos 606
+  ypos 758
+ }
+ CopyBBox {
+  inputs 2
+  name CopyBBox3
+  xpos 606
+  ypos 854
+ }
+ Keymix {
+  inputs 3
+  channels rgb
+  bbox B
+  name Keymix1
+  xpos 606
+  ypos 998
+ }
+ BlackOutside {
+  name BlackOutside1
+  xpos 606
+  ypos 1118
+  disable {{!parent.blackoutside}}
+ }
+ Output {
+  name Output
+  xpos 606
+  ypos 1238
+ }
+end_group
+

@@ -1,0 +1,442 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name LTP_Vignette
+ help "Creates a vignette which has a customization input. So you can in input a any image or shape you wish (custom input works through RGB)."
+ tile_color 0x713371ff
+ selected true
+ addUserKnob {20 Settings}
+ addUserKnob {26 ""}
+ addUserKnob {4 type l Type t "- This has two types of Radial inputs it can use, one which is built internally, or if you have a custom one it can use that.\n- All controls works with both custom/internal.\n\nNOTE: Custom Works on RGB not the alpha, Also reformating vignette to the input is adviced." M {Internal custom "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+ addUserKnob {26 ""}
+ addUserKnob {18 color l Color t "- To tint the colour of the vignette."}
+ color {0 0 0}
+ addUserKnob {6 color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {26 aa l "" +STARTLINE T "\t"}
+ addUserKnob {7 density l Density t "- How opaque you want the vignette to be."}
+ density 0.5
+ addUserKnob {7 falloff l Falloff t "-Gamma control over the vignette to adust the falloff." R 0.2 2}
+ falloff 1
+ addUserKnob {26 space001 l "" +STARTLINE T " "}
+ addUserKnob {7 restore l "Restore Whies" t "The restore whites will allow you to restore any high range values and bleed it back through the vignette."}
+ restore 0.1
+ addUserKnob {26 space l "" +STARTLINE T " "}
+ addUserKnob {20 Offset l Position n 1}
+ Offset 0
+ addUserKnob {14 size l Scale R 0 100}
+ size 1
+ addUserKnob {26 space1 l "" +STARTLINE T "  "}
+ addUserKnob {7 offsetX l "Offset X" R -2 2}
+ addUserKnob {7 offsetY l "Offset Y" R -2 2}
+ addUserKnob {20 endGroup n -1}
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannel l "Mask Channel" T Keymix2.maskChannel}
+ addUserKnob {41 invertMask l invert -STARTLINE T Keymix2.invertMask}
+ addUserKnob {26 ""}
+ addUserKnob {26 space_2 l "" +STARTLINE T " "}
+ addUserKnob {4 output l Output t "Output from the node" M {Result Vignette "" "" "" "" "" ""}}
+ addUserKnob {26 author l "" t "Special Thanks to Ben Dickson and Daniel Velikov.\n" +STARTLINE T "<br><font size='5'>\nVignette\n</font><font color=#ad36b1> v1.2\n<br> <font size='3'>\nLens Treatment Package"}
+ addUserKnob {20 Help}
+ addUserKnob {26 Setup l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 steps l "" +STARTLINE T "<br><strong>1. </br> \nVignette is part of <i>(Lens Treatment Package)</i> <br> which<br>barrel blocks</b> the light. Light taking <br>longer to sit the sensor from the outter edge\n\n<br><strong>2. </br> </b>\n<i>Type</i>, allows you to change from the inbuilt <br>vignette to a custom one, which has been created from a camera etc.\n\n<br><strong>3. </br> </b>\nYou can change the how dense and falloff off<br> of the vignette.\n\n<br><strong>4. </br> </b>\nThe <b>restore whites</b> option will allow you to restore any <br>high range values and bleed it back through the vignette.\n\n<br><br><b>NOTE:</b><br> - All controls work on custom and inbuilt vignette.<br>\n- Reformating the custom vignette to the input format is adviced.\n\n<br><br><b>John Toth © 2017 <br>"}
+ addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#ad36b1\">johntothvfx.com</a>\n"}
+ addUserKnob {26 space_1 l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#ad36b1\">Version Log</a>\n" t "Displays the Version log to the current one." -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool</i><br><br><b>v 1.1</b><br><i>- restore whites<br>- offset and scale was added</i><br><br><b>v 1.2</b><br><i>- Mask input was added</i><br><br><i>Special Thanks to Ben Dickson & Daniel Velikov </i><br><br></i><b>John Toth © 2017\")\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos 820
+  ypos -952
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 854
+  ypos -678
+ }
+set N1fb88960 [stack 0]
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1074
+  ypos -678
+ }
+set N1fb8d480 [stack 0]
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1250
+  ypos -678
+ }
+set N1fb92040 [stack 0]
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1534
+  ypos -678
+ }
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1534
+  ypos 546
+ }
+set N1fb9b750 [stack 0]
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1534
+  ypos 1098
+ }
+set N1fba0340 [stack 0]
+ Remove {
+  channels rgba
+  name Remove3
+  xpos 1500
+  ypos 1239
+ }
+ Input {
+  inputs 0
+  name custom
+  xpos 290
+  ypos -207
+  number 1
+ }
+ Add {
+  channels rgb
+  value {{parent.color} {parent.color} {parent.color} 0}
+  name Add3
+  xpos 290
+  ypos -57
+ }
+ Transform {
+  translate {{parent.offsetX*720} {parent.offsetY*720}}
+  scale {{parent.Expression2.sx-.75} {parent.Expression2.sy-.75}}
+  center {{input.width/2 x153 0} {input.height/2 x153 0}}
+  shutteroffset centred
+  name Transform1
+  xpos 290
+  ypos 14
+ }
+ Grade {
+  gamma {{parent.Grade1.gamma}}
+  black_clamp false
+  white_clamp true
+  name Grade10
+  xpos 290
+  ypos 110
+ }
+set N1fbcd4c0 [stack 0]
+ Shuffle {
+  alpha red
+  name Shuffle2
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 290
+  ypos 362
+ }
+push $N1fb92040
+ Remove {
+  name Remove2
+  xpos 1216
+  ypos -660
+ }
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha black
+  name Shuffle7
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 1216
+  ypos -622
+ }
+ Expression {
+  expr0 "(( (((x+.5)/width)-.5)*2 ) -tx ) /sx"
+  expr1 "(( (((y+.5)/height)-.5)*2 ) - ty)/sy"
+  name Expression2
+  xpos 1216
+  ypos -513
+  addUserKnob {20 User}
+  addUserKnob {7 tx R -1 1}
+  tx {{parent.offsetX}}
+  addUserKnob {7 ty R -1 1}
+  ty {{parent.offsetY}}
+  addUserKnob {7 sx R 0 5}
+  sx {{parent.size.w+.75}}
+  addUserKnob {7 sy R 0 5}
+  sy {{parent.size.h+.75}}
+ }
+ Expression {
+  temp_name0 L
+  temp_expr0 sqrt(r*r+g*g)
+  channel0 rgba
+  expr0 1-L
+  channel1 none
+  channel2 none
+  channel3 none
+  name Expression1
+  xpos 1216
+  ypos -466
+ }
+ Grade {
+  channels alpha
+  gamma {{parent.falloff}}
+  white_clamp true
+  name Grade1
+  xpos 1216
+  ypos -399
+ }
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1250
+  ypos -247
+ }
+set N1fc357c0 [stack 0]
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 1216
+  ypos 99
+ }
+ Switch {
+  inputs 2
+  which {{parent.type}}
+  name Switch3
+  xpos 1216
+  ypos 375
+ }
+ Copy {
+  inputs 2
+  from0 -rgba.alpha
+  to0 -rgba.alpha
+  channels all
+  name Copy1
+  xpos 1216
+  ypos 1226
+ }
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1250
+  ypos 1386
+ }
+ Input {
+  inputs 0
+  name mask
+  xpos 556
+  ypos 903
+  number 2
+ }
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 590
+  ypos 978
+ }
+set N2601f630 [stack 0]
+ Invert {
+  name Invert1
+  xpos 556
+  ypos 1088
+ }
+push $N1fba0340
+push $N1fb88960
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 495
+  ypos -678
+ }
+set N1fc75850 [stack 0]
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 104
+  ypos -678
+ }
+ Keyer {
+  operation "luminance key"
+  range {0.02051084569 0.5606171561 1 1}
+  name Keyer1
+  xpos 70
+  ypos -255
+ }
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 104
+  ypos 546
+ }
+push $N1fb9b750
+push $N1fbcd4c0
+push $N1fc75850
+ Merge2 {
+  inputs 2
+  operation multiply
+  bbox B
+  output rgb
+  mix {{parent.density}}
+  name Multiply
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 461
+  ypos 104
+ }
+push $N1fc357c0
+push $N1fb8d480
+ Remove {
+  operation keep
+  channels rgba
+  name Remove1
+  xpos 1040
+  ypos -657
+ }
+ Shuffle {
+  red black
+  green black
+  blue black
+  name Shuffle8
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 1040
+  ypos -616
+ }
+ Add {
+  channels rgb
+  value {{parent.color} {parent.color} {parent.color} 0}
+  name Add1
+  xpos 1040
+  ypos -490
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1074
+  ypos -390
+ }
+push $N1fb88960
+ Merge2 {
+  inputs 2+1
+  operation copy
+  bbox B
+  output rgb
+  invert_mask true
+  mix {{parent.density}}
+  name vignette2
+  xpos 820
+  ypos -249
+ }
+ Switch {
+  inputs 2
+  which {{parent.type}}
+  name Switch1
+  xpos 820
+  ypos 110
+ }
+ Keymix {
+  inputs 3
+  channels rgb
+  mix {{parent.restore}}
+  bbox B
+  name Keymix1
+  xpos 820
+  ypos 542
+ }
+ Keymix {
+  inputs 3
+  channels rgb
+  invertMask true
+  bbox B
+  name Keymix2
+  xpos 820
+  ypos 1094
+  disable {{!autoAlphaCheck.a}}
+ }
+ BlackOutside {
+  name BlackOutside1
+  xpos 820
+  ypos 1287
+ }
+ Switch {
+  inputs 2
+  which {{output}}
+  name Switch2
+  xpos 820
+  ypos 1382
+ }
+ Output {
+  name Output1
+  xpos 820
+  ypos 1479
+ }
+push $N2601f630
+ NoOp {
+  name autoAlphaCheck
+  xpos 645
+  ypos 975
+  addUserKnob {20 autoAlphaCheck}
+  addUserKnob {6 a +STARTLINE}
+  a {{"\[string first \".a\" \[channels \[input this 0]]]>-1"}}
+ }
+end_group
+

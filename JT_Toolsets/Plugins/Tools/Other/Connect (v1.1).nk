@@ -1,0 +1,49 @@
+Group {
+ name Connect
+ help "This tool allows you to quickly connect the input of this node to another node based on it's name or selection.\n\nThis node is not recommended to use, only as a last resort if you have picked up a WEB from another artist."
+ knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\n\nif n.knob('disconnect').value() == 1 :\n    \n        if k.name() == 'inputChange':\n            try:\n                i = n.dependencies()\n                if i == \[]:\n                    n\['parent'].setValue('')\n                else:\n                    name = n.dependencies()\[0].name()\n                    n\['parent'].setValue(name)\n            except: pass"
+ selected true
+ postage_stamp true
+ addUserKnob {20 Connect}
+ addUserKnob {1 CLASS +INVISIBLE}
+ CLASS Connect
+ addUserKnob {4 presets t "Presets changes the colour of this node depends on the selection.\n\n" M {"0\tRead" "24576\tDeep" "1908830719\tRoto/Paint" "2654757887\tChannel" "2617245696\t3D / Scanline" "16711935\tkeyer" "2963561983\tTime" "3165597183\tWrite" "1993542655\tSTMap" "3241845759\tDev" "3448063\tCustom 001" "782318079\tCustom 002 " "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+ addUserKnob {1 parent t "Name of the node that this node is connected to.\n\nSimply write down the name of the node you want to connect to and press the Connect button \n\n(You have to Press the connect button otherwise it will not connect till then)."}
+ addUserKnob {6 disconnect l "    " t "If this is ticked, every time you connect the input manually to a node it will automatically grab the nodes name and add it to the parent knob. This will also clear the parent knob if you disconnect it from another node.\n\nIf unticked this feature will be ignored." -STARTLINE}
+ disconnect true
+ addUserKnob {22 setParent l Connect t "This button connects the input of this node to the parents knob.\n\n<i><b>Example:</b><i> If the parent has Grade1 written in the knob, when this button is pressed it will connect the input of this node to Grade.\n\nYou  can also select the node you want to connect to and pressing the button which will connect the input of this node and fill out the parent string for you." -STARTLINE T "node = nuke.thisGroup()\nwith nuke.thisParent():\n\n\n    parentKnob = node.knob('parent')\n\nselection = nuke.selectedNodes()\nif selection:\n    selection = selection\[0]\n    if selection != node:\n        parentKnob.setValue(selection.name())\n\n\nparent = nuke.toNode(parentKnob.value())\n\nif parent:\n    node.setInput(0,parent)\nelse:\n        nuke.message('<br><b><left> Please Check:</b><br><br><left> • You either have no node selected you wish to connect to<br>• The parent knob is either written wrong or empty<br><br><br><i> Simply write the name of the node you wish to connect to in the parent string or select the node and press Connect.')\n\n\n\n\n\n\n\n"}
+ addUserKnob {22 findNode l Find t "Finds the input named node in node graph for you by zooming into it." -STARTLINE T "n = nuke.thisNode()\n\n#make functions available\nn.knob(\"parentMessage\").execute()\n\nparentName = nuke.thisNode().knob('parent').value()\n\nwith nuke.thisParent():\n    FindParent(parentName)"}
+ addUserKnob {22 clear l Clear t "Clears the parent knob and removes the connection to the input named node if any." -STARTLINE T "nuke.thisNode().knob(\"parent\").setValue(\"\")\n\n\nn = nuke.thisNode()\nset =  n.setInput\n\nn.setInput(0,None)"}
+ addUserKnob {22 parentMessage l INVISIBLE t "code for the find button for message if no nodes are connected  and zooming into the nodes position in node graph" -STARTLINE +INVISIBLE T "def FindParent(parentName):\n    \"\"\"\n    Jump to node in the nodegraph \n    \"\"\"\n    \n    if not parentName:\n        nuke.message('parent string is empty')\n        return\n        \n    parentNode = nuke.toNode(parentName)\n    if not parentNode:\n        nuke.message('No node named \{\}'.format(parentName))\n        return\n        \n    nuke.zoom( 2, \[parentNode.xpos(), parentNode.ypos()])"}
+ addUserKnob {22 hideInput l "Toggle Hidden Input" t "Toggles the hidden input knob on this node on/off" T "n = nuke.thisNode()\n\nif n\['hide_input'].value() is True:      \n    n\['hide_input'].setValue(False)\nelse:\n    n\['hide_input'].setValue(True)\n" +STARTLINE}
+ addUserKnob {22 togglePostageStamp l "Toggle Postage Stamp" t "Toggles the postage stamp knob on this node on/off" -STARTLINE T "n = nuke.thisNode(); n\[\"postage_stamp\"].setValue(not n\[\"postage_stamp\"].value())"}
+ addUserKnob {1 output l INVISIBLE +INVISIBLE}
+ output "\[knob tile_color \[value presets]]\[value knob.parent]"
+ addUserKnob {26 ""}
+ addUserKnob {6 addToList l " add to index list" t "If this is ticked, it will allow this connect input name of the node to be added to the index list when it's updated.\n\nIf unticked it will ignore it." +STARTLINE}
+ addToList true
+ addUserKnob {4 indexList l "index list" t "When the <b>update list</b> is executed it will update the index list with all the connect nodes within the script parent connections and add to the list." M {}}
+ addUserKnob {22 updateParent l "Update Parent" t "Executing this will add the selected name nodes name from the list to the parent knob and connect this knobs input to that node." -STARTLINE T "n = nuke.thisNode()\n\nilist = n.knob('indexList').value()\nparentKnob = n.knob('parent')\ntoParent = nuke.toNode(ilist)\n\nif ilist == (\[] or '0'):\n    n.knob('parent').setValue(None)\n    n.setInput(0, None)\nelse:\n    n.knob('parent').setValue(ilist)\n    n.setInput(0,toParent)"}
+ addUserKnob {22 update l "Update List" t "This will update the index list with all the connect nodes parents." T "with nuke.thisParent():\n    n_list = \[]\n    for n in nuke.allNodes():\n        try:\n            if n.knob('CLASS').value() == 'Connect':\n                if n.knob('addToList').value() == 1:\n                    store = n.knob('parent').value()\n                    if store is not None:\n                        n_list.append(store)\n        except: pass\n\n    old = n_list\n    n_list = \[]\n\n    for i in old:\n        if i not in n_list:\n            n_list.append(i)\n\n    n_list.sort()\n   \n    try:\n        n_list.remove('')\n    except: pass\n   \n    for n in nuke.allNodes():\n        try:\n            if n.knob('CLASS').value() == 'Connect':\n                n.knob('indexList').setValues(n_list)\n                store = n.knob('parent').value()\n                n.knob('indexList').setValue(store)\n        except: pass" +STARTLINE}
+ addUserKnob {26 ""}
+ addUserKnob {20 Help}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Connect </font><font color=#747474> v1.1"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br> \n<b>Connect</b> helps to quickly connect this node's<br> input to desired node.\n<br></b><i>\n<br><strong>•</br> Select the node you want to connect and<br>press the connect button or write the name<br> of the node in the parent knob and press the<br>connect button. \n<br></b><i>\n<br><strong>•</br> You can use the index list to keep track of the<br>connection points of the connect nodes in the<br>script.\n<br><br></i></i>\n<b>John Toth © 2022\n<br>"}
+ addUserKnob {26 link l "" t "Opens up a web browser which takes you to my personal website." +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#747474\">johntothvfx.com</a>\n"}
+ addUserKnob {26 linkSpace l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#747474\">Tool Demo" t "Opens a web page that will take you to a demo video about this nuke tool." -STARTLINE T "import webbrowser\n\ndef openWebpage():\n  webbrowser.open(\"https://www.youtube.com/watch?v=hgXLnuXW2Qo\")\n\nopenWebpage()"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#747474\">Version Log</a>\n" t "Log that keeps the changed of each iteration version of this nuke tool." -STARTLINE T "nuke.message(\"<i><b>Version Log:<br><br>Date Last Modified:</b> 13/06/2022</i></b><br><br><b>v 1.0<br></b><i>- Connects the input of the node based on the parent</i><br><br><b>v 1.1</b><br><i>- Index list was added to keep an list of all connect nodes to speed up workflow.<br><br><br> Special Thanks to Samantha Maiolo for helping with the tool features.</i><br><br></i><b>John Toth © 2022\")\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos -150
+  ypos -154
+ }
+ Output {
+  name Output1
+  xpos -150
+  ypos -82
+ }
+end_group

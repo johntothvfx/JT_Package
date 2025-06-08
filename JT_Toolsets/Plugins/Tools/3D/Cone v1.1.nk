@@ -1,0 +1,86 @@
+Group {
+ name Cone
+ help "A 3D geometry cone reformed from a Cylinder."
+ tile_color 0x9c0000ff
+ selected true
+ addUserKnob {20 Cone}
+ addUserKnob {41 display t "Adjusts the display characteristics of the 3D object. These settings don?t affect the render output of the scene; these are for display purposes only in the 3D Viewer. \n? off - hides the 3D geometry object. \n? wireframe - displays only the outlines of the object?s geometry. \n? solid - displays all geometry with a solid color. \n? solid+wireframe - displays the geometry as solid color with the object?s geometry outlines. \n? textured - displays only the surface texture. \n? textured+wireframe - displays the wireframe plus the surface texture.\n" T Cylinder1.display}
+ addUserKnob {41 selectable -STARTLINE T TransformGeo1.selectable}
+ addUserKnob {41 render_mode l render t "Sets how the object will render. This control is independent from the display selection, but has the same settings." T Cylinder1.render_mode}
+ addUserKnob {41 geo_select T Cylinder1.geo_select}
+ addUserKnob {41 cast_shadow l "cast shadow" t "When enabled, the Cone object can cast shadows." T Cylinder1.cast_shadow}
+ addUserKnob {41 receive_shadow l "receive shadow" t "\n\nWhen enabled, and a material shader has been added, the Cone object can have shadows cast onto it by other objects\n" -STARTLINE T Cylinder1.receive_shadow}
+ addUserKnob {26 ""}
+ addUserKnob {41 rows l rows/columns t "Sets the number of rows on the outer face of the object. The maximum value is 512, but high values may cause instability." T Cylinder1.rows}
+ addUserKnob {41 columns l "" t "Sets the number of rows on the outer face of the object. The maximum value is 512, but high values may cause instability." -STARTLINE T Cylinder1.columns}
+ addUserKnob {26 ""}
+ addUserKnob {41 transform T Cylinder1.transform}
+ addUserKnob {41 file_menu l @FolderIcon t "Select to import or export a channel file: \n? Import chan file - import a channel file and transform the object according to the transformation data in the channel file. Channel files contain a set of Cartesian coordinates for every frame of animation in a given shot. You can create and export them using Nuke or 3D tracking software, such as 3D-Equalizer, Maya, or Boujou. \n? Export chan file - export the translation parameters that you?ve applied to the object as a channel file. This is a useful method of sharing setups between artists." T TransformGeo1.file_menu}
+ addUserKnob {41 snap_menu l @AxisIcon t "? Match selection position - the object is snapped to a new position depending on the points selected. \n? Match selection position, orientation - the object is snapped to a new position and orientation depending on the points selected. \n? Match selection position, orientation, size - the object is snapped to a new position, orientation, and size depending on the points selected.\n" -STARTLINE T TransformGeo1.snap_menu}
+ addUserKnob {41 xform_order l "transform order" t "Sets the operation order for scale (S), rotation (R), and translation (T). The possible operation combinations are SRT, STR, RST, RTS, TSR, TRS. " T TransformGeo1.xform_order}
+ addUserKnob {41 rot_order l "rotation order" t "Sets the order of rotation. The possible axial combinations are ZXY, XYZ, XZY, YXZ, YZX, ZXY, ZYX. \n" T TransformGeo1.rot_order}
+ addUserKnob {41 translate t "Lets you translate the object along the x, y, and z axes. You can also adjust translate values by clicking and dragging the object in the 3D Viewer.\n" T TransformGeo1.translate}
+ addUserKnob {41 rotate t "Lets you rotate the object around the x, y, and z axes. You can adjust rotate values by holding down Ctrl/Cmd and dragging in the 3D Viewer." T TransformGeo1.rotate}
+ addUserKnob {41 scaling l scale t "\n\nLets you scale the object on the x, y, and z axes. \n" T TransformGeo1.scaling}
+ addUserKnob {41 uniform_scale l "uniform scale" t "Lets you scale the object simultaneously on the x, y, and z axes." T TransformGeo1.uniform_scale}
+ addUserKnob {41 skew t "\n\nLets you skew the object on the x, y, and z axes. \n" T TransformGeo1.skew}
+ addUserKnob {41 pivot t "\n\nWhen you make changes to a 3D object?s position, scaling, skewing, and rotation, these occur from the location of the object?s origin point or pivot. The pivot x, y, and z controls allow you to offset the pivot point and move it anywhere you like - you can even move it outside of the object. Subsequent transformations applied will then occur relative to the new pivot point location. \nYou can also hold down Ctrl/Cmd+Alt and drag the pivot point to a new location in the 3D Viewer. \n" T TransformGeo1.pivot}
+ addUserKnob {20 "" l "Local matrix" n 2}
+ addUserKnob {41 useMatrix l "specify matrix" t "\n\nEnable this control to specify matrix values for the object you?re transforming as an alternative to setting transform, scale, skew and pivot values above. \n" T TransformGeo1.useMatrix}
+ addUserKnob {41 matrix l "" t "The matrix displays values from the object?s transform, rotate, scale, skew, and pivot controls. \nCheck specify matrix and copy or drag-and-drop matrix values from another object to apply those values, for example, if you wanted to align objects in a scene." +STARTLINE T TransformGeo1.matrix}
+ addUserKnob {20 "" n -1}
+ addUserKnob {26 Title l "" +STARTLINE T "<br><font size='5'>Cone </font><font color=#bc0000> v1.1<br>"}
+ addUserKnob {20 Help}
+ addUserKnob {26 guide l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 steps l "" +STARTLINE T "<br><strong>1. </br> \nThis is a Cone geometry for nuke.\n<br>\n<br><b><strong><i>Note: </i></br></b>This Cone is made from a Cylinder and turned into a Cone.\n\n<br><br><b>John Toth © 2020 <br>"}
+ addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#bc0000\">johntothvfx.com</a>\n"}
+ addUserKnob {26 space l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#bc0000\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool</i></b><br><br><b>v 1.1</b><br><i>- Selectable option was fixed</i><br><br></i><br><br><b>John Toth © 2020\")\n"}
+}
+ Reformat {
+  inputs 0
+  format "256 256 0 0 256 256 1 square_256"
+  name Reformat1
+  xpos 218
+  ypos -64
+ }
+ Ramp {
+  p0 {0 256}
+  p1 {0 0}
+  name Ramp1
+  xpos 218
+  ypos -28
+ }
+ Input {
+  inputs 0
+  name img
+  xpos 108
+  ypos -177
+ }
+ Cylinder {
+  selectable false
+  close_top true
+  name Cylinder1
+  xpos 108
+  ypos -106
+ }
+ DisplaceGeo {
+  inputs 2
+  scale -1
+  name DisplaceGeo1
+  xpos 108
+  ypos -28
+ }
+ TransformGeo {
+  name TransformGeo1
+  selected true
+  xpos 108
+  ypos 39
+ }
+ Output {
+  name Output1
+  xpos 108
+  ypos 138
+ }
+end_group

@@ -1,0 +1,19 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+NoOp {
+ name DeepAutoHoldout
+ tile_color 0x60ff
+ selected true
+ addUserKnob {20 DeepHolderOuterTab l "Deep Auto Holdouts"}
+ addUserKnob {22 make_holdouts l "Deep Holdouts" t "Simply Select the deep Location you want to holdout from in the script and simply press the button/" T "def main(create_writes, write_all_channels):\n    chunks = nuke.selectedNodes()\n\n    if len(chunks) == 0:\n        return # Done\n\n    flattened=\[]\n    \[x.setSelected(False) for x in nuke.selectedNodes()]\n    for a in sorted(chunks, key=lambda k: k.xpos()):\n        others = \[x for x in chunks if x is not a]\n\n        holdouts = nuke.nodes.DeepMerge(inputs=others)\n        holdouts.setSelected(True)\n\n        holdouts.setXpos(a.xpos()-100)\n        holdouts.setYpos(a.ypos() + 100)\n\n        with_holdout = nuke.nodes.DeepMerge(inputs=\[a, holdouts], operation='holdout')\n        with_holdout.setSelected(True)\n\n        with_holdout.setXpos(a.xpos())\n        with_holdout.setYpos(a.ypos() + 200)\n\n        dti = nuke.nodes.DeepToImage(inputs=\[with_holdout])\n        dti.setSelected(True)\n        dti.setXpos(a.xpos())\n        dti.setYpos(a.ypos() + 300)\n\n        if create_writes:\n            w = nuke.nodes.Write(inputs=\[dti])\n            w.setSelected(True)\n            w.setXpos(a.xpos() - 100)\n            w.setYpos(a.ypos() + 300)\n    \n            print dti.metadata(\"input/filename\")\n            nuke_helper.assetout_node.addAssetOutTab(w)\n            w\['level_element'].setValue(\"<Custom>\")\n            w\['level_pass'].setValue(\"<Custom>\")\n            if write_all_channels:\n                w\['channels'].setValue(\"all\")\n            else:\n                w\['channels'].setValue(\"rgba\")\n\n        flattened.append(dti)\n\n    dw = nuke.nodes.DeepMerge(inputs=chunks, label=\"deep way\")\n    dw.setXpos(a.xpos() + 150)\n    dw.setYpos(a.ypos() + 100)\n    dw.setSelected(True)\n\n    start = flattened\[0]\n    for x in flattened:\n        if x == start: continue\n        print 'merging', start.name(), 'and', x.name()\n        start = nuke.nodes.Merge2(inputs=\[start, x], operation='disjoint-over')\n        start.setSelected(True)\n        start.setXpos(x.xpos())\n        start.setYpos(x.ypos() + 100)\n\nn = nuke.thisNode()\nmain(n\['create_writes'].value(), n\['write_all'].value())" +STARTLINE}
+ addUserKnob {6 create_writes l "create write nodes" +INVISIBLE +STARTLINE}
+ addUserKnob {6 write_all l "write all channels" +INVISIBLE +STARTLINE}
+ addUserKnob {26 title l "" +STARTLINE T "<br><br><font size='5'>\nDeep Auto Holdouts\n</font><font color=#000070> v1.0<br>\n"}
+ addUserKnob {20 helptab l Help}
+ addUserKnob {26 basic l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 steps l "" +STARTLINE T "<br><strong>1. </br> \n<b></b>This tool simply quickly set up holdouts of deep.<br> Simply select the read you want to holdout and press the button.\n\n</font><font color=#000070>\n<br><br><b>John Toth © 2018 <br>"}
+ addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#000070\">johntothvfx.com</a>\n"}
+ addUserKnob {26 space000 l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#000070\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br>- creation of the tool<br><br><i> Special Thanks to Ben Dickson </i><br><br><b>John Toth © 2018\")\n"}
+}

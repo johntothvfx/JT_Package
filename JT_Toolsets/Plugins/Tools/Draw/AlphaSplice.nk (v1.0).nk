@@ -1,0 +1,47 @@
+Group {
+ name AlphaSplice
+ help "A simple tool that extract a certain value the alpha channel."
+ tile_color 0x9c2f2bff
+ selected true
+ addUserKnob {20 Settings}
+ addUserKnob {26 ""}
+ addUserKnob {7 threshold t "Select the value you want to extract from the alpha channel.\n\n0-1 works the same way as the area you are selecting on the alpha."}
+ threshold 0.5
+ addUserKnob {7 multiplier t "The multiplier will increase the threshold point of the alpha you have selected which will add positive and negative on eother ends of the threshold."}
+ addUserKnob {26 Title l "" +STARTLINE T "<br><br><font size='5'>Alpha Splice</font><font color=#ee453c> v1.0<br>"}
+ addUserKnob {20 helptab l Help}
+ addUserKnob {26 guide l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {26 steps l "" +STARTLINE T "<br><strong>1. </br> \nAlpha splice Simply grabs a certain range<br> of the alpha channel between 0-1 and makes it solid\n\n<br><br><b>John Toth © 2019 <br>"}
+ addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#ee453c\">johntothvfx.com</a>\n"}
+ addUserKnob {26 space001 l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#ee453c\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool </i><br><br></i><b>John Toth © 2019\")\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos -538
+  ypos -832
+ }
+ Expression {
+  channel0 none
+  channel1 none
+  channel2 none
+  expr3 "a > low && a < high"
+  name Expression1
+  label "\n"
+  xpos -538
+  ypos -736
+  addUserKnob {20 User}
+  addUserKnob {7 low}
+  low {{"clamp(threshold - (multiplier)-0.001)"}}
+  addUserKnob {7 high}
+  high {{"threshold + (multiplier)"}}
+ }
+ Output {
+  name Output1
+  xpos -538
+  ypos -634
+ }
+end_group
+

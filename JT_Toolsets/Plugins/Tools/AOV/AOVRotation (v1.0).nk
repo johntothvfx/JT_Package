@@ -1,0 +1,123 @@
+Group {
+ name AOVRotation
+ help "Used to rotate Position, Normals in X Y Z"
+ tile_color 0x184789ff
+ selected true
+ addUserKnob {20 User l "AOV Rotation"}
+ addUserKnob {26 ""}
+ addUserKnob {41 output l channel T Shuffle_Input_Channels.in}
+ addUserKnob {26 ""}
+ addUserKnob {7 rotateX l "rotate X" t "Rotates the input Channel on the X axis" R -180 180}
+ addUserKnob {7 rotateY l "rotate Y" t "Rotates the input Channel on the Y axis" R -180 180}
+ addUserKnob {7 rotateZ l "rotate Z" t "Rotates the input Channel on the Z axis" R -180 180}
+ addUserKnob {26 space0 l "" +STARTLINE T "\t"}
+ addUserKnob {83 replaceRGB l "Channel replace: " t "Replaces the RGB with the Channel input selected. If you turn it off the input channel will still be selected in it's respectable layer.\n\n" M {on off}}
+ addUserKnob {26 ""}
+ addUserKnob {26 title l "" +STARTLINE T "<br><font size='5'>AOV Rotation</font><font color=#194d95> v1.0<br>"}
+ addUserKnob {20 HelpTab l Help}
+ addUserKnob {26 Guid l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 steps l "" +STARTLINE T "<br><strong>1. </br> \nA simple tool to rotate the<b> AOV layers in XYZ.<b></b>\n\n<br><strong>2. </br> </b>\nReplace <b>RGB with the input channel</b> with node <br>changes.\n\n<br><br><i><strong>Note:</i>\nPlease be aware respected input channel also<br> get effected if replace RGB is still ticked off. </br> </b>\n\n<br><br><b>John Toth © 2019 <br>"}
+ addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#194d95\">johntothvfx.com</a>\n"}
+ addUserKnob {26 space l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#194d95\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool</i><br></i><br><br><i> Special Thanks to Daniel Velikov for showing me how to rotate AOVs</i><br><br></i><b>John Toth © 2019\")\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos -469
+  ypos -753
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -435
+  ypos -678
+ }
+set Ndc9aa400 [stack 0]
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -290
+  ypos -678
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -290
+  ypos -352
+ }
+push $Ndc9aa400
+ Shuffle {
+  in none
+  alpha black
+  name Shuffle_Input_Channels
+  xpos -469
+  ypos -633
+ }
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name X
+  xpos -469
+  ypos -548
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{rotateX}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+    }
+  name Y
+  xpos -469
+  ypos -524
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{rotateY}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name Z
+  selected true
+  xpos -469
+  ypos -500
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{rotateZ}}
+ }
+ Shuffle {
+  alpha black
+  out {{{Shuffle_Input_Channels.in}}}
+  name Shuffle_output_Channels
+  xpos -469
+  ypos -441
+ }
+ Copy {
+  inputs 2
+  from0 -rgba.alpha
+  to0 -rgba.alpha
+  channels rgba
+  name Copy1
+  xpos -469
+  ypos -368
+  disable {{!replaceRGB}}
+ }
+ Output {
+  name Output1
+  xpos -469
+  ypos -225
+ }
+end_group

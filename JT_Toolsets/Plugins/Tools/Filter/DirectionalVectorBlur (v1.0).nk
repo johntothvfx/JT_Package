@@ -1,0 +1,378 @@
+Group {
+ name DirectionalVectorBlur
+ tile_color 0x752735ff
+ selected true
+ addUserKnob {20 Directionalblurtab l "Directional Blur"}
+ addUserKnob {26 ""}
+ addUserKnob {41 channels T Directional_Blur2.channels}
+ addUserKnob {26 space000 l "" +STARTLINE T "\t"}
+ addUserKnob {7 msize l size t "The amount of directional blur you want to apply" R 0 100}
+ msize 50
+ addUserKnob {7 angle t "The direction you want the blur to forced to face." R -180 180}
+ angle 45
+ addUserKnob {26 space001_1 l "" +STARTLINE T " \t"}
+ addUserKnob {7 dvbmix l mix t "Dissolves between the original image at 0 and the full directional vectorblur effect at 1."}
+ dvbmix 1
+ addUserKnob {26 space l "" +STARTLINE T "\t"}
+ addUserKnob {20 displayVector l "Display Vector" n 1}
+ displayVector 0
+ addUserKnob {26 space_6 l "" +STARTLINE T "\t"}
+ addUserKnob {83 Voverlay l "Overlay Vectors : " t "Dots will be placed over the image and as it gets Motion blurred you will see what the UV's are doing." M {on off}}
+ Voverlay off
+ addUserKnob {3 res t "Amount of dots you want"}
+ res 40
+ addUserKnob {7 vectorSize l "Vector Size" t "Size of dots" R 0 10}
+ vectorSize 2
+ addUserKnob {18 Vcolor l color t "Color of the dots"}
+ Vcolor {0 1 0}
+ addUserKnob {6 Vcolor_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Vcolor_panelDropped_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Vcolor_panelDropped_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Vcolor_panelDropped_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Vcolor_panelDropped_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Vcolor_panelDropped_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Vcolor_panelDropped_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Vcolor_panelDropped_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Vcolor_panelDropped_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Vcolor_panelDropped_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Vcolor_panelDropped_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Vcolor_panelDropped_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 Vcolor_panelDropped_1_1_1_1_1_1_1_1_1_1_1_1 l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_rgb_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {26 space_7 l "" +STARTLINE T "\t"}
+ addUserKnob {20 endGroup n -1}
+ addUserKnob {26 space001 l "" +STARTLINE T "\t"}
+ addUserKnob {41 blendingmaskChannel l "mask channel" t "The channel to use as a mask. By default, the directional vectorblur is limited to the non-black areas of this channel." T Copy2.from0}
+ addUserKnob {6 invertmask l invert t "Inverts the use of the mask channel so that the directional vectorblur is limited to the non-white areas of the mask." -STARTLINE}
+ addUserKnob {26 title l "" +STARTLINE T "<br><font size='5'>Directional VectorBlur</font><font color=#752735> v1.0"}
+ addUserKnob {20 helptab l Help}
+ addUserKnob {26 guide l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 steps l "" +STARTLINE T "<br><strong>1. </br> \n<b>Directional VectorBlur</b> will blur the image with<br>a certain directionality.\n\n\n<br><strong>2. </br> </b>If the <b> mask input</b> has any <b>feathering</b> it <br> will blend into the source image input.\n\n\n\n<br><strong>3. </br> </b>\n<b>Display Overlay:</b> A <b>grid overlay</b> which gets <br>motion blurred depending on the amount value.\n\n\n<br><br><b>John Toth © 2021 <br>"}
+ addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#752735\">johntothvfx.com</a>\n"}
+ addUserKnob {26 space_1 l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#752735\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool<br><br><b> Special Thanks to Fabian Holtz.</i><br><br><br><b>John Toth © 2021 \")\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos 290
+  ypos 87
+ }
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 324
+  ypos 786
+ }
+set Nccb91600 [stack 0]
+push $Nccb91600
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 557
+  ypos 786
+ }
+set Nccb90f00 [stack 0]
+ Remove {
+  name Remove2
+  xpos 777
+  ypos 777
+ }
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 811
+  ypos 1074
+ }
+set Nccb90100 [stack 0]
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 945
+  ypos 1074
+ }
+set Nd4337900 [stack 0]
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha black
+  name Shuffle3
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 1072
+  ypos 1058
+ }
+ Add {
+  channels rgb
+  value {{Vcolor} {Vcolor} {Vcolor} {Vcolor}}
+  name Add3
+  xpos 1072
+  ypos 1354
+ }
+ Colorspace {
+  colorspace_out HSV
+  name Colorspace2
+  xpos 1072
+  ypos 1527
+ }
+ Dot {
+  name Dot18
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1106
+  ypos 1602
+ }
+push $Nd4337900
+ Grid {
+  output rgb
+  cliptype none
+  number {{res} 0}
+  size {{vectorSize}}
+  name Grid2
+  xpos 911
+  ypos 1138
+ }
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 945
+  ypos 1266
+ }
+push $Nccb90100
+ Grid {
+  output rgb
+  cliptype none
+  number {0 {res}}
+  size {{vectorSize}}
+  name Grid1
+  xpos 777
+  ypos 1138
+ }
+ Merge2 {
+  inputs 2
+  operation min
+  name Merge3
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 777
+  ypos 1257
+ }
+ Multiply {
+  channels rgb
+  value 100
+  name Multiply1
+  label "value: \[value value]"
+  xpos 777
+  ypos 1353
+ }
+ Colorspace {
+  colorspace_out HSV
+  name Colorspace1
+  xpos 777
+  ypos 1527
+ }
+ ShuffleCopy {
+  inputs 2
+  red red
+  green green
+  alpha alpha2
+  name ShuffleCopy3
+  label "\[value in] to \[value out]"
+  xpos 777
+  ypos 1593
+ }
+ Colorspace {
+  colorspace_in HSV
+  name Colorspace3
+  xpos 777
+  ypos 1686
+ }
+push $Nccb90f00
+ Merge2 {
+  inputs 2
+  bbox B
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 522
+  ypos 1680
+ }
+ Switch {
+  inputs 2
+  which {{Voverlay x1001 0}}
+  name Switch1
+  xpos 290
+  ypos 1686
+ }
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 324
+  ypos 1842
+ }
+set Nbc7b2400 [stack 0]
+ Dot {
+  name Dot19
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 104
+  ypos 1842
+ }
+ Dot {
+  name Dot17
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 104
+  ypos 2586
+ }
+ Input {
+  inputs 0
+  name mask
+  label "input \[value number]"
+  xpos 950
+  ypos 2120
+  number 1
+ }
+ Shuffle {
+  name Shuffle2
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 950
+  ypos 2213
+ }
+push $Nbc7b2400
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 544
+  ypos 1843
+ }
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 544
+  ypos 2011
+ }
+set Nbc787900 [stack 0]
+ Remove {
+  name Remove1
+  xpos 762
+  ypos 2001
+ }
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha black
+  name Shuffle4
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 762
+  ypos 2116
+ }
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.red
+  from1 {{{from0}}}
+  to1 rgba.green
+  name Copy2
+  xpos 762
+  ypos 2211
+ }
+ Invert {
+  name Invert2
+  xpos 762
+  ypos 2336
+  disable {{!invertmask}}
+ }
+push $Nbc787900
+ Expression {
+  expr0 1
+  expr1 0
+  expr2 0
+  expr3 1
+  name Expression1
+  xpos 510
+  ypos 2127
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(rotate))} {-sin(radians(rotate))} 0}
+      {{sin(radians(rotate))} {cos(radians(rotate))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix2
+  label "Rotate vectors"
+  xpos 510
+  ypos 2217
+  addUserKnob {20 User}
+  addUserKnob {7 rotate R -180 180}
+  rotate {{-angle}}
+ }
+ Merge2 {
+  inputs 2
+  operation multiply
+  Achannels {rgba.red rgba.green -rgba.blue -rgba.alpha}
+  Bchannels {rgba.red rgba.green -rgba.blue -rgba.alpha}
+  output {rgba.red rgba.green -rgba.blue -rgba.alpha}
+  name Multiply
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 510
+  ypos 2336
+  disable {{"\[exists parent.input1.name] ? 0 : 1"}}
+ }
+push $Nbc7b2400
+ Copy {
+  inputs 2
+  from0 rgba.red
+  to0 forward.u
+  from1 rgba.green
+  to1 forward.v
+  name Copy1
+  xpos 290
+  ypos 2330
+ }
+ VectorBlur {
+  uv forward
+  scale {{msize}}
+  maskChannelMask none
+  mix {{dvbmix}}
+  name Directional_Blur2
+  selected true
+  xpos 290
+  ypos 2480
+ }
+ Copy {
+  inputs 2
+  from0 -rgba.alpha
+  to0 -rgba.alpha
+  channels forward
+  name Copy3
+  xpos 290
+  ypos 2570
+ }
+ Crop {
+  box {{min(Input.bbox.x,box.x)} {min(Input.bbox.y,box.y)} {max(Input.bbox.r,width)} {max(Input.bbox.t,height)}}
+  intersect true
+  crop false
+  name Crop11
+  xpos 290
+  ypos 2654
+ }
+ BlackOutside {
+  name BlackOutside1
+  xpos 290
+  ypos 2702
+ }
+ Output {
+  name Output1
+  xpos 290
+  ypos 2774
+ }
+end_group
