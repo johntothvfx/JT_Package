@@ -1,0 +1,273 @@
+Group {
+ name DepthConvert1
+ help "Divides the incoming selected channel by 1. \n\n\nThis is used to convert the depth channel from (1/z) to (Z) or vice versa. As shown below.\n\n<b>• depth (1/z) </b> &rarr;</br> (Z)\n<b>• depth (Z) &rarr;</br> (1/z)"
+ tile_color 0x802380ff
+ selected true
+ addUserKnob {20 depthConvert l "Depth Convert"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION DepthConvert
+ addUserKnob {41 channels t "The conversion will be applied to the selected input channel.\n\nIt simply divides the input by 1.\n\nThis is used for depth to convert from (1/z) to (Z) or vice versa." T Shuffle2.in}
+ addUserKnob {6 view t "Toggle to view the selected channel input being converted.\n\nThis will show the converted channel." -STARTLINE}
+ addUserKnob {20 warning l Warning}
+ addUserKnob {6 color_rgb_panelDropped l "panel dropped state" +HIDDEN +STARTLINE}
+ addUserKnob {6 warningLabel l "warning overlay if \"view\" is enabled" t "when \"view\" is enabled along with this tick box, a warning label will be displayed on the image. \n\nThis is just a reminder label to tell the user that \"view\" is enabled." +STARTLINE}
+ warningLabel true
+ addUserKnob {2 font t "Full pahtname of font file. Text supports a large number of formats for scalable fonts including TrueType and PostScript by using the FreeType library."}
+ font "\[python nuke.defaultFontPathname()]"
+ addUserKnob {18 warningColor l "warning color" t "color of the warning label"}
+ warningColor {1 1 0}
+ addUserKnob {6 warningColor_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Depth Convert</font><font color=#943794> v1.2"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>Depth Convert</b> - divides the input by 1.\n<i><br><br><strong>•</br> \n Treat this node as a toggle:\n\n<br><strong>•\n depth (1/z) </b> &rarr;</br> (Z)\n\n<br><b>•\ndepth (Z) &rarr;</br> (1/z)\n\n<br><br>\n\n<b>• (1/z) Normalize depth</b> -\nvalues between 0-1, <br>it is Nuke's default format.\n<br>\n<b>• (Z) Real World Units</b> -  is distance from camera<br> (e.g CG renders).\n\n\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#943794;\">John Toth <b>© 2020 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#943794\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message(\"Coming Soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#943794\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.2.1\"\ncontext = \"AOV\"\n\n\ndate = \"30th January\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2020\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- converts depth data from normalised to real world unit and back\n<br></i><b> v 1.1 </b><i>\n- user interface updated to match the package in this set\n- information tab was re-written to be more clear\n- view button was added\n- warning label was added to display over image when 'view' is enabled\n\"\"\"\n\n\n\nthankyou = \"\"\"\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + UPPER + site + developer + \"</a>\") \n\n\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 412
+  ypos -58
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 446
+  ypos 42
+ }
+set N10908700 [stack 0]
+ Shuffle {
+  in depth
+  name Shuffle2
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 685
+  ypos 28
+ }
+ Expression {
+  channel0 {rgba.red -rgba.green -rgba.blue -rgba.alpha}
+  expr0 1/r
+  channel1 {-rgba.red rgba.green -rgba.blue -rgba.alpha}
+  expr1 1/g
+  channel2 {-rgba.red -rgba.green rgba.blue -rgba.alpha}
+  expr2 1/b
+  channel3 {-rgba.red -rgba.green -rgba.blue rgba.alpha}
+  expr3 1/a
+  name Expression2
+  label convert
+  xpos 685
+  ypos 128
+ }
+ Expression {
+  expr0 "isinf(r) || isnan(r) ? 0 : r"
+  expr1 "isinf(g) || isnan(g) ? 0 : g"
+  expr2 "isinf(b) || isnan(b) ? 0 : b"
+  channel3 alpha
+  expr3 "isinf(a) || isnan(a) ? 0 : a"
+  name Expression1
+  label "infinity/nan To Black"
+  selected true
+  xpos 685
+  ypos 248
+ }
+set N1092c820 [stack 0]
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 719
+  ypos 580
+ }
+push $N1092c820
+push $N10908700
+ ShuffleCopy {
+  inputs 2
+  in2 none
+  red red
+  green green
+  blue blue
+  out {{{parent.Shuffle2.in}}}
+  name ShuffleCopy1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 412
+  ypos 244
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 446
+  ypos 484
+ }
+set N10950880 [stack 0]
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 594
+  ypos 484
+ }
+ Copy {
+  inputs 2
+  channels rgba
+  name Copy1
+  xpos 560
+  ypos 564
+ }
+ Dot {
+  name Dot183
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 594
+  ypos 724
+ }
+set N109696a0 [stack 0]
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 594
+  ypos 1202
+ }
+set N1096e4a0 [stack 0]
+push $N109696a0
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 874
+  ypos 724
+ }
+ Remove {
+  name Remove1
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 840
+  ypos 776
+ }
+ CopyBBox {
+  name CopyBBox1
+  xpos 840
+  ypos 844
+ }
+ Text {
+  cliptype none
+  message "\[value parent.name] \n\"view\" is Enabled\n\n"
+  font "\[value parent.font]"
+  size {{"(input.width + input.height)/100"}}
+  leading 0.2
+  xjustify center
+  yjustify top
+  box {{input.width/50} {box.x} {"input.width - box.x"} {"input.height - box.x"}}
+  color {{parent.warningColor} {parent.warningColor} {parent.warningColor} 1}
+  name Text5
+  label "\[basename \[value font]]"
+  note_font_color 0xffffffff
+  xpos 840
+  ypos 896
+ }
+ Dot {
+  name Dot184
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 874
+  ypos 978
+ }
+set N109a56f0 [stack 0]
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1018
+  ypos 978
+ }
+ Multiply {
+  channels rgb
+  value 0
+  name Multiply1
+  label "(\[value value])"
+  xpos 984
+  ypos 1016
+ }
+ Dilate {
+  channels alpha
+  size 4
+  name Dilate2
+  xpos 984
+  ypos 1104
+ }
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1018
+  ypos 1186
+ }
+push $N109a56f0
+ Merge2 {
+  inputs 2
+  operation under
+  name Merge4
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 840
+  ypos 1176
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 874
+  ypos 1290
+ }
+push $N1096e4a0
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 752
+  ypos 1202
+ }
+ Merge2 {
+  inputs 2
+  name Merge3
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 718
+  ypos 1280
+ }
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 752
+  ypos 1386
+ }
+ Switch {
+  inputs 2
+  which {{"parent.warningLabel== 1 ? (parent.view == 1? 0 : 1) : 1"}}
+  name Switch2
+  xpos 560
+  ypos 1382
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 594
+  ypos 1516
+ }
+push $N10950880
+ Switch {
+  inputs 2
+  which {{parent.view}}
+  name Switch1
+  xpos 412
+  ypos 1512
+ }
+ Output {
+  name Output1
+  xpos 412
+  ypos 1656
+ }
+end_group

@@ -1,0 +1,106 @@
+Group {
+ name AOVRebuild1
+ help "Dynamically builds controls for AOV layers using 'category', 'emission', and 'other' prefix fields.\nThis is useful for early lookdev when you need to feedback a certain look (exposure, multiply color back to lighting)."
+ knobChanged "import nuke\nimport re\n\ndef filter_color_knobs():\n    node = nuke.thisNode()\n    knob = nuke.thisKnob()\n\n    if knob.name() != \"search\":\n        return\n\n    search_term = knob.value().strip().lower()\n\n    # Collect dynamic AOV base names\n    aov_basenames = set()\n    for k in node.knobs().values():\n        m = re.match(r\"^(.*)_(color|enabled|toggle)\$\", k.name())\n        if m:\n            aov_basenames.add(m.group(1))\n\n    for base in aov_basenames:\n        show = True\n        if search_term:\n            # Try to match against color knob label or base name\n            color_knob = node.knob(f\"\{base\}_color\")\n            label = color_knob.label() if color_knob else base\n            show = search_term in label.lower()\n\n        for suffix in \['color', 'enabled', 'toggle']:\n            kname = f\"\{base\}_\{suffix\}\"\n            k = node.knob(kname)\n            if k:\n                k.setVisible(show)\n\nfilter_color_knobs()\n"
+ tile_color 0x7aa9ffff
+ selected true
+ addUserKnob {20 AOVRebuild l "AOV Rebuild"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION AOVRebuild
+ addUserKnob {26 ""}
+ addUserKnob {1 category t "Comma-separated list of AOV prefixes to include in the 'category' group.\n\nExample:Light, diffuse, direct, indirect\n\nEach prefix will match any layer that starts with it."}
+ addUserKnob {22 clear_category l "   clear   " t "Clears the contents of the 'category' knob.\n\nThis will remove all matched AOVs from the category group on the next build or refresh." -STARTLINE T "nuke.thisNode().knob('category').setValue(\"\")"}
+ addUserKnob {1 emission t "Comma-separated list of AOV prefixes to include in the 'emission' group.\n\nExample: emission, selfIllum, glow etc\n\nEach prefix will match any layer that starts with it."}
+ emission emission
+ addUserKnob {22 clear_emission l "   clear   " t "Clears the contents of the 'emission' knob.\n\nThis will remove all matched AOVs from the emission group on the next build or refresh." -STARTLINE T "nuke.thisNode().knob('emission').setValue(\"\")"}
+ addUserKnob {1 other t "Comma-separated list of AOV prefixes to include in the 'other' group.\n\nExample: subsurface, ao, sheen\n\nEach prefix will match any layer that starts with it."}
+ addUserKnob {22 clear_other l "   clear   " t "Clears the contents of the 'other' knob.\n\nThis will remove all matched AOVs from the other group on the next build or refresh." -STARTLINE T "nuke.thisNode().knob('other').setValue(\"\")"}
+ addUserKnob {26 ""}
+ addUserKnob {1 search t "Type to filter visible AOV color controls by layer name. Partial matches are supported.\n\nLeave empty to show all AOVs."}
+ addUserKnob {22 clear_search l clear t "Clears the search field and restores visibility to all controls" -STARTLINE T "nuke.thisNode().knob('search').setValue(\"\")"}
+ addUserKnob {26 ""}
+ addUserKnob {1 expr0_base l "" +STARTLINE +HIDDEN +INVISIBLE}
+ expr0_base "(LG01.red * \[value parent.LG01_color.r]) + (LG02.red * \[value parent.LG02_color.r]) + (LG03.red * \[value parent.LG03_color.r]) + (LG04.red * \[value parent.LG04_color.r]) + (LG05.red * \[value parent.LG05_color.r]) + (LG06.red * \[value parent.LG06_color.r]) + (LG07.red * \[value parent.LG07_color.r]) + (emission.red * \[value parent.emission_color.r])"
+ addUserKnob {1 expr1_base l "" +STARTLINE +HIDDEN +INVISIBLE}
+ expr1_base "(LG01.green * \[value parent.LG01_color.g]) + (LG02.green * \[value parent.LG02_color.g]) + (LG03.green * \[value parent.LG03_color.g]) + (LG04.green * \[value parent.LG04_color.g]) + (LG05.green * \[value parent.LG05_color.g]) + (LG06.green * \[value parent.LG06_color.g]) + (LG07.green * \[value parent.LG07_color.g]) + (emission.green * \[value parent.emission_color.g])"
+ addUserKnob {1 expr2_base l "" +STARTLINE +HIDDEN +INVISIBLE}
+ expr2_base "(LG01.blue * \[value parent.LG01_color.b]) + (LG02.blue * \[value parent.LG02_color.b]) + (LG03.blue * \[value parent.LG03_color.b]) + (LG04.blue * \[value parent.LG04_color.b]) + (LG05.blue * \[value parent.LG05_color.b]) + (LG06.blue * \[value parent.LG06_color.b]) + (LG07.blue * \[value parent.LG07_color.b]) + (emission.blue * \[value parent.emission_color.b])"
+ addUserKnob {26 divider_01 l "" +STARTLINE +HIDDEN}
+ addUserKnob {22 build l "   build   " t "Generates AOV controls based on the current 'category', 'emission', and 'other' strings.\nEach matched AOV will have its own color, enable, and toggle controls.\nExisting controls will be replaced." T "import nuke\n\ndef build_expression_with_color_controls():\n    node = nuke.thisNode()\n    expr_node = node.node('Expression1')\n\n    # Find input node\n    input_node = next((node.input(i) for i in range(node.inputs()) if node.input(i)), None)\n    if not input_node or not input_node.channels():\n        nuke.message(\"No input connected to this node.\")\n        return\n\n    all_channels = input_node.channels()\n    all_layers = sorted(set(c.split('.')\[0] for c in all_channels))\n\n    # Match prefixes (fixed NameError from earlier)\n    valid_prefixes = \{\}\n    for knob_name in \['category', 'emission', 'other']:\n        val = node\[knob_name].value().strip()\n        if val:\n            entries = \[v.strip() for v in val.split(',') if v.strip()]\n            matches = \[p for p in entries if any(layer.startswith(p) for layer in all_layers)]\n            if matches:\n                valid_prefixes\[knob_name] = matches\n\n    matched_layers = \{\}\n    for group, prefix_list in valid_prefixes.items():\n        matched_layers\[group] = \[\n            layer for layer in all_layers if any(layer.startswith(p) for p in prefix_list)\n        ]\n\n    # Preserve layout knobs — DO NOT include Tab_Knob here!\n    order_knobs = \[node.knob(k) for k in \[\n        'divider_01', 'build', 'refresh', 'clear',\n        'info', 'version', 'divider_02', 'bulletpoints',\n        'divider_03', 'demo', 'log'\n    ] if node.knob(k)]\n    for k in order_knobs:\n        node.removeKnob(k)\n\n    # Remove all dynamic AOV knobs\n    for k in list(node.knobs()):\n        if k.endswith(('_color', '_enabled', '_toggle')) or k in ('expr0_base', 'expr1_base', 'expr2_base'):\n            try:\n                node.removeKnob(node.knob(k))\n            except:\n                pass\n\n    # Build expression terms\n    red_terms, green_terms, blue_terms = \[], \[], \[]\n\n    for group, layers in matched_layers.items():\n        for layer in layers:\n            color_knob_name = f\"\{layer\}_color\"\n            enable_knob_name = f\"\{layer\}_enabled\"\n            toggle_knob_name = f\"\{layer\}_toggle\"\n\n            # Color knob\n            color_knob = nuke.Color_Knob(color_knob_name, layer)\n            color_knob.setValue(\[1.0, 1.0, 1.0])\n            color_knob.setRange(0, 4)\n            color_knob.setFlag(nuke.STARTLINE)\n            color_knob.setTooltip(f\"Color multiplier for the '\{layer\}' AOV.\")\n            node.addKnob(color_knob)\n\n            # Enable\n            enable_knob = nuke.Int_Knob(enable_knob_name, \"\")\n            enable_knob.setRange(0, 1)\n            enable_knob.setValue(0)\n            enable_knob.setFlag(nuke.INVISIBLE)\n            enable_knob.clearFlag(nuke.STARTLINE)\n            node.addKnob(enable_knob)\n\n            # Toggle\n            toggle_knob = nuke.PyScript_Knob(toggle_knob_name, \"disable\")\n            toggle_knob.setValue(\"toggleAOV(nuke.thisKnob())\")\n            toggle_knob.setLabel(\"   disable   \")\n            toggle_knob.clearFlag(nuke.STARTLINE)\n            toggle_knob.setTooltip(f\"Toggle visibility of the '\{layer\}' AOV in the final result.\\nClick to enable or disable this AOV without deleting its controls.\")\n            node.addKnob(toggle_knob)\n\n            if enable_knob.value() == 0:\n                red_terms.append(f\"(\{layer\}.red * \[value parent.\{color_knob_name\}.r])\")\n                green_terms.append(f\"(\{layer\}.green * \[value parent.\{color_knob_name\}.g])\")\n                blue_terms.append(f\"(\{layer\}.blue * \[value parent.\{color_knob_name\}.b])\")\n\n    # Add expr*_base hidden knobs\n    for name, terms in zip(\['expr0', 'expr1', 'expr2'], \[red_terms, green_terms, blue_terms]):\n        expr_str = \" + \".join(terms) if terms else \"0\"\n        base_knob = nuke.String_Knob(f\"\{name\}_base\", \"\")\n        base_knob.setValue(expr_str)\n        base_knob.setVisible(False)\n        base_knob.setFlag(nuke.INVISIBLE)\n        node.addKnob(base_knob)\n        expr_node\[name].setValue(expr_str)\n\n    # Re-add layout knobs last (they keep the UI flow)\n    for k in order_knobs:\n        node.addKnob(k)\n\n    if node.knob('divider_01'):\n        node.knob('divider_01').setVisible(True)\n\n    # Optional: clear tab flickering by deselecting current knob\n    nuke.thisKnob().setFlag(0)\n\n\nbuild_expression_with_color_controls()" +STARTLINE}
+ addUserKnob {22 refresh l "   refresh   " t "Updates the AOV controls based on the current 'category', 'emission', and 'other' strings.\nPreserves existing values for matched AOVs and adds or removes knobs as needed." -STARTLINE T "import nuke\n\ndef refresh_expression_with_color_controls():\n    node = nuke.thisNode()\n    expr_node = node.node('Expression1')\n\n    # -- Step 1: Preserve layout knobs but DO NOT remove Tab_Knobs\n    layout_knobs = \[node.knob(k) for k in \[\n        'divider_01', 'build', 'refresh', 'clear',\n        'info', 'version', 'divider_02', 'bulletpoints',\n        'divider_03', 'demo', 'log'\n    ] if node.knob(k)]\n    for k in layout_knobs:\n        node.removeKnob(k)\n\n    # -- Step 2: Get valid input layers\n    input_node = next((node.input(i) for i in range(node.inputs()) if node.input(i)), None)\n    if not input_node or not input_node.channels():\n        nuke.message(\"No input connected.\")\n        return\n\n    all_channels = input_node.channels()\n    all_layers = sorted(set(c.split('.')\[0] for c in all_channels))\n\n    # -- Step 3: Get matched AOV layers from user input\n    valid_prefixes = \{\}\n    for field in \['category', 'emission', 'other']:\n        val = node\[field].value().strip()\n        if val:\n            entries = \[v.strip() for v in val.split(',') if v.strip()]\n            matches = \[p for p in entries if any(layer.startswith(p) for layer in all_layers)]\n            if matches:\n                valid_prefixes\[field] = matches\n\n    matched_layers = set()\n    for prefixes in valid_prefixes.values():\n        for p in prefixes:\n            matched_layers.update(layer for layer in all_layers if layer.startswith(p))\n    matched_layers = sorted(matched_layers, key=lambda x: x)\n\n    # -- Step 4: Backup current knob states for matched AOVs\n    remembered_values = \{\}\n    for layer in matched_layers:\n        c = node.knob(f\"\{layer\}_color\")\n        e = node.knob(f\"\{layer\}_enabled\")\n        t = node.knob(f\"\{layer\}_toggle\")\n        if c and e and t:\n            remembered_values\[layer] = \{\n                'color': c.value(),\n                'enabled': e.value(),\n                'toggle_label': t.label()\n            \}\n\n    # -- Step 5: Remove all dynamic knobs\n    for k in list(node.knobs()):\n        if k.endswith(('_color', '_enabled', '_toggle')):\n            try:\n                node.removeKnob(node.knob(k))\n            except:\n                pass\n\n    # -- Step 6: Rebuild knobs in alphabetical order\n    red_terms, green_terms, blue_terms = \[], \[], \[]\n    for layer in matched_layers:\n        c_name, e_name, t_name = f\"\{layer\}_color\", f\"\{layer\}_enabled\", f\"\{layer\}_toggle\"\n        values = remembered_values.get(layer, \{\})\n        c_val = values.get('color', \[1.0, 1.0, 1.0])\n        e_val = values.get('enabled', 0)\n        t_lbl = values.get('toggle_label', \"   disable   \")\n\n        color = nuke.Color_Knob(c_name, layer)\n        color.setRange(0, 4)\n        color.setValue(c_val)\n        color.setFlag(nuke.STARTLINE)\n        node.addKnob(color)\n\n        enable = nuke.Int_Knob(e_name, \"\")\n        enable.setRange(0, 1)\n        enable.setValue(e_val)\n        enable.setFlag(nuke.INVISIBLE)\n        enable.clearFlag(nuke.STARTLINE)\n        node.addKnob(enable)\n\n        toggle = nuke.PyScript_Knob(t_name, \"disable\")\n        toggle.setValue(\"toggleAOV(nuke.thisKnob())\")\n        toggle.setLabel(t_lbl)\n        toggle.clearFlag(nuke.STARTLINE)\n        node.addKnob(toggle)\n\n        if e_val == 0:\n            red_terms.append(f\"(\{layer\}.red * \[value parent.\{c_name\}.r])\")\n            green_terms.append(f\"(\{layer\}.green * \[value parent.\{c_name\}.g])\")\n            blue_terms.append(f\"(\{layer\}.blue * \[value parent.\{c_name\}.b])\")\n\n    # -- Step 7: Update expressions and _base knobs\n    for ch, terms in zip(\['expr0', 'expr1', 'expr2'], \[red_terms, green_terms, blue_terms]):\n        expr_str = \" + \".join(terms) if terms else \"0\"\n        expr_node\[ch].setValue(expr_str)\n        if node.knob(ch + \"_base\"):\n            node\[ch + \"_base\"].setValue(expr_str)\n\n    # -- Step 8: Restore layout knobs in original order\n    for k in layout_knobs:\n        node.addKnob(k)\n    if node.knob(\"divider_01\"):\n        node\[\"divider_01\"].setVisible(True)\n\n    # -- Step 9: Reset active knob (avoid tab jump)\n    nuke.thisKnob().setFlag(0)\n\n    nuke.message(\"Build has been refreshed!\")\n\n\nrefresh_expression_with_color_controls()"}
+ addUserKnob {22 clear l "   clear   " t "Removes all dynamically created AOV color, enable, and toggle controls.\nThis does not affect the category, emission, or other knobs." -STARTLINE T "def knobClear():\n    node = nuke.thisNode()\n\n    # Preserve only these key knobs\n    preserved_names = \['divider_01', 'build', 'refresh', 'clear', 'info', 'version', 'divider_02', 'bulletpoints', 'divider_03', 'demo', 'log', 'category', 'emission', 'other', 'search']\n\n    # Remove any dynamic knobs matching our naming patterns\n    for knob_name in list(node.knobs().keys()):\n        if knob_name in preserved_names:\n            continue\n\n        knob = node.knob(knob_name)\n        if knob is None:\n            continue\n\n        if (\n            isinstance(knob, (nuke.Color_Knob, nuke.Int_Knob, nuke.PyScript_Knob)) and\n            (\n                knob_name.endswith('_color') or\n                knob_name.endswith('_toggle') or\n                knob_name.endswith('_button') or\n                knob_name.endswith('_enabled')\n            )\n        ):\n            node.removeKnob(knob)\n\n    # Clear expressions from Expression1\n    expr_node = node.node('Expression1')\n    for i in range(3):\n        expr_knob = expr_node.knob(f'expr\{i\}')\n        if expr_knob:\n            expr_knob.setValue(\"\")\n\n    # Reset UI/visibility\n    if node.knob('divider_01'):\n        node.knob('divider_01').setVisible(False)\n    if node.knob('number'):\n        node.knob('number').setValue(0)\n\n# Call it\nknobClear()\n"}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>AOV Rebuild</font><font color=#141E28> v1.0"}
+ addUserKnob {26 divider_02 l "" +STARTLINE}
+ addUserKnob {26 bulletpoints l "" t "overview of the node" +STARTLINE T "<br><strong>•</strong> <b>AOVRebuild</b> dynamically builds controls<br>for AOV layers.<br><br>\n<i>• Allows the user to fine-tune AOV contributions<br>\nfor creative look development and provide<br>\nfeedback to lighting for upstream adjustments.</i>\n\n\n\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#141E28;\">John Toth <b>© 2025 <br>\n\n"}
+ addUserKnob {26 divider_03 l "" +STARTLINE}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#141E28\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#141E28\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nversion_number = \"1.0.0\"\ncontext = \"Autocomp\"\nmodified_date = \"25th May 2025\"\ndeveloper = \"John Toth © 2025\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- Dynamically builds controls for AOV layers\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 0
+  ypos -57
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 34
+  ypos 18
+ }
+set N1c41d200 [stack 0]
+ Expression {
+  name Expression1
+  label Rebuild
+  xpos 0
+  ypos 83
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 34
+  ypos 162
+ }
+set N1c40cc00 [stack 0]
+ Output {
+  name Output1
+  xpos 0
+  ypos 423
+ }
+push $N1c40cc00
+push $N1c41d200
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 178
+  ypos 18
+ }
+ Merge2 {
+  inputs 2
+  operation from
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 144
+  ypos 155
+ }
+push $N1c41d200
+ Expression {
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 "(LG03.r * \[value parent.LG03.r])"
+  name Expression2
+  xpos -150
+  ypos 87
+ }
+ Viewer {
+  frame_range 1-100
+  monitorOutNDISenderName "NukeX - untitled - Viewer1"
+  name Viewer1
+  xpos 290
+  ypos 399
+ }
+end_group

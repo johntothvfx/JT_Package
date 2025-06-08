@@ -1,0 +1,126 @@
+Group {
+ name Splice1
+ help "Isolates a certain threshold of pixel values."
+ selected true
+ addUserKnob {20 Splice}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION Splice
+ addUserKnob {41 channels t "The splice effect is only applied to these channels. \nIf you set this to something other than all or none, you can use the checkboxes on the right to select individual channels." T Merge2.Achannels}
+ addUserKnob {7 size t "Threshold pixel value being isolated will increase/decrease."}
+ size 0.1
+ addUserKnob {7 threshold t "Isolates a certain threshold of the image pixel value. The threshold is determined by the size.\n\nThis value can be higher then 1."}
+ threshold 0.5
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannelMask l mask t "Enables the associated mask channel to the right. Disabling this checkbox is the same as setting the channel to none. \n\n\n\nThe channel to use as a mask. By default, the filter effect is limited to the non-black areas of this channel." T Merge2.maskChannelMask}
+ addUserKnob {6 inject t "Copies the mask input to the predefined mask.a channel. Injecting the mask allows you to use the same mask further downstream." -STARTLINE}
+ addUserKnob {6 invert t "Inverts the use of the mask channel, so that the merge is limited to the non-white areas of the mask.\n" -STARTLINE}
+ addUserKnob {6 fringe t "When enabled, only apply the effect to the edge of the mask. \nWhen disabled, the effect is applied to the entire mask." -STARTLINE}
+ addUserKnob {7 mix t "Dissolves between the original image at 0 and the full effect at 1."}
+ mix 1
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Splice</font><font color=#747474> v1.1"}
+ addUserKnob {26 ""}
+ addUserKnob {26 steps l "" +STARTLINE T "<br><strong>•</br><b> Splice</b> isolates a certain threshold<br>of the pixel value.\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#777;\">John Toth <b>© 2019 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#747474\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message(\"Coming Soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#747474\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nversion_number = \"1.1.0\"\ncontext = \"Color/Math\"\nmodified_date = \"7th February 2024\"\ndeveloper = \"John Toth © 2019\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- isolates a certain threshold of the pixel value\n<br></i><b> v 1.1 </b><i>\n- renamed from alpha splice to just splice\n- works now on selected input channels\n- output option was added\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}
+ Input {
+  inputs 0
+  name mask
+  label "\[value number]"
+  xpos -283
+  ypos -1432
+  number 1
+ }
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -249
+  ypos -1086
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos -538
+  ypos -1432
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -504
+  ypos -1326
+ }
+set N24678400 [stack 0]
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -724
+  ypos -1326
+ }
+ Shuffle {
+  in {{{parent.Merge2.Achannels}}}
+  name Shuffle3
+  label "<b>\[value in]</b> &rarr; \[value Merge2.Achannels]"
+  xpos -758
+  ypos -1268
+ }
+ Expression {
+  channel0 {rgba.red -rgba.green -rgba.blue -rgba.alpha}
+  expr0 "r > low && r < high"
+  channel1 {-rgba.red rgba.green -rgba.blue -rgba.alpha}
+  expr1 "g > low && g < high"
+  channel2 {-rgba.red -rgba.green rgba.blue -rgba.alpha}
+  expr2 "b > low && b < high"
+  channel3 {-rgba.red -rgba.green -rgba.blue rgba.alpha}
+  expr3 "a > low && a < high"
+  name Expression1
+  label "splice\n"
+  xpos -758
+  ypos -1216
+  addUserKnob {20 User}
+  addUserKnob {7 low}
+  low {{"(parent.threshold - (parent.size)-0.001)"}}
+  addUserKnob {7 high}
+  high {{"parent.threshold + (parent.size)"}}
+ }
+ Shuffle {
+  out {{{parent.Merge2.Achannels}}}
+  name Shuffle2
+  label "<b>\[value in]</b> &rarr; \[value Merge2.Achannels]"
+  xpos -758
+  ypos -1172
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -724
+  ypos -1086
+ }
+push $N24678400
+ Merge2 {
+  inputs 2+1
+  operation copy
+  Achannels alpha
+  Bchannels none
+  output {{{Achannels}}}
+  inject {{parent.inject}}
+  invert_mask {{parent.invert}}
+  fringe {{parent.fringe}}
+  mix {{parent.mix}}
+  name Merge2
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -538
+  ypos -1102
+ }
+ Output {
+  name Output1
+  xpos -538
+  ypos -922
+ }
+end_group

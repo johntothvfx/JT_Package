@@ -1,0 +1,664 @@
+Group {
+ name AOVGrade1
+ help "AOV grade shuffles out the selected channel removing  it from the RGB category, The removed channel get the effect applied to it, which afterwards get plus back (RGB).\n\nThis is commonly used to grade the CG renders without manually shuffling out AOV's."
+ knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\nparentControl = int(n\['parentControl'].getValue())\n\nif parentControl == 1:\n    parent = n\['parentName'].value()\n    if parent == \"\":\n        n\['channels'].setExpression('none')\n        n\['mode'].setEnabled(False)\n        n\['operations'].setEnabled(False)\n    else:\n        n\['channels'].setExpression('%s.channels' % parent)\n        n\['operations'].setExpression('%s.operations' % parent)\n        n\['mode'].setExpression('%s.mode' % parent)\n        n\['mode'].setEnabled(False)\n        n\['operations'].setEnabled(False)"
+ tile_color 0x7aa9ffff
+ selected true
+ addUserKnob {20 AOVGrade l "AOV Grade"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION AOVGrade
+ addUserKnob {1 operation l INVISIBLE +INVISIBLE}
+ operation "\[expr \{\[numvalue replace] ? \"replace\" : \"\" \}]"
+ addUserKnob {1 output l INVISIBLE +INVISIBLE}
+ output "\[value channels]"
+ addUserKnob {41 channels t "The effect is only applied to these channels. \nIf you set this to something other than none, you can use the checkboxes on the right to select individual channels." T Channels.channels}
+ addUserKnob {6 unpremultiply t "When this is ticked on it will unpremultiply the incoming channel by the alpha, apply the grading and premultiply it back.\n" +STARTLINE}
+ addUserKnob {6 replace t "When this is ticked on it will replace the input channel with the edited version of what you have done. \n\n<b>Example:</b> If you shuffle in a light category and make it more blue next time that category gets shuffled out it will have that blue instead of the original." -STARTLINE}
+ replace true
+ addUserKnob {6 view t "Toggle to view the selected channel input being selected.\n\nNote: If warning label is ticked, a warning on image will appear as a reminder this is just for viewing purpose only." -STARTLINE}
+ addUserKnob {26 ""}
+ addUserKnob {4 presetLoad l preset t "Presets when stored are listed here for quick access.\n\nIf the knob is empty, it means not presets have been stored." M {""}}
+ addUserKnob {22 load t "Once you have selected a preset when this button is clicked it will run that preset settings." -STARTLINE T "import nuke\nnode = nuke.thisNode()\n\ndef loadPreset():\n    preset_load_knob = node.knob('presetLoad')\n    \n    if not preset_load_knob or not preset_load_knob.values():\n        nuke.message('No presets have been stored.')\n        return\n\n    selected_preset = preset_load_knob.value()\n    \n    if selected_preset:\n        for knob in node.knobs():\n            if knob.endswith('_name') and node\[knob].value() == selected_preset:\n                load_button_name = knob.replace('_name', '_load')\n                if node.knob(load_button_name):\n                    node\[load_button_name].execute()\n                    nuke.message(f'Preset \"\{selected_preset\}\" loaded successfully.')\n                    break\n        else:\n            nuke.message('No matching preset found.')\n\n# Use this function when you need to load a preset\nloadPreset()\n"}
+ addUserKnob {22 reloadClone l reload t "Reloads the presets list on the AOV Grade tab." -STARTLINE T "n = nuke.thisNode()\n\n#make functions available\nn.knob(\"reload\").execute()\n"}
+ addUserKnob {26 ""}
+ addUserKnob {41 operations T ParentsControl.operations}
+ addUserKnob {41 exposure t "Doubling or halving the amount of light." T ParentsControl.exposure}
+ addUserKnob {41 blackpoint t "The color is turned into black" T ParentsControl.blackpoint}
+ addUserKnob {41 whitepoint t "The color is turned into white" T ParentsControl.whitepoint}
+ addUserKnob {41 black l lift t "Black is turned into this color" T ParentsControl.black}
+ addUserKnob {41 white l gain t "White is turned into this color" T ParentsControl.white}
+ addUserKnob {41 multiply t "Constant to multiply result by" T ParentsControl.multiply}
+ addUserKnob {41 add l offset t "Constant to add to result\n(raises both black & white unlike lift)" T ParentsControl.add}
+ addUserKnob {41 gamma t "Gamma correction applied to final result" T ParentsControl.gamma}
+ addUserKnob {41 saturation t "Sets the saturation for the input image.\n\nA value of 1 equals no change. A value of 0 produces a grayscale image.\n" T ParentsControl.saturation}
+ addUserKnob {41 mode l "" -STARTLINE T ParentsControl.mode}
+ addUserKnob {41 reverse t "Invert the math to undo correction" T ParentsControl.reverse}
+ addUserKnob {41 black_clamp l "black clamp" t "Output less then zero is changed to zero" -STARTLINE T ParentsControl.black_clamp}
+ addUserKnob {41 white_clamp l "white clamp" t "Output that is greater then 1 is changed to 1" -STARTLINE T ParentsControl.white_clamp}
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannelMask l mask t "Enables the associated mask channel to the right. Disabling this checkbox is the same as setting the channel to none. \n\n\n\nThe channel to use as a mask. By default, the filter effect is limited to the non-black areas of this channel.\n" T Merge5.maskChannelMask}
+ addUserKnob {6 inject t "Copies the mask input to the predefined mask.a channel. Injecting the mask allows you to use the same mask further downstream." -STARTLINE}
+ addUserKnob {6 invert t "Inverts the use of the mask channel, so that the merge is limited to the non-white areas of the mask.\n" -STARTLINE}
+ addUserKnob {6 fringe t "When enabled, only apply the effect to the edge of the mask. \nWhen disabled, the effect is applied to the entire mask." -STARTLINE}
+ addUserKnob {7 mix t "Dissolves between the original image at 0 and the full effect at 1."}
+ mix 1
+ addUserKnob {20 parent l Parent}
+ addUserKnob {41 parentControl l control t "<b>- Parent:</b> This node operates independently and does not retrieve values from any other AOVGrade.\n\n<b>- Child:</b> This node retrieves values based on the parent name and does not operate independently.\n\nNote: The node will change color to orange if it's a child for visual purposes and will stay normal color if set to parent." T ParentsControl.parentControl}
+ addUserKnob {1 parentName t "The name of the parent node within the script."}
+ addUserKnob {22 grab l "grab name" t "This will grab the name of the node and put it int the parent name knob. \n\nPlease be aware this can only be another AOVGrade node." -STARTLINE T "node = nuke.thisGroup()\nwith nuke.thisParent():\n    parentKnob = node.knob('parentName')\n\nselection = nuke.selectedNodes()\nif selection:\n    selection = selection\[0]\n    if selection != node:\n        if selection.knob('CLASSIFICATION') and selection\['CLASSIFICATION'].value() == 'AOVGrade':\n            parentKnob.setValue(selection.name())\n        else:\n            nuke.message(\"This is not an AOVGrade node.\")\n\nparent = nuke.toNode(parentKnob.value())\n"}
+ addUserKnob {22 find t "Finds the parent node" -STARTLINE T "n = nuke.thisNode()\n\n#make functions available\nn.knob(\"parentMessage\").execute()\n\nparentName = nuke.thisNode().knob('parentName').value()\n\nwith nuke.thisParent():\n    FindParent(parentName)"}
+ addUserKnob {22 clearName l clear t "Clears the parent name knob." -STARTLINE T "nuke.thisNode().knob(\"parentName\").setValue(\"\")\n\n\n"}
+ addUserKnob {22 parentMessage l INVISIBLE -STARTLINE +INVISIBLE T "def FindParent(parentName):\n    \"\"\"\n    Jump to node in the nodegraph \n    \"\"\"\n    \n    if not parentName:\n        nuke.message('parent name is empty')\n        return\n        \n    parentNode = nuke.toNode(parentName)\n    if not parentNode:\n        nuke.message('No node named \{\}'.format(parentName))\n        return\n        \n    nuke.zoom( 2, \[parentNode.xpos(), parentNode.ypos()])"}
+ addUserKnob {26 ""}
+ addUserKnob {6 addToList l "add to index list" t "When this is ticked on it will allow other AOVGrade nodes to find this node if it's a parent when updating the index list." +STARTLINE}
+ addToList true
+ addUserKnob {4 indexList l index t "A list of findable parent AOV Grades." M {}}
+ addUserKnob {22 updateList l "update list" t "Reloads the index list and any AOVGrade node that is a parent and findable will be listed." -STARTLINE T "with nuke.thisParent():\n    n_list = \[]\n    for n in nuke.allNodes():\n        try:\n            if n.knob('CLASSIFICATION').value() == 'AOVGrade':\n                if n.knob('addToList').value() == 1 and n.knob('parentControl').value() == 'Parent':\n                    store = n.knob('name').value()\n                    if store is not None:\n                        n_list.append(store)\n        except: pass\n\n    old = n_list\n    n_list = \[]\n\n    for i in old:\n        if i not in n_list:\n            n_list.append(i)\n\n    n_list.sort()\n   \n    try:\n        n_list.remove('')\n    except: pass\n   \n    for n in nuke.allNodes():\n        try:\n            if n.knob('CLASSIFICATION').value() == 'AOVGrade':\n                n.knob('indexList').setValues(n_list)\n                store = n.knob('parentName').value()\n                n.knob('indexList').setValue(store)\n        except: pass"}
+ addUserKnob {22 updateParent l "Update Parent" t "Updates the parent name with the selection from the index list." -STARTLINE T "n = nuke.thisNode()\nilist = n.knob('indexList').value()\nparentKnob = n.knob('parentName')\ntoParent = nuke.toNode(ilist)\n\nif ilist in (\[], '0') or ilist == n.name():\n    nuke.message(f\"You cannot use \\\"\{n.name()\}\\\" as the parent.\")\n    n.knob('parentName').setValue(None)\nelse:\n    n.knob('parentName').setValue(ilist)\n"}
+ addUserKnob {20 presets l Presets}
+ addUserKnob {22 removeKnobs l remove +INVISIBLE T "def autocompModifyKnobRemoveKnob(knob):\n    import nuke\n    import re\n    \n    nuke.Undo().disable()  # Correct undo disable\n    try:\n        node = nuke.thisNode()\n        prefix = knob.name().split(\"_\")\[0] + \"_\"\n        preset_name = \"\"\n\n        # Remove knobs with the specified prefix\n        for knobName in list(node.knobs()):\n            if knobName.startswith(prefix):\n                if knobName.endswith(\"_name\"):\n                    preset_name = node\[knobName].value()  # Capture the preset name before removal\n                node.removeKnob(node.knob(knobName))\n\n        # Hide divider if no knobs match the pattern\n        if not any(\[re.match(r\"knob\\d*_\", k) for k in node.knobs()]):\n            node.knob(\"divider01\").setVisible(False)\n\n        # Remove the preset name from the presetLoad knob\n        if preset_name:\n            preset_load_knob = node.knob('presetLoad')\n            if preset_load_knob:\n                current_values = list(preset_load_knob.values())\n                if preset_name in current_values:\n                    current_values.remove(preset_name)\n                    preset_load_knob.setValues(current_values)\n    finally:\n        nuke.Undo().enable()  # Correct undo enable\n" +STARTLINE}
+ addUserKnob {22 storage -STARTLINE +INVISIBLE T "import nuke\n\nnode = nuke.thisNode()\n\ndef saveData(node, listToCheck, excludeList):\n    nuke.Undo().disable()  # Disable undo to optimize performance\n    try:\n        saveDict = \{\}\n        for knob in node.knobs():\n            # Check if any substring in listToCheck is in knob name\n            # AND the knob is not in the excludeList\n            if any(ext in knob for ext in listToCheck) and knob not in excludeList:\n                value = node\[knob].getValue()\n                if knob == 'mode':\n                    value = int(value)\n                saveDict\[knob] = value\n        return saveDict\n    finally:\n        nuke.Undo().enable()  # Ensure undo is re-enabled\n\n# Define the knobs you want to check\nlistToCheck = \[\n    'exposure', 'blackpoint', 'whitepoint', 'black', 'white',\n    'multiply', 'add', 'gamma', 'reverse', 'black_clamp',\n    'white_clamp', 'saturation', 'mode', 'mix'\n]\n\n# Define the knobs you want to exclude\nexcludeList = \['unpremultiply', 'addToList', 'updateList', 'addKnobs']\n\n# Call saveData with both lists\ndata = saveData(node, listToCheck, excludeList)\n\n# Extract the number from the current knob's name\nnumber = \"\".join(c for c in nuke.thisKnob().name() if c.isdigit())\n\ntry:\n    # Attempt to set the value of an existing save slot knob\n    node\['knob' + str(number) + \"_saveslot\"].setValue(str(data))\nexcept:\n    # If it doesn't exist, create a new invisible string knob to store the data\n    newKnob = nuke.String_Knob(\"knob\" + str(number) + \"_saveslot\", 'INVISIBLE', str(data))\n    newKnob.setVisible(False)\n    node.addKnob(newKnob)\n    nuke.thisKnob().setFlag(0)\n\ndef reloadKnobs():\n    if nuke.ask('Are you sure you want to store this preset?'):\n        preset_name = nuke.getInput('Enter a name for the preset:')\n        if preset_name:\n            # List of knobs to reorder (specific to your node setup)\n            orderKnobs = \[\n                node.knob(k) for k in \[\n                    'divider01', 'addKnobs', 'clear', 'reload', 'warning',\n                    'warningLabel', 'font', 'warningColor', 'info', 'version',\n                    'divider04', 'bulletpoints', 'divider05', 'demo', 'log'\n                ]\n            ]\n            # Remove and re-add knobs to set their order\n            for knob in orderKnobs:\n                node.removeKnob(knob)\n            for knob in orderKnobs:\n                node.addKnob(knob)\n            nuke.thisKnob().setFlag(0)\n            node.knob(\"divider01\").setVisible(True)\n\n            # Set the preset name\n            node\['knob' + str(number) + '_name'].setValue(preset_name)\n\n            # Display the saved knobs in a message\n            stored_knobs = \"\\n\".join(data.keys())\n            nuke.message(f'Preset \"\{preset_name\}\" stored:\\n\{stored_knobs\}')\n            \n            # Update the presetLoad knob with the new preset name\n            preset_load_knob = node.knob('presetLoad')\n            if not preset_load_knob:\n                preset_load_knob = nuke.Enumeration_Knob('presetLoad', 'Load Preset', \[])\n                node.addKnob(preset_load_knob)\n            current_values = list(preset_load_knob.values())\n            if preset_name not in current_values:\n                current_values.append(preset_name)\n                preset_load_knob.setValues(current_values)\n\n# Call the reloadKnobs function to handle preset storage and UI updates\nreloadKnobs()\n"}
+ addUserKnob {22 unpackage -STARTLINE +INVISIBLE T "def setData(data):\n    nuke.Undo().disable()  # Correct undo disable\n    try:\n        dictionary = eval(data)\n\n        node = nuke.thisNode()\n        node.knob('exposure').setValue(dictionary\['exposure'])\n        node.knob('blackpoint').setValue(dictionary\['blackpoint'])\n        node.knob('whitepoint').setValue(dictionary\['whitepoint'])\n        node.knob('black').setValue(dictionary\['black'])\n        node.knob('white').setValue(dictionary\['white'])\n        node.knob('multiply').setValue(dictionary\['multiply'])\n        node.knob('add').setValue(dictionary\['add'])\n        node.knob('gamma').setValue(dictionary\['gamma'])\n        node.knob('saturation').setValue(dictionary\['saturation'])\n        node.knob('mode').setValue(dictionary\['mode'])\n        node.knob('reverse').setValue(dictionary\['reverse'])\n        node.knob('black_clamp').setValue(dictionary\['black_clamp'])\n        node.knob('white_clamp').setValue(dictionary\['white_clamp'])\n        node.knob('mix').setValue(dictionary\['mix'])\n    finally:\n        nuke.Undo().enable()  # Correct undo enable\n\ndef loadData(node):\n    number = \"\".join(c for c in nuke.thisKnob().name() if c.isdigit())\n    knob_name = f'knob\{number\}_saveslot'\n    \n    if knob_name in node.knobs():\n        data = node\[knob_name].getValue()\n        if data:\n            setData(data)\n        else:\n            nuke.message(\"No preset has been stored yet.\")\n    else:\n        nuke.message(\"No preset has been stored yet.\")\n\nloadData(nuke.thisNode())\n"}
+ addUserKnob {22 clearStore l "clear storage" -STARTLINE +INVISIBLE T "def ModifyKnobClearStore(knob):\n    \n    nuke.Undo.disabled()\n    \n    node = nuke.thisNode()\n    prefix = knob.name().split(\"_\")\[0] + \"_\"\n    preset_load_knob = node.knob('presetLoad')\n\n    # Get the name of the preset to remove\n    preset_name_knob = prefix + 'name'\n    preset_name = node\[preset_name_knob].value() if node.knob(preset_name_knob) else \"\"\n\n    # Remove the preset name from the presetLoad knob\n    if preset_name and preset_load_knob:\n        current_values = list(preset_load_knob.values())\n        if preset_name in current_values:\n            current_values.remove(preset_name)\n            preset_load_knob.setValues(current_values)\n\n    # Clear the values of the save slots and names\n    for knobName in node.knobs():\n        if knobName.startswith(prefix) and (knobName.endswith('_saveslot') or knobName.endswith('_name')):\n            node.knob(knobName).setValue(\"\")\n            \n    nuke.Undo.enable()\n"}
+ addUserKnob {26 storeTitleLoad l <b>store</b>}
+ addUserKnob {6 warningColor_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_rgb_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {26 divider01 l "" +STARTLINE +HIDDEN}
+ addUserKnob {22 addKnobs l add t "This will add 5 knobs:\n\n<b>- Preset name:</b> Name of the preset\n<b>- store button:</b> stores the values of the knobs\n<b>- load button:</b> loads that preset\n<b>- clear button:</b> clears the preset\n<b>- remove button:</b> remove the preset completely\n" T "import nuke\n\nRemoveKnobCode = \"\"\"nuke.thisNode().knob(\"removeKnobs\").execute(); autocompModifyKnobRemoveKnob(nuke.thisKnob())\"\"\"\nclearKnobCode = \"\"\"nuke.thisNode().knob(\"clearStore\").execute(); ModifyKnobClearStore(nuke.thisKnob())\"\"\"\n\ndef KnobAddKnob():\n    nuke.Undo().disable()  # Correct undo disable\n    try:\n        node = nuke.thisNode()\n\n        storeCode = node.knob('storage').value()\n        loadCode = node.knob('unpackage').value()\n\n        index = \"01\"\n        while node.knob(\"knob\{\}_name\".format(index)):\n            index = str(int(index) + 1).zfill(2)\n\n        index = str(index).zfill(2)\n\n        # valueStatusKnob = nuke.Boolean_Knob(\"knob\{\}_status\".format(index), \"\")\n        # valueStatusKnob.setFlag(nuke.STARTLINE)\n        \n        nameKnob = nuke.String_Knob(\"knob\{\}_name\".format(index), \" preset \")\n        nameKnob.setEnabled(False)\n        nameKnob.setFlag(nuke.STARTLINE)\n        \n        # modeKnob = nuke.Enumeration_Knob(\"knob\{\}_mode\".format(index), \"\", \[\"set value\", \"set value (evaluated)\", \"set expression\", \"execute\"])\n        # modeKnob.clearFlag(nuke.STARTLINE)\n        \n        # valueKnob = nuke.String_Knob(\"knob\{\}_value\".format(index), \" value \")\n        # valueKnob.clearFlag(nuke.STARTLINE)\n\n        storeKnob = nuke.PyScript_Knob(\"knob\{\}_store\".format(index), \"store\".format(index))\n        storeKnob.setValue(storeCode)    \n        storeKnob.clearFlag(nuke.STARTLINE)\n        \n        loadKnob = nuke.PyScript_Knob(\"knob\{\}_load\".format(index), \"load\".format(index))\n        loadKnob.setValue(loadCode)    \n        loadKnob.clearFlag(nuke.STARTLINE)\n\n        resetKnob = nuke.PyScript_Knob(\"knob\{\}_clear\".format(index), \"clear\".format(index))\n        resetKnob.setValue(clearKnobCode)    \n        resetKnob.clearFlag(nuke.STARTLINE)  \n        \n        removeKnob = nuke.PyScript_Knob(\"knob\{\}_remove\".format(index), \"remove\".format(index))\n        removeKnob.setValue(RemoveKnobCode)\n        removeKnob.clearFlag(nuke.STARTLINE)\n        \n        # Temporarily remove order knobs\n        orderKnobs = \[node.knob(k) for k in \['divider01', 'addKnobs', 'clear', 'reload', 'warning', 'warningLabel', 'font', 'warningColor', 'info', 'version', 'divider04', 'bulletpoints', 'divider05', 'demo', 'log']]\n        for knob in orderKnobs:\n            node.removeKnob(knob)\n           \n        # Add new knobs \n        for knob in \[nameKnob, storeKnob, loadKnob, resetKnob, removeKnob]:\n            node.addKnob(knob)\n            \n        # Add back old knobs\n        for knob in orderKnobs:\n            node.addKnob(knob)\n            \n        # Switch back to tab with the button\n        nuke.thisKnob().setFlag(0)\n        \n        # Unhide divider  \n        node.knob(\"divider01\").setVisible(True)\n\n    finally:\n        nuke.Undo().enable()  # Correct undo enable\n\nKnobAddKnob()\n" +STARTLINE}
+ addUserKnob {22 clear l "clear all" t "Removes all presets, including in the presets loading dropdown menu." -STARTLINE T "def autocompModifyKnobClear():\n    \n    nuke.Undo.disabled()\n    \n    node = nuke.thisNode()\n    \n    import re\n    \n    for knobName, knob in list(node.knobs().items()):\n        if re.match(r\"knob\\d*_\", knobName):\n            node.removeKnob(knob)\n    \n    node.knob(\"divider01\").setVisible(False)\n    \n    # Clear the value of presetLoad\n    preset_load_knob = node.knob('presetLoad')\n    if preset_load_knob:\n        preset_load_knob.setValues(\[])\n        \n    nuke.Undo.enable()\n\nautocompModifyKnobClear()\n"}
+ addUserKnob {22 reload t "Reloads the presets list on the AOV Grade tab" -STARTLINE T "import nuke\n\ndef refreshPresetLoad():\n    \n    nuke.Undo.disabled()\n    \n    node = nuke.thisNode()\n    preset_load_knob = node.knob('presetLoad')\n    \n    if preset_load_knob:\n        # Clear the current values\n        preset_load_knob.setValues(\[])\n        \n        # Collect names of all stored knobs\n        stored_names = \[]\n        for knob in node.knobs():\n            if knob.startswith('knob') and knob.endswith('_name'):\n                name_value = node\[knob].value()\n                if name_value:\n                    stored_names.append(name_value)\n        \n        # Re-add the stored knob names to presetLoad\n        preset_load_knob.setValues(stored_names)\n        nuke.message('Presets have been refreshed with current stored presets.')\n        \n    nuke.Undo.enable()\n\n# Add this to the new button's callback\nrefreshPresetLoad()\n"}
+ addUserKnob {20 warning l Warning}
+ addUserKnob {6 warningLabel l "enable warning label is view if ticked on" t "when \"view\" is enabled along with this tick box, a warning label will be displayed on the image. \n\nThis is just a reminder label to tell the user that \"view\" is enabled." +STARTLINE}
+ warningLabel true
+ addUserKnob {2 font t "Full pahtname of font file. Text supports a large number of formats for scalable fonts including TrueType and PostScript by using the FreeType library."}
+ font "\[python nuke.defaultFontPathname()]"
+ addUserKnob {18 warningColor l "warning color" t "color of the warning label"}
+ warningColor {1 1 0}
+ addUserKnob {6 warningColor_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>AOV Grade</font><font color=#7AA9FF> v1.5"}
+ addUserKnob {26 divider04 l "" +STARTLINE}
+ addUserKnob {26 bulletpoints l "" t "overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>AOV Grade</b> isolates a layer and removes it<br>from the rgb image. The grade changes are<br>then applied to the layer which is then added<br>back.\n\n<br></b><i>\n<br><strong>•</br> This is commonly used on CG renders for<br>quick changes.\n\n\n</i>\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#7AA9FF;\">John Toth <b>© 2020 <br>"}
+ addUserKnob {26 divider05 l "" +STARTLINE}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#7AA9FF\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message(\"Coming Soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#7AA9FF\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\n\n# Constants\nversion_number = \"1.5.0\"\ncontext = \"AOV\"\nmodified_date = \"25st January 2025\"\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='website linke here'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- isolates a layer, applies grades before putting it back.\n<br></i><b> v 1.1 </b><i>\n- alpha channel was retained\n<br></i><b> v 1.2 </b><i>\n- user interface update\n- mask options were added\n<br></i><b> v 1.3 </b><i>\n- tooltips were written\n- saturation options were added\n<br></i><b> v 1.4 </b><i>\n- parent/child options were added (saves original values included)\n- saving presets were added\n- mode for saturation was addded\n- view button/warning label was added\n- internal node cleanup\n- replace was added\n- unpremult option was added\n- operations were added\n- presets save/load options was added\n<br></i><b> v 1.5 </b><i>\n- channel selection has been recoded internally\n\"\"\"\nthank_you = \"\"\n\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"</i>\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n\n# Display the message\nnuke.message(message)"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x23232301
+  label "<center>Don't Touch\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 24
+  note_font_color 0xee453cff
+  xpos -1139
+  ypos -1699
+  bdwidth 425
+  bdheight 357
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode5
+  tile_color 0xaaaaaaff
+  label "<center>warning label"
+  note_font "Source Code Pro Light"
+  note_font_size 35
+  note_font_color 0xee453cff
+  xpos -580
+  ypos -14
+  border_width 15
+  bookmark false
+  bdwidth 608
+  bdheight 743
+  addUserKnob {20 "Backdrop Settings"}
+  addUserKnob {3 padding l Padding}
+  padding 75
+  addUserKnob {22 snap l "Snap to selected nodes" -STARTLINE T "this = nuke.thisNode()\nselNodes = nuke.selectedNodes()\npadding = this.knob('padding').value()\nif len(selNodes)== 0:\n\tpass\nelse:\n\tbdX = min(\[node.xpos() for node in selNodes]) - padding\n\tbdY = min(\[node.ypos() for node in selNodes]) - padding - 60\n\tbdW = max(\[node.xpos() + node.screenWidth() for node in selNodes]) + padding\n\tbdH = max(\[node.ypos() + node.screenHeight() for node in selNodes]) + padding\n\tthis.knob('xpos').setValue(bdX)\n\tthis.knob('ypos').setValue(bdY)\n\tthis.knob('bdwidth').setValue(bdW-bdX)\n\tthis.knob('bdheight').setValue(bdH-bdY)"}
+ }
+ Input {
+  inputs 0
+  name mask
+  label "\[value number]"
+  xpos 180
+  ypos -1837
+  number 1
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos -846
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos -505
+  ypos -1813
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -471
+  ypos -1593
+ }
+set N8612a400 [stack 0]
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -6
+  ypos -1593
+ }
+ NoOp {
+  name Channels
+  knobChanged "\nn = nuke.thisNode()\nk = nuke.thisKnob()\nif k.name() == 'channels':\n    nuke.toNode('Merge1')\['Achannels'].fromScript(k.toScript())\n    nuke.toNode('Merge1')\['Achannels'].enableChannel(4, False)\n    \n    nuke.toNode('Merge2')\['Achannels'].fromScript(k.toScript())\n    nuke.toNode('Merge2')\['Achannels'].enableChannel(4, False)\n    \n    nuke.toNode('Shuffle1')\['in'].fromScript(k.toScript())\n    nuke.toNode('Shuffle1')\['in'].fromScript(k.toScript())\n    \n    nuke.toNode('Merge6')\['Bchannels'].fromScript(k.toScript())\n    nuke.toNode('Merge6')\['Bchannels'].enableChannel(4, False)\n    \n        \n    nuke.toNode('Merge7')\['Achannels'].fromScript(k.toScript())\n    nuke.toNode('Merge7')\['Achannels'].enableChannel(4, False)\n    \n    nuke.toNode('Exposure1')\['channels'].fromScript(k.toScript())\n    nuke.toNode('Grade1')\['channels'].fromScript(k.toScript())\n    nuke.toNode('Saturation1')\['channels'].fromScript(k.toScript())\n    nuke.toNode('Merge5')\['also_merge'].fromScript(k.toScript())\n    nuke.toNode('Merge5')\['also_merge'].enableChannel(4, False)\n    \n    nuke.toNode('Copy1')\['channels'].fromScript(k.toScript())    \n"
+  xpos -40
+  ypos -1525
+  addUserKnob {20 User}
+  addUserKnob {10 channels}
+  channels none
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -6
+  ypos -1395
+ }
+set N5dc8ae00 [stack 0]
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -223
+  ypos -1395
+ }
+ Dot {
+  name Dot24
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -223
+  ypos -1230
+ }
+set N5de49800 [stack 0]
+ Unpremult {
+  name Unpremult1
+  xpos -257
+  ypos -1089
+  disable {{!parent.unpremultiply}}
+ }
+ EXPTool {
+  channels none
+  mode Stops
+  red {{parent.exposure}}
+  green {{parent.exposure}}
+  blue {{parent.exposure}}
+  name Exposure1
+  xpos -257
+  ypos -1052
+ }
+ Grade {
+  channels none
+  blackpoint {{parent.blackpoint} {parent.blackpoint} {parent.blackpoint} {parent.blackpoint}}
+  whitepoint {{parent.whitepoint} {parent.whitepoint} {parent.whitepoint} {parent.whitepoint}}
+  black {{parent.black} {parent.black} {parent.black} {parent.black}}
+  white {{parent.white} {parent.white} {parent.white} {parent.white}}
+  multiply {{parent.multiply} {parent.multiply} {parent.multiply} {parent.multiply}}
+  add {{parent.add} {parent.add} {parent.add} {parent.add}}
+  gamma {{parent.gamma} {parent.gamma} {parent.gamma} {parent.gamma}}
+  reverse {{parent.reverse}}
+  black_clamp {{parent.black_clamp}}
+  white_clamp {{parent.white_clamp}}
+  name Grade1
+  xpos -257
+  ypos -1010
+ }
+ Saturation {
+  channels none
+  saturation {{parent.saturation}}
+  mode {{parent.mode}}
+  name Saturation1
+  label "saturation: \[value saturation]"
+  xpos -257
+  ypos -954
+ }
+ Premult {
+  name Premult1
+  xpos -257
+  ypos -897
+  disable {{!parent.unpremultiply}}
+ }
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -223
+  ypos -846
+ }
+push $N5dc8ae00
+ Merge2 {
+  inputs 2+1
+  operation copy
+  Achannels none
+  Bchannels none
+  output none
+  inject {{parent.inject}}
+  invert_mask {{parent.invert}}
+  fringe {{parent.fringe}}
+  mix {{parent.mix}}
+  name Merge5
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -40
+  ypos -858
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -6
+  ypos -683
+ }
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -226
+  ypos -683
+ }
+set N5e630a00 [stack 0]
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -226
+  ypos -265
+ }
+set N5dc60200 [stack 0]
+ Shuffle {
+  in none
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -260
+  ypos -176
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -226
+  ypos -67
+ }
+push $N5dc60200
+push $N5e630a00
+ Dot {
+  name Dot26
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -336
+  ypos -683
+ }
+set N5dc2b800 [stack 0]
+ Dot {
+  name Dot18
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -556
+  ypos -683
+ }
+push $N8612a400
+ Dot {
+  name Dot25
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -471
+  ypos -1302
+ }
+set N8612dc00 [stack 0]
+ Dot {
+  name Dot21
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -663
+  ypos -1302
+ }
+push $N5de49800
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -367
+  ypos -1230
+ }
+set N8605e000 [stack 0]
+ Dot {
+  name Dot20
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -553
+  ypos -1230
+ }
+ Merge2 {
+  inputs 2
+  operation divide
+  Bchannels none
+  name Merge6
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -697
+  ypos -1141
+ }
+ Dot {
+  name Dot22
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -663
+  ypos -1009
+ }
+push $N8605e000
+push $N8612dc00
+ Merge2 {
+  inputs 2
+  operation from
+  Achannels none
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -505
+  ypos -1141
+ }
+ Switch {
+  inputs 2
+  which {{parent.operations}}
+  name Switch3
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  xpos -505
+  ypos -1016
+ }
+ Dot {
+  name Dot19
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -471
+  ypos -745
+ }
+set N7921ea00 [stack 0]
+ Dot {
+  name Dot17
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -666
+  ypos -745
+ }
+ Merge2 {
+  inputs 2
+  operation multiply
+  Achannels none
+  name Merge7
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -700
+  ypos -589
+ }
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -666
+  ypos -433
+ }
+push $N5dc2b800
+push $N7921ea00
+ Merge2 {
+  inputs 2
+  operation plus
+  Achannels none
+  name Merge2
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -505
+  ypos -589
+ }
+ Switch {
+  inputs 2
+  which {{parent.operations}}
+  name Switch4
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  xpos -505
+  ypos -440
+ }
+ Copy {
+  inputs 2
+  name Copy1
+  selected true
+  xpos -505
+  ypos -272
+  disable {{!parent.replace}}
+ }
+ Switch {
+  inputs 2
+  which {{parent.view}}
+  name Switch1
+  xpos -505
+  ypos -70
+ }
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -471
+  ypos 128
+ }
+set N5e68ca00 [stack 0]
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -471
+  ypos 352
+ }
+set N98d09c00 [stack 0]
+push $N5e68ca00
+ Remove {
+  name Remove2
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos -127
+  ypos 121
+ }
+ CopyBBox {
+  name CopyBBox1
+  xpos -127
+  ypos 189
+ }
+ Text {
+  cliptype none
+  message "\[value parent.name] \n\"view\" is Enabled\n\n"
+  font "\[value parent.font]"
+  size {{"(input.width + input.height)/100"}}
+  leading 0.2
+  xjustify center
+  yjustify top
+  box {{input.width/50} {box.x} {"input.width - box.x"} {"input.height - box.x"}}
+  color {{parent.warningColor} {parent.warningColor} {parent.warningColor} 1}
+  name Text1
+  label "\[basename \[value font]]"
+  note_font_color 0xffffffff
+  xpos -127
+  ypos 249
+ }
+ Dot {
+  name Dot184
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -93
+  ypos 304
+ }
+set N98d62400 [stack 0]
+ Dot {
+  name Dot187
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -203
+  ypos 304
+ }
+ Multiply {
+  channels rgb
+  value 0
+  name Multiply1
+  label "value: \[value value]"
+  xpos -237
+  ypos 376
+ }
+ Dilate {
+  channels alpha
+  size 4
+  name Dilate2
+  xpos -237
+  ypos 430
+ }
+push $N98d62400
+ Merge2 {
+  inputs 2
+  operation under
+  name Merge4
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -127
+  ypos 430
+ }
+ Dot {
+  name Dot186
+  xpos -93
+  ypos 544
+ }
+push $N98d09c00
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -313
+  ypos 352
+ }
+ Merge2 {
+  inputs 2
+  name Merge3
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -347
+  ypos 537
+ }
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -313
+  ypos 640
+ }
+ Switch {
+  inputs 2
+  which {{"parent.view== 1 ? (parent.warningLabel == 1? 0 : 1) : 1"}}
+  name Switch2
+  xpos -505
+  ypos 636
+ }
+ Output {
+  name Output1
+  xpos -505
+  ypos 837
+ }
+push $N8612a400
+ Dot {
+  name Dot23
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -824
+  ypos -1593
+ }
+ Blur {
+  channels none
+  name Blur1
+  label "DO NOT DELETE"
+  xpos -858
+  ypos -1506
+ }
+ NoOp {
+  inputs 0
+  name ParentsControl
+  knobChanged "node = nuke.thisNode()\nknob = nuke.thisKnob()\n\nparentControl = int(nuke.thisGroup().knob('parentControl').getValue())\n\n\nif knob.name() == \"parentControl\":\n    knobs = \['exposure', 'blackpoint', 'whitepoint', 'black', 'white', 'multiply', 'add', 'gamma', 'reverse', 'black_clamp', 'white_clamp', 'saturation']\n    \n    nuke.Undo.disable()\n\n    if parentControl == 1:\n        for name in knobs:\n            source_knob = node\[name]\n            backup_knob = node\[name + '_backup']\n\n            \n\n            if source_knob.isAnimated():\n                backup_knob.copyAnimations(source_knob.animations())\n                source_knob.clearAnimated()\n                source_knob.setExpression(f'\[value parentName].\{name\}')\n                \n            else:\n                \n                backup_knob.setValue(source_knob.getValue())\n                source_knob.setExpression(f'\[value parentName].\{name\}')\n                \n                \n#        # Making mode a child and backing up data & setting expression\n        mode_value = int(nuke.thisGroup().knob('mode').getValue())\n        node\['mode_backup'].setValue(mode_value)\n#        node\['mode'].setEnabled(False)\n#        node\['mode'].setExpression('\[value parentName].mode')\n#        \n#        # Making operations a child and backing up data & setting expression\n        operations = int(nuke.thisGroup().knob('operations').getValue())\n        node\['operations_backup'].setValue(operations)\n#        node\['operations'].setEnabled(False)\n#        parent = node\['parentName'].value()\n#        node\['operations'].setExpression('%s.operations' % parent)\n\n                \n        \n        # Handle channel separately\n        blur_node = nuke.thisGroup().node('Blur1')\n        parent_channel = nuke.thisGroup().knob('channels').value()\n        blur_node\['channels'].setValue(parent_channel)\n    \n\n\n\n            \n              \n        #knobs are being set back to parent status\n        group = nuke.thisGroup()\n\n        for name in knobs:\n            group.knob(name).setEnabled(False)\n        \n        group.knob('addKnobs').setEnabled(False)\n        group.knob('clear').setEnabled(False)\n        group.knob('tile_color').setValue(4281925887)\n        group.knob('presetLoad').setEnabled(False)\n        group.knob('load').setEnabled(False)\n        group.knob('reload').setEnabled(False)\n        group.knob('reloadClone').setEnabled(False)\n        \n        \n        group = nuke.thisGroup()\n        # Disable all knobs named \"knob\{number\}_\"\n        for knobName in group.knobs():\n            if knobName.startswith(\"knob\") and knobName.split(\"_\")\[0]\[4:].isdigit():\n                group.knob(knobName).setEnabled(False)\n            if knobName.endswith(\"_name\"):\n                group.knob(knobName).setEnabled(False)\n        \n\n\n    else:\n        for name in knobs:\n            source_knob = node\[name]\n            backup_knob = node\[name + '_backup']\n            \n            if backup_knob.isAnimated():\n                source_knob.clearAnimated()\n                source_knob.copyAnimations(backup_knob.animations())\n                backup_knob.clearAnimated()\n            else:\n                source_knob.clearAnimated()\n                source_knob.setValue(backup_knob.getValue())\n                \n        mode_value_backup = int(node\['mode_backup'].getValue())\n        node\['mode'].clearAnimated()\n        node\['mode'].setValue(mode_value_backup)\n        node\['mode_backup'].setValue(0)\n        node\['mode'].setEnabled(True)\n\n        operations_backup = int(node\['operations_backup'].getValue())\n        node\['operations'].clearAnimated()\n        node\['operations'].setValue(operations_backup)\n        node\['operations_backup'].setValue(0)\n        node\['operations'].setEnabled(True)\n              \n        \n            \n        group = nuke.thisGroup()\n\n        for name in knobs:\n            group.knob(name).setEnabled(True)\n\n        #locking knobs\n        group.knob('addKnobs').setEnabled(True)\n        group.knob('clear').setEnabled(True)\n        group.knob('tile_color').setValue(2057961471)\n        group.knob('presetLoad').setEnabled(True)\n        group.knob('load').setEnabled(True)\n        group.knob('reload').setEnabled(True)\n        group.knob('reloadClone').setEnabled(True)\n        \n        group = nuke.thisGroup()\n        \n        # Disable all knobs named \"knob\{number\}_\"\n        for knobName in group.knobs():\n            if knobName.startswith(\"knob\") and knobName.split(\"_\")\[0]\[4:].isdigit():\n                group.knob(knobName).setEnabled(True)\n            if knobName.endswith(\"_name\"):\n                group.knob(knobName).setEnabled(False)\n                \n                \n        # Restore channel from Blur1 and set Blur1's channel to \"none\"\n        blur_channel = nuke.thisGroup().node('Blur1').knob('channels').value()\n        nuke.thisGroup().knob('channels').clearAnimated()\n        nuke.thisGroup().knob('channels').setValue(blur_channel)\n        nuke.thisGroup().knob('channels').setEnabled(True)\n        nuke.thisGroup().node('Blur1').knob('channels').clearAnimated()\n        nuke.thisGroup().node('Blur1').knob('channels').setValue('none')\n        nuke.thisGroup().node('Blur1').knob('channels').setEnabled(True)\n\n\n    nuke.Undo.enable()"
+  xpos -1030
+  ypos -1497
+  addUserKnob {20 control l Control}
+  addUserKnob {4 parentControl l control M {Parent Child "" "" "" "" "" "" "" "" "" "" ""}}
+  addUserKnob {1 parentName l "parent name" t "The name of the Parent.\n\nThis can<b> ONLY</b> connected to another AOVGrade node."}
+  parentName "\[value parent.parentName]"
+  addUserKnob {26 ""}
+  addUserKnob {7 exposure R -5.68333 5.68333}
+  addUserKnob {26 ""}
+  addUserKnob {19 blackpoint R -1 1}
+  addUserKnob {6 blackpoint_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {19 whitepoint R 0 4}
+  whitepoint 1
+  addUserKnob {6 whitepoint_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {19 black l lift R -1 1}
+  addUserKnob {6 black_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {19 white l gain R 0 4}
+  white 1
+  addUserKnob {6 white_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {19 multiply R 0 4}
+  multiply 1
+  addUserKnob {6 multiply_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {19 add l offset R -1 1}
+  addUserKnob {6 add_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {19 gamma R 0.2 5}
+  gamma 1
+  addUserKnob {6 gamma_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {6 reverse +STARTLINE}
+  addUserKnob {6 black_clamp l "black clamp" -STARTLINE}
+  black_clamp true
+  addUserKnob {6 white_clamp l "white clamp" -STARTLINE}
+  addUserKnob {26 ""}
+  addUserKnob {7 saturation R 0 4}
+  saturation 1
+  addUserKnob {4 mode l "luminance math" M {"Rec 709" "Ccir 601" Average Maximum "" "" ""}}
+  addUserKnob {26 ""}
+  addUserKnob {4 operations M {"minus / plus" "divide / multiply" "" "" ""}}
+  addUserKnob {20 backup}
+  addUserKnob {26 space000 l "" +STARTLINE T "\t"}
+  addUserKnob {7 exposure_backup l "exposure backup" R -5.68333 5.68333}
+  addUserKnob {19 blackpoint_backup l "blackpoint backup" R -1 1}
+  blackpoint_backup {0 0 0 0}
+  addUserKnob {6 blackpoint_backup_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {19 whitepoint_backup l "whitepoint backup" R -1 1}
+  whitepoint_backup {1 1 1 1}
+  addUserKnob {6 whitepoint_backup_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {6 whitepointBackup_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {19 black_backup l "lift backup"}
+  black_backup {0 0 0 0}
+  addUserKnob {6 black_backup_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {6 blackBackup_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {19 white_backup l "gain backup" R 0 4}
+  white_backup {1 1 1 1}
+  addUserKnob {6 white_backup_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {6 whiteBackup_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {19 multiply_backup l "multiply backup" R 0 4}
+  multiply_backup {1 1 1 1}
+  addUserKnob {6 multiply_backup_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {6 multiplyBackup_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {19 add_backup l "offset backup" R -1 1}
+  add_backup {0 0 0 0}
+  addUserKnob {6 add_backup_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {6 addBackup_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {6 addbackup_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {19 gamma_backup l "gamma backup" R 0.2 4}
+  gamma_backup {1 1 1 1}
+  addUserKnob {6 gamma_backup_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {6 gammaBackup_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {6 reverse_backup l "reverse backup" +STARTLINE}
+  addUserKnob {6 black_clamp_backup l "black clamp backup" -STARTLINE}
+  black_clamp_backup true
+  addUserKnob {6 white_clamp_backup l "clamp white backup" -STARTLINE}
+  addUserKnob {26 ""}
+  addUserKnob {7 saturation_backup l "saturation backup"}
+  saturation_backup 1
+  addUserKnob {4 mode_backup l "luminance math" M {"Rec 709" "Ccir 601" Average Maximum "" "" ""}}
+  addUserKnob {26 ""}
+  addUserKnob {4 operations_backup l "operation backup" M {"minus / plus" "divide / multiply" "" "" "" "" ""}}
+  addUserKnob {1 your_string_knob l "Your String Knob"}
+ }
+end_group

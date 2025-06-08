@@ -1,0 +1,907 @@
+Group {
+ name NormalsRelight1
+ help "Matte is generated based on the selected direction on the normals."
+ tile_color 0x981d3cff
+ selected true
+ addUserKnob {20 normalsRelight l "Normals Relight"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION NormalsRelight
+ addUserKnob {1 operation l INVISIBLE +INVISIBLE}
+ operation "\[expr \{\[numvalue replace] ? \"\" : \"\[value operations]\" \}]"
+ addUserKnob {41 channels t "Select your normals channel that you want to use to generate a UV channel." T Shuffle1.in}
+ addUserKnob {41 out l output t "The effect is rendered into these output channels. \nIf you set this to something other than none, you can use the checkboxes on the right to select individual channels." T Merge2.Achannels}
+ addUserKnob {6 unpremultiply t "Divides the channels by its alpha." +STARTLINE}
+ addUserKnob {41 visualizeOutput l "visualize output" t "When enabled the generated matte will overlay the image based on the settings in the Visualize tab." -STARTLINE T visual.visualizeOutput}
+ addUserKnob {26 ""}
+ addUserKnob {4 operations l operation t "B is the incoming alpha layer.\nA is the generated matte.\n\n<b>• absminus abs(A-B) </b>- how much the pixels differ. \n\n<b>• b if not a A?A:B </b>- shows A wherever A exists; otherwise shows B. \n\n<b>• divide A/B, 0 if A<0 and B<0 </b>- divides the values but stops two negative values from becoming a positive number. \n\n<b>• from (B-A) </b>- subtracts A from B. \n\n<b>• in Ab </b>- only shows the areas of image A that overlap with the alpha of B. \n\n<b>• max (max(A,B)) </b>- selects the lighter of the two colors as the resulting color. Only areas darker than B are replaced, while areas lighter than B do not change. \n\n<b>• min (min(A,B)) </b>- selects the darker of the two colors as the resulting color. Any parts that are lighter than B are substituted. Any parts of the image that are darker than B don’t change. \n\n<b>• minus (A-B) </b>- subtracts B from A. \n\n<b>• multiply (AB, A if A<0 and B<0)</b> - multiplies A by B. The result is always darker. Blending with black gives black and with white returns the color unchanged. \n\n<b>• out A(1-b) </b>- only shows the areas of image A that do not overlap with the alpha of B. \n\n<b>• plus A+B </b>- the sum of the two colors. Increases brightness to lighten A and reflect B. \n\n<b>• stencil B(1-a) </b>- this is the reverse of the out operation. Only shows the areas of image B that do not overlap with the alpha of A. \n\n<b>• union A+B-AB </b>- shows both image A and B. \n\n<b>• xor A+B-2AB </b>- shows both image A and B where the images do not overlap." +DISABLED M {absminus "b if not a " "divide " from in max min minus multiply out plus stencil union xor "" ""}}
+ operations in
+ addUserKnob {41 replace t "When enabled, existing alpha channel is replaced with generated matte from this node.\n\nIf this is disabled you can use the operations to combine the generated matte and the previous coming alpha." -STARTLINE T menu.replace}
+ addUserKnob {4 math t "<b>• linear:</b> input normals are kept as it is.\n<b>• normalize:</b> turns the normals between 0-1\n<b>• symmetric:</b> turns the normals between -1-1" M {linear normalize symmetric "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+ addUserKnob {26 ""}
+ addUserKnob {41 picker t "Generates a matte based on the selected normal directions." T Controller.picker}
+ addUserKnob {4 falloff_type l falloff t "Applies a mathematic falloff to each pixel" M {linear smooth quadratic cubic "" "" "" "" "" "" "" "" "" ""}}
+ addUserKnob {26 space000 l "" +STARTLINE T "\t"}
+ addUserKnob {4 order l "rotation order" t "Specifies the order to apply Euler angles to the rotation." M {XYZ XZY YXZ YZX ZXY ZYX "" "" "" "" ""}}
+ order ZXY
+ addUserKnob {13 rotate t "Rotates the input channel on the X,Y,Z axis."}
+ addUserKnob {26 ""}
+ addUserKnob {7 gain t "Any pixels that are white are times by this value\n\n(pixel * gain)" R 0 4}
+ gain 1
+ addUserKnob {7 gamma t "Applies a constant gamma value to the result of the generated matte. This lightens or darkens the midtones." R 0 5}
+ gamma 1
+ addUserKnob {20 visualize l Visualize}
+ addUserKnob {6 picker_panelDropped l "panel dropped state" +HIDDEN +STARTLINE}
+ addUserKnob {6 color_rgb_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {41 visualizeOutput_1 l "visualize output" t "When enabled the generated matte will overlay the image based on the settings in the Visualize tab." T visual.visualizeOutput}
+ addUserKnob {18 newMatte l "new matte" t "Generated matte respresentation overlay in the viewport."}
+ newMatte {1 0 0}
+ addUserKnob {6 newMatte_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {18 oldMatte l "old matte" t "Incoming alpha respresentation overlay in the viewport.\n\nThis is only visible if \"replace\" is disbaled."}
+ oldMatte {0 1 0}
+ addUserKnob {6 oldMatte_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_rgb_1_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {7 visualizeMix l mix t "Dissolves between no visualize colour overlay on the image from 0 and 1 when visualize output is enabled.\n\n1 Being full effect"}
+ visualizeMix 0.5
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" t "Node version info, for more information look at version log" +STARTLINE T "<br><font size='5'>Normals Relight</font><font color=#981E47> v1.0</font>"}
+ addUserKnob {26 divider_001 l "" +STARTLINE}
+ addUserKnob {26 bulletpoints l "" t "Overview of the node" +STARTLINE T "<br><strong>•</strong><b> Normals Relight</b> generates a matte by<br>specifying normal direction from selection.\n<br><br>\n<b><a href=\"https://johntothvfx.com\" style=\"color:#981E47;\">John Toth © 2021</a></b><br>"}
+ addUserKnob {26 divider_002 l "" +STARTLINE}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#981E47\">Tool Demo</span></a>" t "Launches the web page where it will have more documentation or a video about the node." -STARTLINE +INVISIBLE T "nuke.message(\"coming soon\")"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#981E47\">Version Log</span></a>" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\n# Constants\nversion_number = \"1.0.0\"\ncontext = \"AOV\"\nmodified_date = \"6th August 2024\"\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- generates a UV pass using normals\n\"\"\"\nthank_you = \"thanks message here\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"</i>\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode1
+  tile_color 0x23232301
+  label "<center>Don't Touch\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  note_font_color 0xee453cff
+  xpos -1175
+  ypos 52
+  bdwidth 278
+  bdheight 340
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0xff9900ff
+  label "<center>Visualize Output\n<i><font size=1>(bottom section is to mimic ChannelMerge operations)\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 24
+  note_font_color 0xee453cff
+  xpos -1866
+  ypos 1965
+  bdwidth 592
+  bdheight 1182
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode4
+  tile_color 0x8e0e39ff
+  label "<center>Normals\n<i><font size=1>Relight\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 24
+  note_font_color 0xee453cff
+  xpos -1534
+  ypos 487
+  bdwidth 1045
+  bdheight 1227
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos -210
+  ypos -493
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -176
+  ypos -269
+ }
+set N373e1200 [stack 0]
+ Dot {
+  name Dot24
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -389
+  ypos -265
+ }
+set N373e1800 [stack 0]
+ Dot {
+  name Dot2
+  xpos -1387
+  ypos -264
+ }
+set N373e1e00 [stack 0]
+ Unpremult {
+  channels all
+  name Unpremult1
+  xpos -1421
+  ypos -157
+  disable {{!parent.unpremultiply}}
+ }
+ Shuffle {
+  in none
+  in2 rgba
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -1421
+  ypos -43
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -1387
+  ypos 153
+ }
+set N3237ce00 [stack 0]
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -1106
+  ypos 153
+ }
+ NoOp {
+  name Controller
+  xpos -1140
+  ypos 294
+  addUserKnob {20 menu}
+  addUserKnob {18 picker}
+  picker {0 0 0}
+  addUserKnob {6 picker_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {6 color_rgb_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ }
+ NoOp {
+  inputs 0
+  name visual
+  xpos -1030
+  ypos 199
+  addUserKnob {20 User}
+  addUserKnob {6 visualizeOutput l "visualize output" +STARTLINE}
+  visualizeOutput true
+ }
+ NoOp {
+  inputs 0
+  name menu
+  knobChanged "grp = nuke.thisGroup()\ntk = nuke.thisKnob()\n\nif tk.name() == \"replace\" and tk.value() == True:\n    grp.knob('operations').setEnabled(False)\n#    grp.knob('oldMatte').setEnabled(False)\n#    grp.knob('disable_inputMatte').setEnabled(False)\n\nelse:\n    grp.knob('operations').setEnabled(True)\n#    grp.knob('oldMatte').setEnabled(True)\n#    grp.knob('disable_inputMatte').setEnabled(True)\n"
+  xpos -1023
+  ypos 294
+  addUserKnob {20 User}
+  addUserKnob {6 replace +STARTLINE}
+  replace true
+ }
+push $N3237ce00
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -1387
+  ypos 618
+ }
+set N32384600 [stack 0]
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -886
+  ypos 618
+ }
+ Expression {
+  expr0 "parent.math == 1 ? (r + 1) / 2 : parent.math == 2 ? r * 2 - 1 : r"
+  expr1 "parent.math == 1 ? (g + 1) / 2 : parent.math == 2 ? g * 2 - 1 : g"
+  expr2 "parent.math == 1 ? (b + 1) / 2 : parent.math == 2 ? b * 2 - 1 : b"
+  name Expression4
+  label "normalize math\n"
+  xpos -920
+  ypos 683
+ }
+ Dot {
+  name Dot27
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -886
+  ypos 778
+ }
+set N32382200 [stack 0]
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -809
+  ypos 778
+ }
+set N32382800 [stack 0]
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -699
+  ypos 778
+ }
+set N32382e00 [stack 0]
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -589
+  ypos 778
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix7
+  label Z
+  xpos -623
+  ypos 851
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.z}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+    }
+  name ColorMatrix8
+  label Y
+  xpos -623
+  ypos 899
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.y}}
+ }
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name ColorMatrix9
+  label X
+  xpos -623
+  ypos 947
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.x}}
+ }
+push $N32382e00
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix22
+  label Z
+  xpos -733
+  ypos 851
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.z}}
+ }
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name ColorMatrix23
+  label X
+  xpos -733
+  ypos 899
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.x}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+    }
+  name ColorMatrix24
+  label Y
+  xpos -733
+  ypos 947
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.y}}
+ }
+push $N32382800
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+    }
+  name ColorMatrix25
+  label Y
+  xpos -843
+  ypos 851
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.y}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix26
+  label Z
+  xpos -843
+  ypos 899
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.z}}
+ }
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name ColorMatrix27
+  label X
+  xpos -843
+  ypos 947
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.x}}
+ }
+push $N32382200
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -961
+  ypos 778
+ }
+set N37df8e00 [stack 0]
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+    }
+  name ColorMatrix28
+  label Y
+  xpos -995
+  ypos 851
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.y}}
+ }
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name ColorMatrix29
+  label X
+  xpos -995
+  ypos 899
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.x}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix30
+  label Z
+  xpos -995
+  ypos 947
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.z}}
+ }
+push $N37df8e00
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -1071
+  ypos 778
+ }
+set N37dfa600 [stack 0]
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name ColorMatrix31
+  label X
+  xpos -1105
+  ypos 851
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.x}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix32
+  label Z
+  xpos -1105
+  ypos 899
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.z}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+    }
+  name ColorMatrix33
+  label Y
+  xpos -1105
+  ypos 947
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.y}}
+ }
+push $N37dfa600
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -1170
+  ypos 778
+ }
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name ColorMatrix34
+  label X
+  xpos -1204
+  ypos 851
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.x}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+    }
+  name ColorMatrix35
+  label Y
+  xpos -1204
+  ypos 899
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.y}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix36
+  label Z
+  xpos -1204
+  ypos 947
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.z}}
+ }
+ Switch {
+  inputs 6
+  which {{parent.order}}
+  name Switch2
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  xpos -920
+  ypos 1115
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -886
+  ypos 1242
+ }
+push $N32384600
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha black
+  name Shuffle3
+  tile_color 0x222222ff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -1421
+  ypos 677
+ }
+ Add {
+  channels rgb
+  value {{parent.picker} {parent.picker} {parent.picker} 0}
+  name Add1
+  label picker
+  xpos -1421
+  ypos 831
+ }
+ Expression {
+  expr0 "fmod( r+1 , 2 ) -1"
+  expr1 "fmod( g+1 , 2 ) -1"
+  expr2 "fmod( b+1 , 2 ) -1"
+  name Expression8
+  xpos -1421
+  ypos 903
+ }
+ Expression {
+  expr0 "parent.math == 1 ? (r + 1) / 2 : parent.math == 2 ? r * 2 - 1 : r"
+  expr1 "parent.math == 1 ? (g + 1) / 2 : parent.math == 2 ? g * 2 - 1 : g"
+  expr2 "parent.math == 1 ? (b + 1) / 2 : parent.math == 2 ? b * 2 - 1 : b"
+  name Expression2
+  label "normalize math\n"
+  xpos -1421
+  ypos 971
+ }
+ MergeExpression {
+  inputs 2
+  temp_name0 dot
+  temp_expr0 "A.r*B.r + A.g*B.g + A.b*B.b"
+  temp_name1 u
+  temp_expr1 "sqrt(pow2(A.r) + pow2(A.g) +pow2(A.b))"
+  temp_name2 v
+  temp_expr2 "sqrt(pow2(B.r) + pow2(B.g) +pow2(B.b))"
+  channel0 rgba
+  expr0 "1-sqrt(pow2(A.r-B.r) + pow2(A.g-B.g) + pow2(A.b-B.b))/2"
+  channel1 none
+  expr1 degrees(dot/(u*v))
+  channel2 none
+  channel3 none
+  name MergeExpression2
+  xpos -1421
+  ypos 1239
+ }
+ Expression {
+  expr0 isnan(r)?0:r
+  expr1 isnan(g)?0:g
+  expr2 isnan(b)?0:b
+  expr3 isnan(a)?0:a
+  name Expression25
+  label "nan to black (0)"
+  xpos -1421
+  ypos 1331
+ }
+ Expression {
+  expr0 isinf(r)?0:r
+  expr1 isinf(g)?0:g
+  expr2 isinf(b)?0:b
+  expr3 isinf(a)?0:a
+  name Expression5
+  label "inf to black (0)"
+  xpos -1421
+  ypos 1363
+ }
+ Expression {
+  temp_name0 falloff_math
+  temp_expr0 "alpha * (1/ clamp( 1 ,0.00001,2) )"
+  expr3 "parent.falloff_type == 0 ? falloff_math : parent.falloff_type == 1 ? smoothstep( 0 , 1 , falloff_math ) : parent.falloff_type == 2 ? clamp( pow2 ( falloff_math ) ) : parent.falloff_type == 3 ? clamp( falloff_math ** 3 ) : pow( 1 - pow( 1 - falloff_math , 1 ) , 1 )"
+  name Expression10
+  label Falloff
+  xpos -1421
+  ypos 1451
+ }
+ Grade {
+  channels rgba
+  white {{parent.gain}}
+  gamma {{"parent.gamma + 0.000001"}}
+  white_clamp true
+  name Grade3
+  xpos -1421
+  ypos 1542
+ }
+ Clamp {
+  channels rgba
+  name Clamp3
+  label "\[expr \{\[value minimum_enable]? \"\[value minimum] min\" : \"\"\}]\[expr \{\[value minimum_enable] && \[value maximum_enable]? \"\n\" : \"\"\}]\[expr \{\[value maximum_enable]? \"\[value maximum] max\" : \"\"\}]"
+  xpos -1421
+  ypos 1566
+ }
+ Dot {
+  name Dot19
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -1387
+  ypos 1842
+ }
+set N3238f800 [stack 0]
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle4
+  tile_color 0xffffffff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -1421
+  ypos 2167
+ }
+ Grade {
+  multiply {{parent.newMatte} {parent.newMatte} {parent.newMatte} 1}
+  white_clamp true
+  name Grade4
+  label "position matte"
+  xpos -1421
+  ypos 2270
+ }
+ Dot {
+  name Dot20
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -1387
+  ypos 2541
+ }
+set N32393400 [stack 0]
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -1387
+  ypos 2922
+ }
+set N32393a00 [stack 0]
+ Dot {
+  name Dot25
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -1387
+  ypos 3018
+ }
+push $N32393a00
+push $N32393400
+ Dot {
+  name Dot23
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -1497
+  ypos 2541
+ }
+ Expression {
+  channel0 none
+  channel1 none
+  channel2 none
+  channel3 alpha
+  expr3 "a>0.0000001? 1:0"
+  name Hard_Alpha1
+  tile_color 0xffffffff
+  xpos -1531
+  ypos 2579
+  disable {{"parent.operations == 1 ? 0 : 1"}}
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle9
+  tile_color 0xbbbbbbff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -1531
+  ypos 2623
+  disable {{"parent.operations == 0 ? 0 : parent.operations == 3 ? 0 : parent.operations == 6 ? 0 : parent.operations == 7 ? 0 : 1"}}
+ }
+ Grade {
+  multiply {{parent.oldMatte} {parent.oldMatte} {parent.oldMatte} 1}
+  white_clamp true
+  name Grade1
+  label "input matte"
+  xpos -1531
+  ypos 2699
+  disable {{"parent.operations == 0 ? 0 : parent.operations == 3 ? 0 : parent.operations == 6 ? 0 : parent.operations == 7 ? 0 : 1"}}
+ }
+ Dot {
+  name Dot22
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -1497
+  ypos 2829
+ }
+push $N373e1e00
+ Dot {
+  name Dot26
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -1766
+  ypos -264
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle5
+  tile_color 0xffffffff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -1800
+  ypos 2170
+ }
+ Grade {
+  multiply {{parent.oldMatte} {parent.oldMatte} {parent.oldMatte} 1}
+  white_clamp true
+  name Grade2
+  label "input matte"
+  xpos -1800
+  ypos 2273
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle8
+  tile_color 0xbbbbbbff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -1800
+  ypos 2626
+  disable {{"parent.operations == 8 ? 0 : 1"}}
+ }
+ Grade {
+  multiply {{parent.newMatte} {parent.newMatte} {parent.newMatte} 1}
+  white_clamp true
+  name Grade5
+  label "position matte"
+  xpos -1800
+  ypos 2702
+  disable {{"parent.operations == 8 ? 0 : 1"}}
+ }
+ Merge2 {
+  inputs 2
+  operation {{"parent.operations == 0 ? 6 : parent.operations == 1 ? 27 : parent.operations == 2 ? 8 : parent.operations == 3 ? 10 : parent.operations == 4 ? 14 : parent.operations == 5 ? 17 : parent.operations == 6 ? 18 : parent.operations == 7 ? 19 : parent.operations == 8 ? 20 : parent.operations == 9? 21 : parent.operations == 10? 24 : parent.operations == 11? 27 : parent.operations == 12? 22 : parent.operations == 13? 29 : 22"}}
+  name Merge3
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -1800
+  ypos 2822
+ }
+ Merge2 {
+  inputs 2
+  name Merge4
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -1800
+  ypos 2915
+  disable {{"parent.operations == 1 ? 0 : 1"}}
+ }
+ Switch {
+  inputs 2
+  which {{parent.replace}}
+  name Switch3
+  label replace
+  xpos -1800
+  ypos 3011
+ }
+ Clamp {
+  channels rgb
+  maximum_enable false
+  name Clamp2
+  label "\[expr \{\[value minimum_enable]? \"\[value minimum] min\" : \"\"\}]\[expr \{\[value minimum_enable] && \[value maximum_enable]? \"\n\" : \"\"\}]\[expr \{\[value maximum_enable]? \"\[value maximum] max\" : \"\"\}]"
+  xpos -1800
+  ypos 3083
+ }
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -1766
+  ypos 3306
+ }
+push $N3238f800
+push $N373e1800
+ Shuffle {
+  in none
+  alpha black
+  out alpha
+  name Shuffle6
+  tile_color 0x111111ff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -423
+  ypos -91
+  disable {{!parent.replace}}
+ }
+ ChannelMerge {
+  inputs 2
+  operation {{"parent.replace == 1 ? 10 : parent.operations"}}
+  name ChannelMerge1
+  xpos -423
+  ypos 1830
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  out {{{parent.Merge2.Achannels}}}
+  name Shuffle2
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -423
+  ypos 2213
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -389
+  ypos 2418
+ }
+push $N373e1200
+ Merge2 {
+  inputs 2
+  operation copy
+  Achannels alpha
+  Bchannels none
+  output {{{Achannels}}}
+  name Merge2
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -210
+  ypos 2406
+  disable {{"\[string match -nocase \"none\" \[value Shuffle1.in] ] ? 1 : 0"}}
+ }
+ Dot {
+  name Dot21
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -178
+  ypos 3136
+ }
+set N323ab000 [stack 0]
+ Dot {
+  name Dot17
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -338
+  ypos 3136
+ }
+ Merge2 {
+  inputs 2
+  output rgb
+  mix {{parent.visualizeMix}}
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -372
+  ypos 3299
+ }
+ Dot {
+  name Dot18
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -338
+  ypos 3448
+ }
+push $N323ab000
+ Switch {
+  inputs 2
+  which {{parent.visualizeOutput}}
+  name Switch4
+  xpos -212
+  ypos 3445
+ }
+ Output {
+  name Output
+  xpos -212
+  ypos 3783
+ }
+end_group

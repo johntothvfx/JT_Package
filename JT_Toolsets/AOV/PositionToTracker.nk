@@ -1,0 +1,110 @@
+Group {
+ name PositionToTracker1
+ help "Converts selected points into tracking information."
+ onCreate "n = nuke.thisNode()\n\nif n.knob('useFormatInput').value() == 1:    \n    n\['format'].setEnabled(False)\nelse:\n    n\['format'].setEnabled(True)\n\nnuke.thisNode().knob('get_viewer_frame_range').execute()\nnuke.thisNode().knob('onCreate').setValue(\"\")\n"
+ tile_color 0x119911ff
+ selected true
+ addUserKnob {20 positionToTracker l "Position To Tracker"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION PositionToAxis
+ addUserKnob {1 operation l INVISIBLE +INVISIBLE}
+ operation "\[expr \{\[numvalue number] ? \"\[value number]\" : \"\" \}]"
+ addUserKnob {41 channels t "Select the channel layer you wish to sample from" T Shuffle1.in}
+ addUserKnob {3 number l " " +DISABLED +INVISIBLE}
+ addUserKnob {22 lockToggle l lock/unlock -STARTLINE +INVISIBLE T "nuke.thisNode()\['number'].setEnabled( not nuke.thisNode()\['number'].enabled() )"}
+ addUserKnob {22 removeKnobs l remove -STARTLINE +INVISIBLE T "import re\n\ndef removeKnob(knob):\n    node = nuke.thisNode()\n    \n    match = re.search(r\"position_(\\d+)\", knob.name())\n    if not match:\n        return\n    \n    c = match.group(1)\n\n    # Remove knobs from the group node\n    for knobName, knobObj in list(node.knobs().items()):\n        if re.match(f\"position_\{c\}(_.*)?\", knobName):\n            node.removeKnob(knobObj)\n\n    # Check if there are any remaining position knobs in the group node\n    if not any(re.match(r\"position_\\d+\", k) for k in node.knobs()):\n        node.knob(\"divider03\").setVisible(False)\n        \n    # Update the number knob\n    num = node\['number'].value() - 1\n    if num < 0:\n        num = 0\n    node\['number'].setValue(num)\n    \n    # Remove the corresponding knobs from the Picker1 node\n    picker = nuke.toNode(\"Picker1\")\n    if picker:\n        for knobName, knobObj in list(picker.knobs().items()):\n            if re.match(f\"picker_color_\{c\}\", knobName):\n                picker.removeKnob(knobObj)\n\n"}
+ addUserKnob {26 ""}
+ addUserKnob {41 useFormatInput l "use input format" t "When enabled it will use the input formats to calculated width and height. If enabled it will use the format knobs information.\n" T menu.useFormatInput}
+ addUserKnob {17 format t "When the tracker is exported, the format will be used to determine the pixel location in 2D space.\n\nTo use this information you need to have \"use input format\" knob disabled." +DISABLED}
+ addUserKnob {3 first_frame l "frame range" t "The initial frame value will be used to set keyframes on the tracker node."}
+ first_frame 1
+ addUserKnob {3 last_frame l " -  " t "The final frame value will be used to set the concluding keyframes on the tracker node." -STARTLINE}
+ last_frame 100
+ addUserKnob {22 get_viewer_frame_range l "get viewers frame range" t "Grabs the viewers frame range and adds it to the first and last frame range knob." -STARTLINE T "n=nuke.thisNode()\ntry:\n    v=nuke.activeViewer().node()\nexcept:\n    nuke.message('No Viewer detected in the script.')\nelse:\n    fr=v\['frame_range'].value().split('-')\n    if not(v\['frame_range_lock'].value()):\n        fr=str(nuke.root().frameRange()).split('-')\n    \n    n\['first_frame'].setValue(int(fr\[0]))\n    n\['last_frame'].setValue(int(fr\[1]))\n\n"}
+ addUserKnob {3 subFrames l "sub frames" +INVISIBLE}
+ addUserKnob {26 ""}
+ addUserKnob {26 divider03 l "" +STARTLINE +HIDDEN}
+ addUserKnob {22 add t "add a new dynamic knob" T "import nuke\n\n# Code to get the existing Picker1 node inside the group\ndef getOrCreatePicker():\n    node = nuke.thisGroup()\n    \n    with node:\n        try:\n            picker = nuke.toNode(\"Picker1\")\n            if not picker:\n                nuke.message(\"Picker1 node not found inside the group.\")\n                return None\n            return picker\n        except Exception as e:\n            nuke.message(f\"Error: \{e\}\")\n            return None\n\n# Code for removing knobs\nRemoveKnobCode = \"\"\"nuke.thisNode().knob(\"removeKnobs\").execute(); removeKnob(nuke.thisKnob())\"\"\"\n\n# Main function to add knobs\ndef addKnob():\n    node = nuke.thisNode()\n\n    index = node\['number'].value() + 1\n    node\['number'].setValue(index)\n\n    index = \"01\"\n    while node.knob(f\"position_\{index\}\"):\n        index = str(int(index) + 1).zfill(2)\n\n    # Get the Picker1 node inside the group\n    picker = getOrCreatePicker()\n    if picker is None:\n        return\n\n    # Create the position Link_Knob and link it to the Picker1's Color_Knob\n    name_knob = nuke.Link_Knob(f\"position_\{index\}\", \" position \")\n    color_knob_name = f\"picker_color_\{index\}\"\n    \n    # Add the new Color_Knob to the Picker1 node if it doesn't exist\n    if not picker.knob(color_knob_name):\n        color_knob = nuke.Color_Knob(color_knob_name, f\"Picker Color \{index\}\")\n        picker.addKnob(color_knob)\n    \n    name_knob.setLink(f'Picker1.\{color_knob_name\}')\n    name_knob.setTooltip('A position point which will be tracked based on the camera movement')\n    name_knob.setFlag(nuke.STARTLINE)\n\n    # Spacer and remove button\n    space = nuke.Text_Knob(f\"position_\{index\}_space\", \"\")\n    space.setValue(\"   \")\n    space.clearFlag(nuke.STARTLINE)\n\n    remove_knob = nuke.PyScript_Knob(f\"position_\{index\}_remove\", \"remove\")\n    remove_knob.setValue(RemoveKnobCode)\n    remove_knob.setTooltip('Remove the dynamic \"position\" knob')\n    remove_knob.clearFlag(nuke.STARTLINE)\n\n    # Re-order the existing knobs\n    order_knobs = \[node.knob(k) for k in \[\"divider03\", \"add\", \"clear\", \"export\", \"info\", \"version\", \"divider04\", \"bulletpoints\", \"divider05\", \"demo\", \"log\"]]\n    for knob in order_knobs:\n        node.removeKnob(knob)\n\n    # Add the new knobs\n    for knob in \[name_knob, space, remove_knob]:\n        node.addKnob(knob)\n\n    # Re-add the previously removed knobs\n    for knob in order_knobs:\n        node.addKnob(knob)\n\n    # Finalize the knob setup\n    nuke.thisKnob().setFlag(0)\n    node.knob(\"divider03\").setVisible(True)\n\n# Call the function to add the knob\naddKnob()\n" +STARTLINE}
+ addUserKnob {22 clear l "clear all" t "removes all dynamic knobs" -STARTLINE T "def clearAllKnobs():\n    node = nuke.thisNode()\n    \n    import re\n    \n    for knobName, knob in node.knobs().items():\n        if re.match(r\"position_\\d*\", knobName):\n            node.removeKnob(knob)\n    \n    node.knob(\"divider03\").setVisible(False)\n    \n    picker = nuke.toNode(\"Picker1\")\n    if picker:\n        for knobName, knob in list(picker.knobs().items()):\n            if re.match(r\"picker_color_\\d*\", knobName):\n                picker.removeKnob(knob)\n\nclearAllKnobs()\n"}
+ addUserKnob {22 export l "   export   " t "Exports all dynamic point data from knobs into a tracker node, utilizing the specified camera/format for reference." -STARTLINE T "import nuke\nimport math\nimport re\n\ndef subRange(start, end, samples=0):\n    samples += 1\n    step = 1.0 / samples\n    rng = \[]\n    for i in range(int(start), int(end)):\n        rng.append(i)\n        for j in range(1, int(samples)):\n            rng.append(i + j * step)\n    rng.append(end)\n    return rng\n\ndef findC(cls='Camera', node=nuke.thisNode(), inp=1):\n    obj = node.input(inp)\n    if obj is None:\n        return False\n    if cls in obj.Class():\n        return obj\n    else:\n        return findC(cls, obj, 0)\n\ndef getCamWorldMatrix(camera, frame=nuke.frame()):\n    theMatrix = nuke.math.Matrix4()\n    tempMatrix = camera\['world_matrix'].getValueAt(frame)\n    for j in range(4):\n        for i in range(4):\n            theMatrix\[(j * 4 + i)] = tempMatrix\[i * 4 + j]\n    return theMatrix\n\ndef camPMatrix(cameraNode, theFrame, fmt):\n    # Get the camera's world matrix and invert it to get camera space\n    camMatrix = getCamWorldMatrix(cameraNode, theFrame)\n    camMatrix = camMatrix.inverse()\n\n    # Camera roll, scale, and translation\n    roll = float(cameraNode\['winroll'].getValueAt(theFrame))\n    scale_x, scale_y = \[float(v) for v in cameraNode\['win_scale'].getValueAt(theFrame)]\n    translate_x, translate_y = \[float(v) for v in cameraNode\['win_translate'].getValueAt(theFrame)]\n\n    # Apply roll, scaling, and translation to 2D window\n    focal_length = float(cameraNode\['focal'].getValueAt(theFrame))\n    h_aperture = float(cameraNode\['haperture'].getValueAt(theFrame))\n\n    # Projection calculation, more explicit approach\n    d = -fmt.width() * (focal_length / h_aperture)\n\n    return camMatrix, roll, scale_x, scale_y, translate_x, translate_y, d\n\ndef getScriptedTracks(theCamera):\n    theNode = nuke.thisNode()\n\n    # Check if \"useFormatInput\" is ticked\n    useFormatInput = theNode\['useFormatInput'].value()\n    if useFormatInput:\n        input_node = theNode.input(0)\n        if input_node:\n            theFormat = input_node.format()  # Get the format directly from input(0)\n        else:\n            nuke.message(\"Input 0 is missing. Using the current node's format.\")\n            theFormat = theNode\['format'].value()\n    else:\n        theFormat = theNode\['format'].value()\n\n    # Extract format information\n    formatWidth = theFormat.width()\n    formatHeight = theFormat.height()\n    pixelAspect = theFormat.pixelAspect()\n    halfFormatWidth = formatWidth * 0.5\n    halfFormatHeight = formatHeight * 0.5\n\n    # Get 3D knobs (modified to find position_\{number\})\n    knobNames = \[knob.name() for knob in theNode.allKnobs() if re.match(r\"position_\\d+\", knob.name()) and not re.search(r\"_(space|remove)\$\", knob.name())]\n\n    # Get frame range\n    startFrame = int(theNode\['first_frame'].value())\n    endFrame = int(theNode\['last_frame'].value())\n    subSamples = theNode\['subFrames'].value()\n    theFrameRange = subRange(startFrame, endFrame, subSamples)\n\n    # Generate data array\n    pointsData = \[]\n    for i in knobNames:\n        pointsData.append(\['\{curve ', '\{curve '])\n\n    # For each frame\n    for idx, frame in enumerate(theFrameRange):\n        # Get camera matrix and projection settings\n        camMatrix, roll, scale_x, scale_y, translate_x, translate_y, d = camPMatrix(theCamera, frame, theFormat)\n        \n        # For each point\n        for pidx, knob in enumerate(knobNames):\n            # Get point coordinates\n            point = theNode\[knob].valueAt(frame)\n            pointX, pointY, pointZ = point\[0], point\[1], point\[2]\n\n            # Convert to camera space\n            VW = nuke.math.Vector4(pointX, pointY, pointZ, 1.0)\n            VW = camMatrix * VW\n            pointX, pointY, pointZ = VW.x, VW.y, VW.z\n\n            # Projection to 2D screen space\n            ratio = d / pointZ\n            x = pointX * ratio\n            y = pointY * ratio\n\n            # Apply window translation and scaling\n            x = (x - (translate_x * halfFormatWidth)) / scale_x\n            y = (y - (translate_y * halfFormatWidth)) / scale_y\n\n            # Apply camera roll\n            srow = math.sin(math.radians(roll))\n            crow = math.cos(math.radians(roll))\n            X = crow * x - srow * y\n            Y = srow * x + crow * y\n\n            # Apply aspect ratio corrections and adjust for pixel aspect ratio\n            X += halfFormatWidth\n            Y = Y * pixelAspect + halfFormatHeight\n\n            # Add values to X, Y curves\n            pointsData\[pidx]\[0] += 'x\{\} \{\} '.format(frame, X)\n            pointsData\[pidx]\[1] += 'x\{\} \{\} '.format(frame, Y)\n\n    scriptString = \"\{ 1 31 \"\n    scriptString += str(len(knobNames))\n    scriptString += \" \} \\n\{ \{ 5 1 20 enable e 1 \} \\n\{ 3 1 75 name name 1 \} \\n\{ 2 1 58 track_x track_x 1 \} \\n\{ 2 1 58 track_y track_y 1 \} \\n\{ 2 1 63 offset_x offset_x 1 \} \\n\{ 2 1 63 offset_y offset_y 1 \} \\n\{ 4 1 27 T T 1 \} \\n\{ 4 1 27 R R 1 \} \\n\{ 4 1 27 S S 1 \} \\n\{ 2 0 45 error error 1 \} \\n\{ 1 1 0 error_min error_min 1 \} \\n\{ 1 1 0 error_max error_max 1 \} \\n\{ 1 1 0 pattern_x pattern_x 1 \} \\n\{ 1 1 0 pattern_y pattern_y 1 \} \\n\{ 1 1 0 pattern_r pattern_r 1 \} \\n\{ 1 1 0 pattern_t pattern_t 1 \} \\n\{ 1 1 0 search_x search_x 1 \} \\n\{ 1 1 0 search_y search_y 1 \} \\n\{ 1 1 0 search_r search_r 1 \} \\n\{ 1 1 0 search_t search_t 1 \} \\n\{ 2 1 0 key_track key_track 1 \} \\n\{ 2 1 0 key_search_x key_search_x 1 \} \\n\{ 2 1 0 key_search_y key_search_y 1 \} \\n\{ 2 1 0 key_search_r key_search_r 1 \} \\n\{ 2 1 0 key_search_t key_search_t 1 \} \\n\{ 2 1 0 key_track_x key_track_x 1 \} \\n\{ 2 1 0 key_track_y key_track_y 1 \} \\n\{ 2 1 0 key_track_r key_track_r 1 \} \\n\{ 2 1 0 key_track_t key_track_t 1 \} \\n\{ 2 1 0 key_centre_offset_x key_centre_offset_x 1 \} \\n\{ 2 1 0 key_centre_offset_y key_centre_offset_y 1 \} \\n\} \\n\{ \\n\"\n\n    startFrame = min(theFrameRange)\n    for pidx, knob in enumerate(knobNames):\n        pointsData\[pidx] = ' \{ \{curve K x' + str(startFrame) + ' 1\} \"' + knob + '\" ' + (pointsData\[pidx]\[0].rstrip() + '\} ') + (pointsData\[pidx]\[1].rstrip() + '\}')\n        pointsData\[pidx] += \" \{\}  \{\}  1 0 0 \{\}  0 0 0 0 0 0 0 0 0 0 \"\n        pointsData\[pidx] += (11 * (\"\{curve 0 x\" + str(startFrame) + \" 0\} \") + \"   \}\\n\")\n        scriptString += pointsData\[pidx]\n\n    scriptString += \"\} \\n\"\n    return scriptString\n\ndef createTracker(data, xpos, ypos):\n    with nuke.root():\n        trackNode = nuke.createNode('Tracker4', inpanel=False)\n        trackNode\['tracks'].fromScript(data)\n        trackNode.setXpos(xpos)\n        trackNode.setYpos(ypos)\n        trackNode.setInput(0, None)  # Disconnect the tracker from any input\n    return trackNode\n\ndef exportTracker():\n    node = nuke.thisNode()\n    \n    # Find the camera using input 1\n    camera = findC('Camera', node, 1)\n    if not camera:\n        nuke.message(\"No Camera found.\")\n        return\n\n    # Generate the track data using position_\{number\} knobs\n    trackData = getScriptedTracks(camera)\n\n    # Calculate positions for the new nodes\n    selected_node = nuke.thisNode()\n    xpos = selected_node.xpos() + 100\n    ypos = selected_node.ypos() + 100\n\n    # Create the tracker node with the generated data\n    tracker = createTracker(trackData, xpos, ypos)\n\nexportTracker()\n"}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" t "Node version info, for more information look at version log" +STARTLINE T "<br><font size='5'>Position To Tracker</font><font color=#119911> v1.0"}
+ addUserKnob {26 divider04 l "" +STARTLINE}
+ addUserKnob {26 bulletpoints l "" t "overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>Position To Tracker</b> Convert position data<br>into tracking information.\n<br><br><i> \n• Utilize the incoming channel data to select a<br>position point, and bake the tracking data using<br>a specified camera and point.\n\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#119911;\">John Toth <b>© 2024 <br>\n\n"}
+ addUserKnob {26 divider05 l "" +STARTLINE}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#119911\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message(\"Coming Soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#119911\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nversion_number = \"1.0.1\"\ncontext = \"AOV\"\nmodified_date = \"9th August 2024\"\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- converts position data into tracking information\n\"\"\"\nthank_you = \"Special Thanks to Daniel Velikov as the math from worldspace to screenspace (tracker) is his\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x23232301
+  label "<center>Don't Touch\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 24
+  note_font_color 0xee453cff
+  xpos -1157
+  ypos 219
+  bdwidth 239
+  bdheight 220
+ }
+ Input {
+  inputs 0
+  name Camera
+  label "\[value number]"
+  xpos -810
+  ypos 107
+  number 1
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos -916
+  ypos 107
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -882
+  ypos 282
+ }
+set N4a381800 [stack 0]
+ Output {
+  name Output
+  xpos -916
+  ypos 519
+ }
+push $N4a381800
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -992
+  ypos 282
+ }
+ Shuffle {
+  in none
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -1026
+  ypos 317
+ }
+ NoOp {
+  name Picker1
+  xpos -1026
+  ypos 375
+  addUserKnob {20 picker l Picker}
+ }
+ NoOp {
+  inputs 0
+  name menu
+  knobChanged "grp = nuke.thisGroup()\ntk = nuke.thisKnob()\n\nif tk.name() == \"useFormatInput\" and tk.value() == True:\n    grp.knob('format').setEnabled(False)\nelse:\n    grp.knob('format').setEnabled(True)\n"
+  xpos -1140
+  ypos 327
+  addUserKnob {20 User}
+  addUserKnob {6 useFormatInput l "use input format" +STARTLINE}
+  useFormatInput true
+ }
+end_group
