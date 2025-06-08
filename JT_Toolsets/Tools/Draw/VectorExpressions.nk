@@ -1,0 +1,152 @@
+Group {
+ inputs 0
+ name VectorExpressions1
+ onCreate "def onCreate_center():\n    n = nuke.thisGroup()\n    # Replace knob name\n    knob_name = 'center'\n    n\[knob_name].setValue((n.width() * 0.5, n.height() * 0.5))\n\n# Execute the onCreate_center function\nonCreate_center()\n\n# Clean up the onCreate knob\ndef clean_up_onCreate_knob():\n    on_create_knob = nuke.thisNode().knob('onCreate')\n    script = on_create_knob.value()\n    # Find the line with 'def onCreate_center()' and remove everything below it\n    lines = script.split('\\n')\n    cleaned_lines = \[]\n    for line in lines:\n        if 'def onCreate_center()' in line:\n            break\n        cleaned_lines.append(line)\n    cleaned_script = '\\n'.join(cleaned_lines)\n    on_create_knob.setValue(cleaned_script)\n\n# Call the clean-up function\nclean_up_onCreate_knob()"
+ selected true
+ postage_stamp true
+ addUserKnob {20 vectorExpressions l "Vector Expressions"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION VectorExpressions
+ addUserKnob {41 format t "Sets the vectors format. You can select a preset format or create a custom size using the new or edit options." T Constant1.format}
+ addUserKnob {26 ""}
+ addUserKnob {41 operation t "Generates directional vectors:\n\n- directional\n- radial\n- hyberbolic\n- zoom\n" T menu.operation}
+ addUserKnob {7 angle t "This is the angle of the direct vectors for \"directional\" option." +HIDDEN R -180 180}
+ addUserKnob {12 center t "Center point generated vectors:\n\n- radial\n- hyberbolic\n- zoom"}
+ addUserKnob {26 ""}
+ addUserKnob {22 export t "Exports a Copy/VectorBlur setup, ready for the artists to start adding directional Blurs to there image." T "import nuke\n\nn = nuke.thisNode()\nnuke.root().end()  # Ensure creation is outside any group\n\nx_pos = n.xpos()\ny_pos = n.ypos()\n\n# Create Dot node\ndot = nuke.nodes.Dot()\ndot.setInput(0, n)\ndot.setXpos(int(x_pos + (n.screenWidth() / 2) - (dot.screenWidth() / 2)))\ndot.setYpos(int(y_pos + n.screenHeight() + 150))\n\n# Create Copy node\ncopy = nuke.nodes.Copy()\ncopy\['from0'].setValue('rgba.red')\ncopy\['from1'].setValue('rgba.green')\ncopy\['to0'].setValue('forward.u')\ncopy\['to1'].setValue('forward.v')\n\n# Set Copy node position so its center aligns with the Dot node's center\ncopy.setXpos(int(dot.xpos() + 150))\ncopy.setYpos(int(dot.ypos() + (dot.screenHeight() / 2) - (copy.screenHeight() / 2)))\n\n# Connect Copy node inputs\ncopy.setInput(0, None)\ncopy.setInput(1, dot)\n\n# Create VectorBlur node\nvector_blur = nuke.nodes.VectorBlur()\nvector_blur\['uv'].setValue('forward')\nvector_blur\['scale'].setValue(10)\n\n# Set VectorBlur node position slightly below the Copy node\nvector_blur.setXpos(copy.xpos())\nvector_blur.setYpos(copy.ypos() + copy.screenHeight() + 50)  # 50 units below the Copy node\n\n# Connect VectorBlur node input\nvector_blur.setInput(0, copy)\n" +STARTLINE}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" t "Node version info, for more information look at version log" +STARTLINE T "<br><font size='5'>Vector Expressions</font><font color=#747474> v1.0</font>"}
+ addUserKnob {26 divider_001 l "" +STARTLINE}
+ addUserKnob {26 bulletpoints l "" t "Overview of the node" +STARTLINE T "<br><strong>•</strong><b>Vector Expressions</b> are generated based<br>on the operation. These operations are based<br>on directions.\n<br><br>\n<b><a href=\"https://johntothvfx.com\" style=\"color:#747474;\">John Toth © 2024</a></b><br>"}
+ addUserKnob {26 divider_002 l "" +STARTLINE}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#747474\">Tool Demo</span></a>" t "Launches the web page where it will have more documentation or a video about the node." -STARTLINE +INVISIBLE T "nuke.message(\"coming soon\")"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#747474\">Version Log</span></a>" t "Contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "version_number = \"1.0.0\"\ncontext = \"Draw\"\nmodified_date = \"25th November 2024\"\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='website linke here'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- generates directional vectors\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"</i>\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}
+ Constant {
+  inputs 0
+  channels none
+  name Constant1
+  label "(\[lindex \[split \[value format] ] end])"
+  xpos 240
+  ypos -421
+ }
+ Remove {
+  channels rgb
+  name Remove1
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 240
+  ypos -277
+ }
+ NoOp {
+  name menu
+  knobChanged "grp = nuke.thisGroup()\nk = nuke.thisKnob()\n\ndirectional = \['angle']\npoint = \['center']\n\nif k.name() in ('operation', 'showPanel'):\n    CONTROLS_type = grp\['operation'].value()\n    \n    if CONTROLS_type == 'directional':\n        for i in directional:\n            grp\[i].setVisible(True)\n        for i in point:\n            grp\[i].setVisible(False)\n            \n    elif CONTROLS_type in ('radial', 'hyperbolic', 'zoom'):\n        for i in directional:\n            grp\[i].setVisible(False)\n        for i in point:\n            grp\[i].setVisible(True)\n"
+  xpos 240
+  ypos -201
+  addUserKnob {20 User}
+  addUserKnob {4 operation M {directional radial hyberbolic zoom "" "" "" "" "" "" "" ""}}
+  operation radial
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 274
+  ypos -102
+ }
+set N59402400 [stack 0]
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 164
+  ypos -102
+ }
+set N59402c00 [stack 0]
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 54
+  ypos -102
+ }
+set N59404000 [stack 0]
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -56
+  ypos -102
+ }
+ Expression {
+  expr0 "(x - parent.center.x)/width * pixel_aspect"
+  expr1 "(y - parent.center.y)/height"
+  name Expression24
+  label "ZoomBlur\nVectors"
+  xpos -90
+  ypos -18
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -56
+  ypos 90
+ }
+push $N59404000
+ Expression {
+  expr0 "((y - parent.center.y)/height)"
+  expr1 "((x - parent.center.x)/width)"
+  name Expression23
+  label "Hyperbolic\nVectors"
+  xpos 20
+  ypos -18
+ }
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 54
+  ypos 90
+ }
+push $N59402c00
+ Expression {
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 "((y - parent.center.y) / height)"
+  channel1 {-rgba.red rgba.green -rgba.blue none}
+  expr1 "-((x - parent.center.x) / width) * pixel_aspect"
+  channel2 {-rgba.red -rgba.green rgba.blue none}
+  name Expression22
+  label "Radial\nVectors"
+  xpos 130
+  ypos -18
+ }
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 164
+  ypos 90
+ }
+push $N59402400
+ Expression {
+  expr0 "cos(parent.angle * PI / 180)"
+  expr1 "sin(parent.angle * PI / 180)"
+  name Expression21
+  label "Directional\nVectors"
+  xpos 240
+  ypos -18
+ }
+ Switch {
+  inputs 4
+  which {{parent.operation}}
+  name Switch1
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  xpos 240
+  ypos 203
+ }
+ Output {
+  name Output
+  xpos 240
+  ypos 327
+ }
+end_group

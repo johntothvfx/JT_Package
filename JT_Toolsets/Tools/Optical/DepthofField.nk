@@ -1,0 +1,1281 @@
+Group {
+ name DepthOfField1
+ help "This tool simulates realistic Depth of Field (DOF) using either traditional ZDefocus or a physically-based Bokeh model. It supports deep input, real-world lens metadata, and customizable defocus control through axis or picker sampling."
+ tile_color 0x31406bff
+ selected true
+ addUserKnob {20 DepthOfField l "Depth of Field"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION DepthOfField
+ addUserKnob {41 channels t "The effect is only applied to these channels. \nIf you set this to something other than all or none, you can use the checkboxes on the right to select individual channels." T Bokeh1.bokehChannels}
+ addUserKnob {41 depthChannel l "depth channel" t "The channel used for determining depth in the image (e.g., depth.Z)." T Bokeh1.depthChannel}
+ addUserKnob {41 node t "Choose the node model to defocus the input image:\n• Bokeh\n• ZDefocus\n" T Menu.node}
+ addUserKnob {22 toggleDeep l "use deep" t "Enable this to use deep data from the input if available.\nWhen enabled, the node exposes a separate deep input.\nYou don’t need to connect a 2D input for the deep input to function — it works independently." -STARTLINE T "import nuke\n\ndef toggleDeep():\n    node = nuke.thisNode()\n    knob = node.knob(\"toggleDeep\")\n\n    # Set label\n    labels = \[\"stop using deep\", \"use deep\"]\n    mode = int(knob.label() == labels\[1])\n    knob.setLabel(labels\[1 - mode])\n\n    inputName = \"deep\"\n    groupNode = nuke.thisGroup()  # Get the group node\n\n    if mode:  # Create Input node\n        # Create input node\n        inputNode = nuke.nodes.Input()\n        inputNode.setName(inputName)\n        inputNode.knob(\"label\").setValue(\"\[value number]\")\n        inputNode.knob(\"xpos\").setValue(180)\n        inputNode.knob(\"ypos\").setValue(-1069)\n\n        # Connect to DeepInputDot1\n        inputDeepNode = nuke.toNode(\"DeepInputContainer\")\n        if inputDeepNode:\n            inputDeepNode.setInput(0, inputNode)\n\n        # Set 'deepInputStorage' knob to True on the 'menu' node inside the group\n        menuNode = groupNode.node(\"Menu\")  # Find the 'menu' node\n        if menuNode:\n            deepInputStorageKnob = menuNode.knob(\"deepInputStorage\")\n            if deepInputStorageKnob:\n                deepInputStorageKnob.setValue(1)     \n\n        # Disable RestoreDepth node\n        restoreDepthNode = groupNode.node(\"RestoreDepth\")\n        if restoreDepthNode:\n            restoreDepthNode.knob(\"disable\").setValue(1)  # Disable\n\n    else:  # Delete Input node\n        inputNode = nuke.toNode(inputName)\n        if inputNode:\n            groupNode.setInput(4, None)\n            nuke.delete(inputNode)\n\n        # Set 'deepInputStorage' knob to False on the 'menu' node inside the group\n        menuNode = groupNode.node(\"Menu\")  # Find the 'menu' node\n        if menuNode:\n            deepInputStorageKnob = menuNode.knob(\"deepInputStorage\")\n            if deepInputStorageKnob:\n                deepInputStorageKnob.setValue(0)\n\n        # Enable RestoreDepth node\n        restoreDepthNode = groupNode.node(\"RestoreDepth\")\n        if restoreDepthNode:\n            restoreDepthNode.knob(\"disable\").setValue(0)  # Enable\n\n# Run the function\ntoggleDeep()\n"}
+ addUserKnob {41 output_type l output t "<b>• defocus image: </b>Show the final result of the depth of field effect\n\n<b>• focal visualization: </b>focal-plane setup – Visualize depth-of-field (DOF) information in the RGB channels:\n<b><i>Red:</b></i> Areas closer to the camera than the focus plane.\n<b><i>Green:</b></i> In-focus areas (within depth of field of the focus plane).\n<b><i>Blue:</b></i> Areas further from the camera than the focus plane.\n\n<b>• filter shape: </b> – Show the shape of the filter kernel." T OutputOptions.output_type}
+ addUserKnob {41 focalVisualMix l "focal visual mix" +HIDDEN T OutputOptions.focalVisualMix}
+ addUserKnob {26 ""}
+ addUserKnob {41 gpuName l "Local GPU: " t "This is the GPU that will be used for rendering, when <b>Use GPU if available</b> is selected.\n\nIf you have more than one GPU in your machine, you can select a different <b>GPU Device</b> to use by editing your <b>Preferences</b>. (Note that selecting a different GPU will require a restart of Nuke to take effect.)\n\n<b>Local GPU</b> will be shown as <b>Not available</b> when any of the following is true:\n* <b>Use CPU</b> is selected as the <b>GPU Device</b> in your <b>Preferences</b>.\n* No suitable GPU was found on your system. Please refer to the documentation for details of the requirements for GPU acceleration.\n* It was not possible to create a context for processing on the selected GPU. For example, this can happen when there is not enough free memory available on the GPU.\n\nTo use the GPU when rendering from the command line, add <b>--gpu</b> to your command.\n" T GPU.gpuName}
+ addUserKnob {6 useGPUIfAvailable l "Use GPU if available" t "\nSelect this to render on the <b>Local GPU</b>, if available.\n\nYou can select this even if no GPU is currently available on your machine. The GPU will then be used whenever the script is opened on a machine which does have a GPU available. You should also select this if you wish to render from the command line with the <b>--gpu</b> option.\n\nIf this node requires full frames from its inputs, and is therefore unable to reduce its memory overhead, it will fall back to the CPU if an attempt to render a frame on the GPU fails due to lack of memory. When this occurs, a warning message will be printed to the console.\n" +STARTLINE}
+ useGPUIfAvailable true
+ addUserKnob {26 ""}
+ addUserKnob {20 lensData l "Lens Data"}
+ addUserKnob {4 cameraFrom l "camera from" +INVISIBLE M {input name ""}}
+ addUserKnob {1 cameraName l "" -STARTLINE +INVISIBLE}
+ addUserKnob {4 axisFrom l "axis from" +INVISIBLE M {input name ""}}
+ addUserKnob {1 axisName l "" -STARTLINE +INVISIBLE}
+ addUserKnob {26 ""}
+ addUserKnob {4 units t "Select the measurement unit used for all physical lens parameters (e.g. meters, centimeters, millimeters). This should match the units used by your CG renderer — most pipelines export in meters/decimeters by default." M {".001\tmillimeter" "0.01\tcentimeter" ".254\tinch" "0.3048\tfeet" "0.1\tdecimeter" "1\tmeter" "1000\tkilometer" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+ units 0.1
+ addUserKnob {26 ""}
+ addUserKnob {41 focus l "focus picker" +HIDDEN T DepthSampler1.focus}
+ addUserKnob {41 focal_plane_mode l "focal plane" t "Controls the distance from the camera at which objects appear in perfect focus. This value defines the central depth of field plane and can be sourced from the following modes:\n\n<b>• manual: </b>freely slide or expression-link this value as needed. Ideal for creative control or automation.\n<b>• plate: </b>pulls focus distance from lens metadata via the Plate Focus tab’s calibration.\n<b>• camera: </b>uses the actual focus value from the input render camera.\n<b>•axis: </b>calculates the distance from the camera to a selected 3D Axis in the scene.\n<b>• picker: </b>lets you select a pixel in the image to drive focus based on its depth, using the DepthSampler." T Lens.focal_plane_mode}
+ addUserKnob {41 focal_plane l "  " t "Focal plane value, this autmatically changes depending on the focal plane mode you have selected" -STARTLINE T Lens.focal_plane}
+ addUserKnob {41 fstop_mode l fstop t "Controls the aperture size, which affects the strength of the blur.\nSmaller values result in stronger depth of field.\n\n<b>• manual:</b> freely slide or expression-link this value as needed. Ideal for creative control or automation.\n<b>• plate:</b> reads fstop from the plate’s metadata via the Plate Focus tab’s calibration.\n<b>• camera:</b> uses the f-stop from the  camera input." T Lens.fstop_mode}
+ addUserKnob {41 fstop l "  " t "Fstop value, this autmatically changes depending on the Fstop mode you have selected" -STARTLINE T Lens.fstop}
+ addUserKnob {41 focal_length_mode l "focal length" t "Sets the lens’s focal length, impacting field of view and DOF.\n\n<b>• manual:</b> freely slide or expression-link this value as needed. Ideal for creative control or automation.\n<b>• plate:</b> reads focal length from the plate’s metadata via the Plate Focus tab’s calibration.\n<b>• camera:</b> pulls focal length from the input camera." T Lens.focal_length_mode}
+ addUserKnob {41 focal_length l "  " t "Focal length value, this autmatically changes depending on the focal length mode you have selected" -STARTLINE T Lens.focal_length}
+ addUserKnob {41 haperture_mode l haperture t "Define the horizontal aperture of the lens, affecting the overall blur shape and scale.\n\n<b>• manual:</b> freely slide or expression-link this value as needed. Ideal for creative control or automation.\n<b>• camera:</b> use the input camera’s physical haperture values." T Lens.haperture_mode}
+ addUserKnob {41 haperture l "  " t "Haperture value, this autmatically changes depending on the Haperture mode you have selected" -STARTLINE T Lens.haperture}
+ addUserKnob {41 vaperture_mode l vaperture t "Define the vertical aperture of the lens, affecting the overall blur shape and scale.\n\n<b>• manual:</b> freely slide or expression-link this value as needed. Ideal for creative control or automation.\n<b>• camera:</b> use the input camera’s physical haperture values." T Lens.vaperture_mode}
+ addUserKnob {41 vaperture l "  " t "Vaperture value, this autmatically changes depending on the Vaperture mode you have selected" -STARTLINE T Lens.vaperture}
+ addUserKnob {41 aspect_ratio_mode l "aspect ratio" t "Determines how blur is distributed across the image.\n\n<b>• manual:</b> freely slide or expression-link this value as needed. Ideal for creative control or automation.\n<b>• root:</b> use the projects root format’s pixel aspect ratio.\n<b>• plate:</b> pull aspect ratio from the Plate metadata." T Lens.aspect_ratio_mode}
+ addUserKnob {41 aspect_ratio l "  " t "Aspect ratio value, this autmatically changes depending on the aspect ratio mode you have selected" -STARTLINE T Lens.aspect_ratio}
+ addUserKnob {26 ""}
+ addUserKnob {7 front_multiplier l "front multiplier" t "Adjusts the strength of the blur in front of the focal plane. Higher values exaggerate foreground defocus." R 1 256}
+ front_multiplier 1
+ addUserKnob {7 back_multiplier l "back multiplier" t "Adjusts the strength of the blur behind the focal plane. Higher values exaggerate background defocus." R 1 256}
+ back_multiplier 1
+ addUserKnob {26 ""}
+ addUserKnob {14 overscan t "The number of extra pixels to calculate the defocus outside the image frame (left, right, top, and bottom). This is used mostly for the bokeh node." R 0 100}
+ addUserKnob {20 plateFocus l "Plate Focus"}
+ addUserKnob {26 "" +HIDDEN}
+ addUserKnob {6 deepTriggered -STARTLINE +HIDDEN}
+ deepTriggered true
+ addUserKnob {41 plateName l "plate name" t "The name of the plate node containing metadata. This is used to fetch lens and camera data from the image metadata. " T Plate.plateName}
+ addUserKnob {22 findPlate l "   find   " t "Finds the input named node in node graph for you by zooming into it." -STARTLINE T "n = nuke.thisNode()\n\n#make functions available\nn.knob(\"parentMessage\").execute()\n\nparentName = nuke.thisNode().knob('plateName').value()\n\nwith nuke.thisParent():\n    FindParent(parentName)"}
+ addUserKnob {22 clearPlateName l "   clear   " t "Clears the plate name and removes and clears the expression of all the metadata." -STARTLINE T "nuke.thisNode().knob(\"plateName\").setValue(\"\")\n\n\nn = nuke.thisNode()\n"}
+ addUserKnob {22 parentMessage l INVISIBLE -STARTLINE +INVISIBLE T "def FindParent(parentName):\n    \"\"\"\n    Jump to node in the nodegraph \n    \"\"\"\n    \n    if not parentName:\n        nuke.message('Missing plate name. Please enter one before proceeding.')\n        return\n        \n    parentNode = nuke.toNode(parentName)\n    if not parentNode:\n        nuke.message('No node named \{\}'.format(parentName))\n        return\n        \n    nuke.zoom( 2, \[parentNode.xpos(), parentNode.ypos()])"}
+ addUserKnob {26 ""}
+ addUserKnob {26 "" +HIDDEN}
+ addUserKnob {41 metadata_plate_focal l "metadata focal" t "The metadata path used to retrieve the focus distance from the plate (e.g. exr/FocusDistance). This value gets copied into the \"plate focal\" knob if available." T Plate.metadata_plate_focal}
+ addUserKnob {41 plate_focal l "plate focal" t "The resolved focus distance pulled from metadata, used as a fallback focus source in depth-of-field calculations." T Plate.plate_focal}
+ addUserKnob {41 metadata_plate_fstop l "metadata fstop" t "Metadata path used to retrieve the f-stop value from the plate image metadata." T Plate.metadata_plate_fstop}
+ addUserKnob {41 plate_fstop l "plate fstop" t "The extracted f-stop value from the metadata, used to calculate depth-of-field intensity." T Plate.plate_fstop}
+ addUserKnob {41 metadata_plate_focal_length l "metadata focal length" t "Path to the metadata entry that holds the lens focal length from the plate." T Plate.metadata_plate_focal_length}
+ addUserKnob {41 plate_focal_length l "plate focal length" t "The parsed focal length from the metadata, used as a substitute when using plate data for DOF calculations." T Plate.plate_focal_length}
+ addUserKnob {41 metadata_plate_aperture l "metadata aperture" t "Path to the metadata field containing the lens aperture (typically horizontal film gate size)." T Plate.metadata_plate_aperture}
+ addUserKnob {41 plate_aperture l "plate aperture" t "Value parsed from the metadata aperture field, used in conjunction with focal length and f-stop for blur computation." T Plate.plate_aperture}
+ addUserKnob {41 metadata_plate_pixel_aspect l "metadata pixel aspect" t "The metadata path pointing to the plate's pixel aspect ratio field (e.g. exr/aspect)." T Plate.metadata_plate_pixel_aspect}
+ addUserKnob {41 plate_pixel_aspect l "plate pixel aspect" t "Resolved pixel aspect ratio from metadata, used for correct distortion and aperture shape calculation." T Plate.plate_pixel_aspect}
+ addUserKnob {20 kernel l Kernel}
+ addUserKnob {41 filterType l "filter type" t "Select the shape used for the defocus blur kernel.\n<b>• input:</b> Uses the image connected to the Filter input as the custom blur shape.\n<b>• disc:</b> circular blur shape, ideal for basic lens simulations.\n<b>• bladed:</b> circular disc with simulated aperture blades, allowing for more realistic bokeh effects." T Kernel.filterType}
+ addUserKnob {26 ""}
+ addUserKnob {7 kernel_aspect_ratio l "aspect ratio" t "Stretches or squashes the blur kernel shape.\nUse this to simulate anamorphic lenses or stylized blur directions.\nAn aspect ratio above 1.0 elongates the blur horizontally; below 1.0 stretches it vertically.\n(This only works on the disc, bladed filter types)" R 0 2}
+ kernel_aspect_ratio 1
+ addUserKnob {7 kernel_softness l softness t "A higher value softens the shape, reducing hard edges and creating a more diffused bokeh effect.\nLower values produce a sharper, more defined blur shape.\n\n(This only works on the disc, bladed filter types)"}
+ kernel_softness 0.1
+ addUserKnob {26 ""}
+ addUserKnob {41 bladeCount l "blade count" +HIDDEN T Kernel.bladeCount}
+ addUserKnob {41 bladed_curve l "blade curve" +HIDDEN T Kernel.bladed_curve}
+ addUserKnob {20 zDefocus l ZDefocus}
+ addUserKnob {4 math t "Selects the method to interpret the Z-depth values.\n\n<b>• direct:</b> Uses the raw Z-depth values directly to control the blur amount.\nUseful when the depth channel already represents a proper blur distance without needing conversion.\n\n<b>• -direct:</b> Same as <b>direct</b>, but with the depth direction inverted.\nOften used when the Z-depth values are stored with occlusion flipped (e.g., further objects have smaller Z values)." M {direct -direct "" "" ""}}
+ addUserKnob {26 ""}
+ addUserKnob {7 blurClip l "blur clip" t "Limits the maximum blur applied to a pixel to avoid extreme values.\nHelpful for keeping defocus visually stable and preventing overly large kernels." R 0 100}
+ blurClip 100
+ addUserKnob {26 ""}
+ addUserKnob {7 layerCurve l "layer curve" t "Controls how blur is interpolated between depth layers.\nA higher value can create smoother transitions; lower values make sharper depth steps." R 0 5}
+ layerCurve 1
+ addUserKnob {26 ""}
+ addUserKnob {7 focal_front l "focal front" t "Expands the focus region in front of the focal plane.\nPixels within this distance from the focal plane will receive reduced blur." R 0 10}
+ addUserKnob {7 focal_back l "focal back" t "Expands the focus region behind the focal plane.\nHelps blend the in-focus zone into the background with more control." R 0 10}
+ addUserKnob {20 slices l Slices}
+ addUserKnob {41 number_of_slices l "number of slices" t "Specifies how many discrete layers the Z-depth is split into for defocus simulation.\nMore slices provide smoother transitions but increase processing time. Only available when automatic slicing is disabled." +DISABLED T Slices.number_of_slices}
+ addUserKnob {41 automatic_slicing l "automatic slicing" t "Enable this to automatically determine the optimal number of depth layers based on scene content and Z-range. Disabling allows manual control via the number of slices knob." -STARTLINE T Slices.automatic_slicing}
+ addUserKnob {26 ""}
+ addUserKnob {41 integrate_slices l "integrate slices" +INVISIBLE T Slices.integrate_slices}
+ addUserKnob {41 front_slice_offset l "front slice offset" +INVISIBLE T Slices.front_slice_offset}
+ addUserKnob {41 back_slice_offset l "back slice offset" +INVISIBLE T Slices.back_slice_offset}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Depthof Field</font><font color=#43527d> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br> \n<b>Depth of Field</b> This tool simulates realistic Depth of Field (DOF)<br>using either traditional ZDefocus or a physically-based Bokeh model.<br>It supports deep input, real-world lens metadata, and customizable <br>defocus control through axis or picker sampling. plane:<br>\n<br><i>\n• This node works with real world units\n<br>\n• Deep only works with Bokeh model\n\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#43527d\">John Toth <b>© 2021 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#31406b\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message(\"Coming Soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#31406b\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\n# Constants\nversion_number = \"1.0.0\"\ncontext = \"Optical\"\nmodified_date = \"24th March 2025\"\ndeveloper = \"John Toth © 2025\"\nsite = \"<a href='website linke here'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- simulates realistic depth of field using either bokeh or Zdefocus model.\n\"\"\"\nthank_you = \"\"\n\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n#    f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"</i>\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n\n# Display the message\nnuke.message(message)\n\n"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode1
+  tile_color 0x23232301
+  label "<center>Don't Touch\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  note_font_color 0xee453cff
+  xpos 1155
+  ypos -824
+  bdwidth 425
+  bdheight 410
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode13
+  tile_color 0x802380ff
+  label "<center><font size='5'></font>Convert Deep to Real world Depth\n</center><font size='1'>"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  note_font_color 0xffffffff
+  xpos 855
+  ypos 538
+  bdwidth 483
+  bdheight 1019
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x232323ff
+  label "<center><font size='5'></font><font color=#ee453c>Transfer Channels to Kernel\n</center><font size='1'>"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  xpos 2242
+  ypos 44
+  bdwidth 1017
+  bdheight 1749
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode3
+  tile_color 0x232323ff
+  label "<center><font size='5'></font><font color=#ee453c>Built in Kernels\n</center><font size='1'>"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  xpos 3482
+  ypos -728
+  bdwidth 654
+  bdheight 761
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode4
+  tile_color 0x1d574aff
+  label "<center><font size='5'></font>Calculation  Overscan\n</center><font size='1'>"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  note_font_color 0xff
+  xpos 37
+  ypos 2721
+  bdwidth 1605
+  bdheight 287
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode5
+  tile_color 0x1d574aff
+  label "<center><font size='5'></font>Calculation Overscan\n</center><font size='1'>"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  note_font_color 0xff
+  xpos 1172
+  ypos 5177
+  bdwidth 564
+  bdheight 256
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode6
+  tile_color 0x802380ff
+  label "<center><font size='5'></font>Manual focal point sampler\n</center><font size='1'>"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  note_font_color 0xffffffff
+  xpos 1004
+  ypos 1797
+  bdwidth 337
+  bdheight 459
+ }
+ Input {
+  inputs 0
+  name camera
+  label "\[value number]"
+  xpos 2490
+  ypos -1072
+  number 1
+ }
+ Axis2 {
+  name CameraInput
+  xpos 2500
+  ypos -993
+ }
+ Constant {
+  inputs 0
+  channels rgb
+  format "256 256 0 0 256 256 1 square_256"
+  name Constant1
+  xpos 3769
+  ypos -613
+ }
+ Flare {
+  position {{input.width/2} {input.height/2}}
+  radius {0 {"(radius.2 * (1 - parent.kernel_softness)) + (radius.0 * parent.kernel_softness)\n"} {"(input.width/2) - 2"}}
+  size_mult {{"\[expr \{\[value anamorph] > 1 ? 1.0 / \[value anamorph] : \[value anamorph]\}]\n"}}
+  anamorph {{1/parent.kernel_aspect_ratio}}
+  inner_color 1
+  corners {{parent.Kernel.bladeCount}}
+  flattening {{"parent.filterType == 1 ? 0 : \nparent.filterType == 2 ? 1 - parent.bladed_curve : 1"}}
+  sharpness 1
+  corners_angle 35
+  name Flare1
+  xpos 3769
+  ypos -445
+ }
+ Shuffle {
+  alpha red
+  name Shuffle6
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 3769
+  ypos -102
+ }
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3803
+  ypos 258
+ }
+ Input {
+  inputs 0
+  name filter
+  label "\[value number]"
+  xpos 3071
+  ypos -1076
+  number 3
+ }
+ Switch {
+  inputs 2
+  which {{clamp(parent.filterType)}}
+  name KernelSelect
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  xpos 3071
+  ypos 251
+ }
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3105
+  ypos 550
+ }
+set Nbca7e800 [stack 0]
+ Dot {
+  name Dot25
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3105
+  ypos 1370
+ }
+set Nbca7ee00 [stack 0]
+push $Nbca7e800
+ Dot {
+  name Dot19
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2930
+  ypos 550
+ }
+ Grade {
+  white 0.1
+  name Grade1
+  xpos 2896
+  ypos 652
+ }
+ Dot {
+  name Dot23
+  xpos 2930
+  ypos 738
+ }
+set N79b49400 [stack 0]
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle3
+  tile_color 0xeeeeeeff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 2896
+  ypos 810
+ }
+ Dot {
+  name Dot24
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2930
+  ypos 1111
+ }
+push $N79b49400
+ Dot {
+  name Dot18
+  xpos 2820
+  ypos 738
+ }
+set N79a53c00 [stack 0]
+ Shuffle {
+  red blue
+  green blue
+  alpha blue
+  name Shuffle4
+  tile_color 0x274d9cff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 2786
+  ypos 810
+ }
+ Dot {
+  name Dot22
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2820
+  ypos 1063
+ }
+push $N79a53c00
+ Dot {
+  name Dot16
+  xpos 2703
+  ypos 738
+ }
+set N79a57200 [stack 0]
+ Shuffle {
+  red green
+  blue green
+  alpha green
+  name Shuffle2
+  tile_color 0x2e9c27ff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 2669
+  ypos 810
+ }
+ Dot {
+  name Dot21
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2703
+  ypos 991
+ }
+push $N79a57200
+ Dot {
+  name Dot17
+  xpos 2593
+  ypos 738
+ }
+ Shuffle {
+  green red
+  blue red
+  alpha red
+  name Shuffle1
+  tile_color 0x9c2828ff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 2559
+  ypos 810
+ }
+ Dot {
+  name Dot20
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2593
+  ypos 919
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 1422
+  ypos -1073
+ }
+ NoOp {
+  name Menu
+  knobChanged "import nuke\n\ndef node():\n    \"\"\"\n    Runs when the 'node' knob changes:\n    - If 'node' == 'Bokeh': Creates 'deep' input inside the Group node.\n    - If 'node' == 'ZDefocus': Disconnects any node from 'deep' input before deleting it.\n    - Ensures 'toggleDeep' visibility is correctly handled.\n    - Adjusts 'RestoreDepth' disable knob based on deep input state.\n    \"\"\"\n\n    knob = nuke.thisKnob()  # Get the knob that triggered the event\n    if knob.name() != \"node\":\n        return  # Only execute if the 'node' knob was changed\n\n    grp = nuke.thisGroup()  # Get the parent Group node\n    if not grp:\n        nuke.warning(\"knobChanged(): No parent Group found! Aborting.\")\n        return\n\n    nodeType = grp.knob(\"node\").value()  # Get the selected value from 'node'\n\n    def disconnect_and_delete(node_name):\n        \"\"\"Disconnects all nodes from the given node before deleting it.\"\"\"\n        deep_node = grp.node(node_name)\n        if deep_node:\n            # **Find all nodes that use 'deep' as input and disconnect them**\n            for n in grp.nodes():\n                for i in range(n.inputs()):  # Check all input connections\n                    if n.input(i) == deep_node:\n                        n.setInput(i, None)\n                        print(f\"knobChanged(): Disconnected '\{n.name()\}' from '\{node_name\}'.\")\n            \n            # **Delete the 'deep' input node after disconnecting**\n            nuke.delete(deep_node)\n            print(f\"knobChanged(): Deleted '\{node_name\}'.\")\n\n    # Get 'RestoreDepth' node\n    restoreDepthNode = grp.node(\"RestoreDepth\")\n\n    if nodeType == \"Bokeh\":\n        # **SHOW 'toggleDeep' knob**\n        toggleDeepKnob = grp.knob(\"toggleDeep\")\n        if toggleDeepKnob:\n            toggleDeepKnob.setVisible(True)\n\n        # **Ensure a clean state by disconnecting and deleting 'deep' input first**\n        disconnect_and_delete(\"deep\")\n\n        # **Check if 'deepInputStorage' is 1 before creating a new 'deep' input**\n        storage = nuke.thisNode().knob(\"deepInputStorage\").getValue()\n        if storage == 1:\n            with grp:  # Ensures the node is created inside the Group\n                deepInput = nuke.createNode(\"Input\", inpanel=False)\n                deepInput.setName(\"deep\")\n                deepInput.knob(\"label\").setValue(\"\[value number]\")\n\n                # **Use fixed position**\n                deepInput.knob(\"xpos\").setValue(180)\n                deepInput.knob(\"ypos\").setValue(-1069)\n\n            # **Connect to 'DeepInputContainer' if it exists**\n            deepInputContainer = grp.node(\"DeepInputContainer\")\n            if deepInputContainer:\n                deepInputContainer.setInput(0, deepInput)\n            else:\n                nuke.warning(\"knobChanged(): DeepInputContainer not found. Input node was created but not connected.\")\n\n        # **Set 'RestoreDepth' disable value to match 'deepInputStorage'**\n        if restoreDepthNode:\n            restoreDepthNode.knob(\"disable\").setValue(storage)\n\n    elif nodeType == \"ZDefocus\":\n        # **HIDE 'toggleDeep' knob**\n        toggleDeepKnob = grp.knob(\"toggleDeep\")\n        if toggleDeepKnob:\n            toggleDeepKnob.setVisible(False)\n\n        # **Ensure Group's input slot is disconnected**\n        grp.setInput(4, None)\n\n        # **Disconnect and delete 'deep' input**\n        disconnect_and_delete(\"deep\")\n\n        # **Ensure 'RestoreDepth' is enabled (disable = 0)**\n        if restoreDepthNode:\n            restoreDepthNode.knob(\"disable\").setValue(0)\n\n# Automatically triggers when 'node' changes\nnode()\n"
+  tile_color 0x334468ff
+  label "(\[value node])"
+  xpos 1422
+  ypos -666
+  addUserKnob {20 menu}
+  addUserKnob {4 node M {Bokeh ZDefocus ""}}
+  addUserKnob {6 deepInputStorage l "deep input storage" -STARTLINE}
+  addUserKnob {22 bokeh l Bokeh T "import nuke\n\ndef bokeh():\n    \"\"\"\n    Called when the 'bokeh' button is clicked.\n    - Always deletes the existing 'deep' input first (to ensure a clean state).\n    - Creates 'deep' input inside the Group node only if deepInputStorage == 1.\n    - Shows the 'toggleDeep' knob inside the Group node.\n    - Connects 'deep' input to 'DeepInputContainer' if it exists.\n    \"\"\"\n    nuke.Undo.disable()  # Prevent undo clutter\n\n    grp = nuke.thisGroup()  # Get the parent Group node\n    if not grp:\n        nuke.warning(\"bokeh(): No parent Group found! Aborting.\")\n        nuke.Undo.enable()\n        return\n\n    # Get the value of 'deepInputStorage' directly from the NoOp node inside the Group\n    storage = nuke.thisNode().knob(\"deepInputStorage\").getValue()\n\n    # Ensure 'toggleDeep' knob is visible\n    toggleDeepKnob = grp.knob(\"toggleDeep\")\n    if toggleDeepKnob:\n        toggleDeepKnob.setVisible(True)\n\n    inputName = \"deep\"\n\n    # **Always delete 'deep' first to start fresh**\n    deepInput = grp.node(inputName)\n    if deepInput:\n        nuke.delete(deepInput)\n        print(\"bokeh(): Deleted existing 'deep' input to start fresh.\")\n\n    # **Only create 'deep' input if deepInputStorage is 1**\n    if storage == 1:\n        with grp:  # Ensures the node is created inside the Group\n            deepInput = nuke.createNode(\"Input\", inpanel=False)\n            deepInput.setName(inputName)\n            deepInput.knob(\"label\").setValue(\"\[value number]\")\n\n            # **Use the requested fixed position**\n            deepInput.knob(\"xpos\").setValue(180)\n            deepInput.knob(\"ypos\").setValue(-1069)\n\n        # Ensure Group's input slot is assigned correctly\n        if grp.input(1) is None:\n            grp.setInput(1, deepInput)\n\n        # Connect 'deep' input to 'DeepInputContainer' if it exists\n        deepInputContainer = grp.node(\"DeepInputContainer\")\n        if deepInputContainer:\n            deepInputContainer.setInput(0, deepInput)\n        else:\n            nuke.warning(\"bokeh(): DeepInputContainer not found. Input node was created but not connected.\")\n    \n    nuke.Undo.enable()  # Re-enable undo functionality\n\nbokeh()\n" +STARTLINE}
+  addUserKnob {22 zdefocus l ZDefocus -STARTLINE T "import nuke\n\ndef zdefocus():\n    \"\"\"\n    Called when the 'zdefocus' button is clicked.\n    - Deletes 'deep' input inside the Group node.\n    - Hides the 'toggleDeep' knob inside the Group node.\n    \"\"\"\n    nuke.Undo.disable()  # Prevent undo clutter\n\n    grp = nuke.thisGroup()  # Get the parent Group node\n\n    # Ensure 'toggleDeep' knob is hidden\n    if grp.knob(\"toggleDeep\"):\n        grp.knob(\"toggleDeep\").setVisible(False)\n\n    with grp:\n        deepInput = nuke.toNode(\"deep\")  # Look inside the group\n        if deepInput:\n            for i in range(deepInput.inputs()):  # Disconnect all inputs\n                deepInput.setInput(i, None)\n            nuke.delete(deepInput)  # Remove deep input\n\n    nuke.Undo.enable()  # Re-enable undo functionality\n\nzdefocus()\n"}
+ }
+ NoOp {
+  name Math
+  tile_color 0x334468ff
+  xpos 1422
+  ypos -634
+  addUserKnob {20 math l Math}
+  addUserKnob {7 units}
+  units {{"parent.units==0 ? 1 :\nparent.units==1 ? 10 :\nparent.units==2 ? 25.4 :\nparent.units==3 ? 304.8 :\nparent.units==4 ? 100 :\nparent.units==5 ? 1000 :\nparent.units==6 ? 1000000 :\n1\n"}}
+  addUserKnob {26 ""}
+  addUserKnob {7 focal_plane l "focal plane"}
+  focal_plane {{"parent.focal_plane_mode == 0 ? 0 : \nparent.focal_plane_mode == 1 ?  0 :\nparent.focal_plane_mode == 2 ?  \[expr \{\[numvalue parent.cameraFrom] ? \"\[value parent.cameraName].focal_point\" : \"\[topnode parent.input1].focal_point\" \}] :\nparent.focal_plane_mode == 3 ? distance_from_camera : 0"}}
+  addUserKnob {26 space000 l "" +STARTLINE T "\t"}
+  addUserKnob {26 cameraTitle l <b>Camera</b>}
+  addUserKnob {13 camera_position l "camera position"}
+  camera_position {{"\[expr \{\[numvalue parent.cameraFrom] ? \"\[value parent.cameraName].world_matrix.3\" : \"CameraInput.world_matrix.3\" \}]"} {"\[expr \{\[numvalue parent.cameraFrom] ? \"\[value parent.cameraName].world_matrix.7\" : \"CameraInput.world_matrix.7\" \}]"} {"\[expr \{\[numvalue parent.cameraFrom] ? \"\[value parent.cameraName].world_matrix.11\" : \"CameraInput.world_matrix.11\" \}]"}}
+  addUserKnob {7 camera_fstop l "camera fstop"}
+  camera_fstop {{"\[expr \{\[numvalue parent.cameraFrom] ? \"\[value parent.cameraName].fstop\" : \"\[topnode parent.input1].fstop\" \}]"}}
+  addUserKnob {7 camera_focal_length l "camera focal length"}
+  camera_focal_length {{"\[expr \{\[numvalue parent.cameraFrom] ? \"\[value parent.cameraName].focal\" : \"\[topnode parent.input1].focal\" \}]"}}
+  addUserKnob {7 coc}
+  coc {{"input.width / camera_haperture"}}
+  addUserKnob {26 space001 l "" +STARTLINE T "\t"}
+  addUserKnob {7 camera_haperture l "camera haperture"}
+  camera_haperture {{"\[expr \{\[numvalue parent.cameraFrom] ? \"\[value parent.cameraName].haperture\" : \"\[topnode parent.input1].haperture\" \}]"}}
+  addUserKnob {7 camera_vaperture l "camera vaperture"}
+  camera_vaperture {{"\[expr \{\[numvalue parent.cameraFrom] ? \"\[value parent.cameraName].vaperture\" : \"\[topnode parent.input1].vaperture\" \}]"}}
+  addUserKnob {26 axisTitle l <b>Axis</b>}
+  addUserKnob {13 axis_position l "axis position"}
+  axis_position {{"\[expr \{\[numvalue parent.axisFrom] ? \"\[value parent.axisName].world_matrix.3\" : \"AxisInput.world_matrix.3\" \}]"} {"\[expr \{\[numvalue parent.axisFrom] ? \"\[value parent.axisName].world_matrix.7\" : \"AxisInput.world_matrix.7\" \}]"} {"\[expr \{\[numvalue parent.axisFrom] ? \"\[value parent.axisName].world_matrix.11\" : \"AxisInput.world_matrix.11\" \}]"}}
+  addUserKnob {7 distance_from_camera l "distance from cam"}
+  distance_from_camera {{"sqrt(pow(camera_position.x - axis_position.x, 2) + pow(camera_position.y - axis_position.y, 2) + pow(camera_position.z - axis_position.z, 2))"}}
+ }
+ NoOp {
+  name Lens
+  knobChanged "import nuke\n\ndef updateLens():\n    \"\"\"\n    Updates lens parameter expressions based on user-selected mode,\n    while managing animation clearing and picker visibility.\n    \"\"\"\n\n    thisKnob = nuke.thisKnob()\n    knobName = thisKnob.name()\n\n    if not knobName.endswith(\"_mode\"):\n        return\n\n    n = nuke.thisNode()\n    knobValue = thisKnob.value()\n\n    # Map mode knobs to value knobs\n    mode_to_knob = \{\n        \"focal_plane_mode\": \"focal_plane\",\n        \"fstop_mode\": \"fstop\",\n        \"focal_length_mode\": \"focal_length\",\n        \"haperture_mode\": \"haperture\",\n        \"vaperture_mode\": \"vaperture\",\n        \"aspect_ratio_mode\": \"aspect_ratio\",\n    \}\n\n    # Define expressions\n    expressions = \{\n        \"focal_plane_mode\": \{\n            \"plate\": \"parent.Plate.plate_focal\",\n            \"axis\": \"parent.Math.distance_from_camera\",\n            \"picker\": \"parent.DepthSampler1.focal_plane\",\n            \"camera\": \"parent.Math.focal_plane\",\n        \},\n        \"fstop_mode\": \{\n            \"plate\": \"parent.Plate.plate_focal\",\n            \"camera\": \"parent.Math.camera_fstop\",\n        \},\n        \"focal_length_mode\": \{\n            \"plate\": \"parent.Plate.plate_focal_length\",\n            \"camera\": \"parent.Math.camera_focal_length\",\n        \},\n        \"haperture_mode\": \{\n            \"camera\": \"parent.Math.camera_haperture\",\n        \},\n        \"vaperture_mode\": \{\n            \"camera\": \"parent.Math.camera_vaperture\",\n        \},\n        \"aspect_ratio_mode\": \{\n            \"root\": \"root.pixel_aspect\",\n            \"plate\": \"parent.Plate.plate_pixel_aspect\",\n        \}\n    \}\n\n    if knobName not in mode_to_knob:\n        return\n\n    targetKnobName = mode_to_knob\[knobName]\n    targetKnob = n.knob(targetKnobName)\n\n    if not targetKnob:\n        return\n\n    # Manual or Picker mode clears expressions and enables knob\n    if knobValue in (\"manual\", \"picker\"):\n        if targetKnob.hasExpression():\n            targetKnob.clearAnimated()\n            print(f\"'\{targetKnobName\}' switched to manual/picker: Cleared expression.\")\n        targetKnob.setEnabled(True)\n    else:\n        # Clear keyframes\n        if any(targetKnob.isAnimated(i) for i in range(targetKnob.arraySize())):\n            targetKnob.clearAnimated()\n            print(f\"'\{targetKnobName\}' animation cleared before applying expression.\")\n\n        # Apply expression\n        expression = expressions.get(knobName, \{\}).get(knobValue, \"\")\n        if expression:\n            targetKnob.setExpression(expression)\n            targetKnob.setEnabled(knobValue == \"picker\")\n            print(f\"Expression set for '\{targetKnobName\}': \{expression\}\")\n\n    # Update picker visibility\n    updatePicker()\n\n\ndef updatePicker():\n    grp = nuke.thisGroup()\n    k = nuke.thisKnob()\n\n    try:\n        internal_node = grp.node(\"DepthSampler1\")\n    except:\n        nuke.warning(\"Internal node 'DepthSampler1' not found inside the group!\")\n        return\n\n    if k.name() in ('focal_plane_mode', 'showPanel'):\n        focus_source = grp\['focal_plane_mode'].value()\n        linked_knobs = \{knob: grp.knobs().get(knob, None) for knob in \['focus']\}\n\n        for knob_name, knob in linked_knobs.items():\n            if knob:\n                knob.setVisible(focus_source == 'picker')\n\n\n# Execute\nupdateLens()\n"
+  tile_color 0x334468ff
+  xpos 1422
+  ypos -608
+  addUserKnob {20 lens l Lens}
+  addUserKnob {4 focal_plane_mode l "focal plane" M {manual plate camera axis picker "" "" "" "" "" "" "" "" ""}}
+  focal_plane_mode camera
+  addUserKnob {7 focal_plane l "  " -STARTLINE +DISABLED R 0 100}
+  focal_plane {{parent.Math.focal_plane}}
+  addUserKnob {4 fstop_mode l fstop M {manual plate camera "" "" "" "" "" ""}}
+  fstop_mode camera
+  addUserKnob {7 fstop l "  " -STARTLINE +DISABLED R 0 100}
+  fstop {{parent.Math.camera_fstop}}
+  addUserKnob {4 focal_length_mode l "focal length" M {manual plate camera "" ""}}
+  focal_length_mode camera
+  addUserKnob {7 focal_length l "  " -STARTLINE +DISABLED R 0 100}
+  focal_length {{parent.Math.camera_focal_length}}
+  addUserKnob {4 haperture_mode l haperture M {manual camera "" ""}}
+  haperture_mode camera
+  addUserKnob {7 haperture l "  " -STARTLINE +DISABLED R 0 100}
+  haperture {{parent.Math.camera_haperture}}
+  addUserKnob {4 vaperture_mode l vaperture M {manual camera "" "" ""}}
+  vaperture_mode camera
+  addUserKnob {7 vaperture l "  " -STARTLINE +DISABLED R 0 100}
+  vaperture {{parent.Math.camera_vaperture}}
+  addUserKnob {4 aspect_ratio_mode l "aspect ratio" M {manual plate root "" "" "" "" ""}}
+  aspect_ratio_mode root
+  addUserKnob {7 aspect_ratio l "  " -STARTLINE +DISABLED R 0 2}
+  aspect_ratio {{root.pixel_aspect}}
+ }
+ NoOp {
+  name Plate
+  knobChanged "import nuke\n\ndef updateAllMetadata():\n    \"\"\"\n    Retrieves metadata from the plate specified in 'plateName'\n    and assigns expressions to all relevant knobs dynamically.\n    If 'plateName' is empty, removes expressions and allows manual input.\n    Ensures that metadata is fetched from nodes outside the Group node.\n    \"\"\"\n    n = nuke.thisNode()\n    parent = nuke.thisParent()  # Ensures we reference nodes outside the group\n\n    # List of metadata knobs and their corresponding output knobs\n    metadata_mappings = \{\n        \"metadata_plate_focal\": \"plate_focal\",\n        \"metadata_plate_focal_length\": \"plate_focal_length\",\n        \"metadata_plate_aperture\": \"plate_aperture\",\n        \"metadata_plate_pixel_aspect\": \"plate_pixel_aspect\",\n        \"metadata_plate_fstop\": \"plate_fstop\",\n    \}\n\n    # Get the plate name (from inside the group)\n    plate_name_knob = n.knob(\"plateName\")\n    plate_name = plate_name_knob.value().strip() if plate_name_knob else \"\"\n\n    # If plateName is empty, remove all expressions and enable manual input\n    if not plate_name:\n        for target_knob in metadata_mappings.values():\n            if target_knob in n.knobs():\n                n.knob(target_knob).clearAnimated()\n                n.knob(target_knob).setValue(0)  # Reset to 0 or default value\n                n.knob(target_knob).setEnabled(True)  # Enable manual input\n                print(f\" Removed expression from '\{target_knob\}', allowing manual input.\")\n        return  # Stop execution if no plate is set\n\n    # Modify the reference to always look outside the group\n    for metadata_knob, target_knob in metadata_mappings.items():\n        if metadata_knob in n.knobs() and target_knob in n.knobs():\n            # Ensure we look for the plate node OUTSIDE the group\n            expression = (\n                \"\[python \{float(nuke.toNode(nuke.thisParent().knob('plateName').value()).metadata().get(\"\n                \"nuke.thisNode().knob('\" + metadata_knob + \"').value(), 0))\}]\"\n            )\n\n            # Set the expression on the target knob\n            n.knob(target_knob).setExpression(expression)\n            n.knob(target_knob).setEnabled(False)  # Disable manual input\n            print(f\" Expression set for '\{target_knob\}': \{expression\}\")\n\n# Run the function\nupdateAllMetadata()\n"
+  tile_color 0x31406bff
+  xpos 1422
+  ypos -584
+  addUserKnob {20 plateFocus l "Plate Focus"}
+  addUserKnob {26 "" +HIDDEN}
+  addUserKnob {6 deepTriggered -STARTLINE +HIDDEN}
+  deepTriggered true
+  addUserKnob {1 plateName l "plate name"}
+  addUserKnob {26 ""}
+  addUserKnob {1 metadata_plate_focal l "metadata focal"}
+  metadata_plate_focal exr/FocusDistance
+  addUserKnob {7 plate_focal l "plate focal"}
+  addUserKnob {1 metadata_plate_fstop l "metadata fstop"}
+  metadata_plate_fstop exr/fstop
+  addUserKnob {7 plate_fstop l "plate fstop"}
+  addUserKnob {1 metadata_plate_focal_length l "metadata focal length"}
+  metadata_plate_focal_length exr/FocalLength
+  addUserKnob {7 plate_focal_length l "plate focal length"}
+  addUserKnob {1 metadata_plate_aperture l "metadata aperture"}
+  metadata_plate_aperture exr/aperture
+  addUserKnob {7 plate_aperture l "plate aperture"}
+  addUserKnob {1 metadata_plate_pixel_aspect l "metadata pixel aspect"}
+  metadata_plate_pixel_aspect exr/aspect
+  addUserKnob {7 plate_pixel_aspect l "plate pixel aspect"}
+ }
+ NoOp {
+  name Slices
+  knobChanged "grp = nuke.thisGroup()\nk = nuke.thisKnob()\n\n# Find the internal node inside the group\ninternal_node = grp.node(\"Slices\")\n\nif not internal_node:\n    nuke.warning(\"Internal node 'Slices' not found inside the group!\")\nelse:\n    if k.name() in ('automatic_slicing', 'showPanel', 'number_of_slices'):\n\n        is_auto = grp\['automatic_slicing'].value()\n\n        linked_knobs = \{knob: grp.knobs().get(knob, None) for knob in \['number_of_slices']\}\n\n        for knob_name, knob in linked_knobs.items():\n            if knob:\n                knob.setEnabled(not is_auto)  # Enable only when auto is off\n"
+  tile_color 0x31406bff
+  xpos 1422
+  ypos -560
+  addUserKnob {20 slices l Slices}
+  addUserKnob {3 number_of_slices l "number of slices"}
+  number_of_slices 10
+  addUserKnob {6 automatic_slicing l "automatic slicing" -STARTLINE}
+  automatic_slicing true
+  addUserKnob {26 ""}
+  addUserKnob {4 integrate_slices l "integrate slices" M {disabled "front & back" "front, back & focal" "" "" "" "" "" "" ""}}
+  addUserKnob {7 front_slice_offset l "front slice offset"}
+  addUserKnob {7 back_slice_offset l "back slice offset"}
+ }
+ NoOp {
+  name Kernel
+  knobChanged "grp = nuke.thisGroup()\nk = nuke.thisKnob()\n\n# Find the internal node inside the group\ninternal_node = grp.node(\"Kernel\")\n\nif not internal_node:\n    nuke.warning(\"Internal node 'Kernel' not found inside the group!\")\nelse:\n    if k.name() in ('filterType', 'showPanel', 'bladeCount'):\n\n        focus_source = grp\['filterType'].value()\n\n        linked_knobs = \{knob: grp.knobs().get(knob, None) for knob in \['bladeCount', 'bladed_curve']\}\n\n        if focus_source == 'bladed':\n            # Show the linked knobs\n            for knob_name, knob in linked_knobs.items():\n                if knob:\n                    knob.setVisible(True)\n        else:\n            # Hide the linked knobs properly\n            for knob_name, knob in linked_knobs.items():\n                if knob:\n                    knob.setVisible(False)\n\n        # Enforce bladeCount >= 3\n        blade_knob = grp.knob('bladeCount')\n        if blade_knob and blade_knob.value() < 3:\n            blade_knob.setValue(3)\n"
+  tile_color 0x31406bff
+  xpos 1422
+  ypos -536
+  addUserKnob {20 User}
+  addUserKnob {4 filterType l "filter type" M {input disc bladed "" "" "" ""}}
+  filterType disc
+  addUserKnob {3 bladeCount l "blade count"}
+  bladeCount 8
+  addUserKnob {7 bladed_curve l "blade curve"}
+ }
+ NoOp {
+  name OutputOptions
+  knobChanged "grp = nuke.thisGroup()\nk = nuke.thisKnob()\n\n# Find the internal node inside the group\ninternal_node = grp.node(\"Kernel\")\n\nif not internal_node:\n    nuke.warning(\"Internal node 'Kernel' not found inside the group!\")\nelse:\n    if k.name() in ('output_type', 'showPanel', 'focalVisualMix'):\n\n        focus_source = grp\['output_type'].value()\n\n        linked_knobs = \{knob: grp.knobs().get(knob, None) for knob in \['focalVisualMix']\}\n\n        if focus_source == 'focal visualization':\n            # Show the linked knobs\n            for knob_name, knob in linked_knobs.items():\n                if knob:\n                    knob.setVisible(True)\n        else:\n            # Hide the linked knobs properly\n            for knob_name, knob in linked_knobs.items():\n                if knob:\n                    knob.setVisible(False)"
+  tile_color 0x31406bff
+  xpos 1422
+  ypos -513
+  addUserKnob {20 User}
+  addUserKnob {4 output_type l output M {"defocused image" "focal visualization" "filter shape" "" "" "" ""}}
+  addUserKnob {7 focalVisualMix l "focal visual mix"}
+  focalVisualMix 0.25
+ }
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1456
+  ypos 161
+ }
+set N7997fa00 [stack 0]
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2445
+  ypos 158
+ }
+ Reformat {
+  type "to box"
+  box_width {{KernelSelect.width}}
+  box_height {{KernelSelect.height}}
+  box_fixed true
+  box_pixel_aspect {{KernelSelect.pixel_aspect}}
+  resize distort
+  black_outside true
+  name Reformat1
+  label "\[expr \{\[numvalue type] ? \"(\[value filter])\" : \"(\[lindex \[split \[value format] \" \"] end]\n(\[value filter])\" \}]"
+  xpos 2411
+  ypos 251
+ }
+ Multiply {
+  value 0
+  name Multiply1
+  label "value: \[value value]"
+  xpos 2411
+  ypos 414
+ }
+ Clamp {
+  name Clamp1
+  label "\[expr \{\[value minimum_enable]? \"\[value minimum] min\" : \"\"\}]\[expr \{\[value minimum_enable] && \[value maximum_enable]? \"\n\" : \"\"\}]\[expr \{\[value maximum_enable]? \"\[value maximum] max\" : \"\"\}]"
+  xpos 2411
+  ypos 481
+ }
+ Add {
+  inputs 1+1
+  value {{1/parent.Grade1.white} 0 0 0}
+  name Add1
+  xpos 2411
+  ypos 912
+ }
+ Add {
+  inputs 1+1
+  value {0 {1/parent.Grade1.white} 0 0}
+  name Add2
+  xpos 2411
+  ypos 984
+ }
+ Add {
+  inputs 1+1
+  value {0 0 {1/parent.Grade1.white} 0}
+  name Add3
+  xpos 2411
+  ypos 1056
+ }
+ Add {
+  inputs 1+1
+  value {0 0 0 {1/parent.Grade1.white}}
+  name Add4
+  xpos 2411
+  ypos 1108
+ }
+ Remove {
+  channels rgba
+  channels2 depth
+  name Remove1
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 2411
+  ypos 1243
+ }
+ Copy {
+  inputs 2
+  channels all
+  name Copy1
+  xpos 2411
+  ypos 1358
+ }
+ Dot {
+  name Dot26
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2445
+  ypos 1630
+ }
+push $Nbca7ee00
+ Copy {
+  inputs 2
+  channels all
+  name Copy2
+  xpos 3071
+  ypos 1618
+ }
+ Dot {
+  name Dot64
+  note_font "DejaVu Sans"
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3101
+  ypos 4203
+ }
+set N3ad2da00 [stack 0]
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3101
+  ypos 4203
+ }
+ Dot {
+  name Dot41
+  note_font "DejaVu Sans"
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3097
+  ypos 5610
+ }
+ NoOp {
+  inputs 0
+  name DeepInputContainer
+  tile_color 0x60ff
+  xpos 176
+  ypos -922
+ }
+ Dot {
+  name Dot28
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 210
+  ypos 698
+ }
+set Na9936000 [stack 0]
+ Dot {
+  name Dot32
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 980
+  ypos 698
+ }
+set Na9935000 [stack 0]
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1200
+  ypos 698
+ }
+ DeepToImage2 {
+  name DeepToImage3
+  xpos 1166
+  ypos 775
+ }
+ Dot {
+  name Dot33
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1200
+  ypos 898
+ }
+set N3ad81200 [stack 0]
+ Dot {
+  name Dot29
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1090
+  ypos 898
+ }
+ Shuffle {
+  red white
+  green white
+  blue white
+  alpha white
+  name Shuffle7
+  tile_color 0xddddddff
+  label "<center><b>\[value in]</b> &rarr; \[value out]\n\nrgba to 1\nto crate rgba\nchannels in the\ndeep pass"
+  xpos 1056
+  ypos 950
+ }
+ Dot {
+  name Dot31
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1090
+  ypos 1113
+ }
+push $Na9935000
+ DeepRecolor {
+  inputs 2
+  name DeepRecolor2
+  label "\[expr \{ \[value targetInputAlpha] ?  \"(target input alpha)\" : \"\"\}]"
+  xpos 946
+  ypos 1110
+ }
+ DeepExpression {
+  chans1 deep
+  rgba.red deep.front*rgba.alpha
+  rgba.green deep.front*rgba.alpha
+  rgba.blue deep.front*rgba.alpha
+  name DeepExpression13
+  xpos 946
+  ypos 1159
+ }
+ DeepToImage {
+  name DeepToImage9
+  xpos 946
+  ypos 1207
+ }
+ Unpremult {
+  name Unpremult7
+  xpos 946
+  ypos 1255
+ }
+ AddChannels {
+  channels depth
+  name AddChannels2
+  xpos 946
+  ypos 1282
+ }
+ Shuffle {
+  name Shuffle5
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 946
+  ypos 1314
+ }
+ Dot {
+  name Dot34
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 980
+  ypos 1378
+ }
+push $N3ad81200
+ Copy {
+  inputs 2
+  from0 rgba.red
+  to0 depth.Z
+  name DeepToDepth
+  xpos 1166
+  ypos 1371
+ }
+ Dot {
+  name Dot27
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1200
+  ypos 1642
+ }
+push $N7997fa00
+ Switch {
+  inputs 2
+  which {{"parent.node == 1 ? 0 : parent.Menu.deepInputStorage\n"}}
+  name Switch5
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  xpos 1422
+  ypos 1635
+ }
+ Dot {
+  name Dot14
+  note_font "DejaVu Sans"
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1456
+  ypos 1769
+ }
+set N3ad2f200 [stack 0]
+ Dot {
+  name Dot46
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1456
+  ypos 2351
+ }
+set Nbca98e00 [stack 0]
+ Dot {
+  name Dot43
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 927
+  ypos 2351
+ }
+set Nbca99400 [stack 0]
+ Dot {
+  name Dot47
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 650
+  ypos 2351
+ }
+ Expression {
+  temp_name0 focal
+  temp_expr0 parent.Lens.focal_plane
+  temp_name1 fstop
+  temp_expr1 parent.Lens.fstop
+  temp_name2 focus
+  temp_expr2 "parent.Lens.focal_plane * parent.Math.units"
+  temp_name3 units
+  temp_expr3 "\[value Bokeh1.depthChannel]*parent.Math.units"
+  expr0 "clamp((\[value Bokeh1.depthChannel] >  focal  ? 0 :  (focal - \[value Bokeh1.depthChannel])))"
+  expr1 "clamp(1 - ((  (( (focal / fstop) * ( (focus  * focal) / (focus - focal) ) * fabs( (1/units) - (1/focus) ))) * parent.Math.coc ) /2))"
+  expr2 "clamp((\[value Bokeh1.depthChannel] >  focal   ? (\[value Bokeh1.depthChannel] -  focal) : 0))"
+  expr3 1
+  name Expression2
+  tile_color 0x802380ff
+  label visualizer
+  xpos 616
+  ypos 2459
+ }
+push $Nbca99400
+ Dot {
+  name Dot54
+  note_font "DejaVu Sans"
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 927
+  ypos 2592
+ }
+ Merge2 {
+  inputs 2
+  output rgb
+  mix {{"1 - parent.OutputOptions.focalVisualMix"}}
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 616
+  ypos 2585
+ }
+ Dot {
+  name Dot42
+  note_font "DejaVu Sans"
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 650
+  ypos 5613
+ }
+push $Nbca98e00
+ Reformat {
+  type scale
+  scale {{"max(1 + (parent.overscan / 1000), 0)\n"}}
+  resize none
+  pbb true
+  name Reformat2
+  label "\[expr \{\[numvalue type] ? \"(\[value filter])\" : \"(\[lindex \[split \[value format] \" \"] end]\n(\[value filter])\" \}]\ncompute  overscan"
+  xpos 1422
+  ypos 2862
+ }
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1456
+  ypos 3215
+ }
+set Nbca9ae00 [stack 0]
+ AdjBBox {
+  name AdjBBox1
+  note_font "DejaVu Sans"
+  xpos 1422
+  ypos 3327
+ }
+ Dot {
+  name Dot40
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1456
+  ypos 3550
+ }
+set Nbca9ba00 [stack 0]
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 870
+  ypos 3550
+ }
+ AddChannels {
+  channels depth
+  name AddChannels1
+  xpos 836
+  ypos 4836
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 870
+  ypos 5014
+ }
+push $N3ad2da00
+ Dot {
+  name Dot38
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2300
+  ypos 4204
+ }
+set Nbc9b8800 [stack 0]
+ Dot {
+  name Dot37
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2300
+  ypos 4339
+ }
+push $Nbca9ae00
+ Dot {
+  name Dot61
+  note_font "DejaVu Sans"
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2084
+  ypos 3212
+ }
+set Nbc9b9400 [stack 0]
+ Dot {
+  name Dot36
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2194
+  ypos 3212
+ }
+set Nbc9b9a00 [stack 0]
+ Dot {
+  name Dot50
+  note_font "DejaVu Sans"
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2304
+  ypos 3212
+ }
+set Nbc9ba000 [stack 0]
+ Dot {
+  name Dot51
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2414
+  ypos 3212
+ }
+ Expression {
+  temp_name0 focal
+  temp_expr0 parent.Lens.focal_length
+  temp_name1 fstop
+  temp_expr1 parent.Lens.fstop
+  temp_name2 focus
+  temp_expr2 "parent.Lens.focal_plane * parent.Math.units"
+  temp_name3 units
+  temp_expr3 "\[value Bokeh1.depthChannel] * parent.Math.units"
+  channel0 depth
+  expr0 "((focal / fstop) * ((focus * focal) / (focus - focal)) * abs((1 / units) - (1 / focus)) * (input.width / parent.haperture / 2)) * (\nclamp(units < focus ? (1 - smoothstep(focus - max(0, parent.focal_front * parent.Math.units), focus, units)) : 0, 0, 1) * parent.front_multiplier +\nclamp(units > focus ? smoothstep(focus, focus + max(0, parent.focal_back * parent.Math.units), units) : 0, 0, 1) * parent.back_multiplier)\n"
+  name CircleOfConfusion4
+  knobChanged "n=nuke.thisNode()\nk = nuke.thisKnob()\n\nif k.name() == 'focus' and k.isAnimated() == False:\n \n    i = k.value()\n        \n    px = int(i\[0])\n    py = int(i\[1])\n    \n    r = n.sample('Z', px, py)\n\n    \n    \n    n\['focal_plane'].setValue(r)\n\n\n"
+  tile_color 0x178000ff
+  label "Circle of Confusion - Focal\n\nmultipliers\n\n-"
+  xpos 2380
+  ypos 3257
+ }
+push $Nbc9ba000
+ Expression {
+  temp_name0 focal
+  temp_expr0 parent.Lens.focal_length
+  temp_name1 fstop
+  temp_expr1 parent.Lens.fstop
+  temp_name2 focus
+  temp_expr2 "parent.Lens.focal_plane * parent.Math.units"
+  temp_name3 units
+  temp_expr3 "\[value Bokeh1.depthChannel] * parent.Math.units"
+  channel0 depth
+  expr0 "units > 0 ? ((((focal / fstop) * ((focus * focal) / (focus - focal)) * fabs((1/units) - (1/focus))) / parent.haperture) * input.width / 2) * (units < focus ? ((smoothstep(focus - (parent.focal_front * parent.Math.units), focus, units) * -1) + 1) : smoothstep(focus, focus + (parent.focal_back * parent.Math.units), units)) : 0"
+  name CircleOfConfusion3
+  knobChanged "n=nuke.thisNode()\nk = nuke.thisKnob()\n\nif k.name() == 'focus' and k.isAnimated() == False:\n \n    i = k.value()\n        \n    px = int(i\[0])\n    py = int(i\[1])\n    \n    r = n.sample('Z', px, py)\n\n    \n    \n    n\['focal_plane'].setValue(r)\n\n\n"
+  tile_color 0x80223fff
+  label "Circle of Confusion - Focal\n\nsmooth (test)\n\n-"
+  xpos 2270
+  ypos 3257
+ }
+push $Nbc9b9a00
+ Expression {
+  temp_name0 focal
+  temp_expr0 parent.Lens.focal_length
+  temp_name1 fstop
+  temp_expr1 parent.Lens.fstop
+  temp_name2 focus
+  temp_expr2 "parent.Lens.focal_plane * parent.Math.units"
+  temp_name3 units
+  temp_expr3 "\[value Bokeh1.depthChannel] * parent.Math.units"
+  channel0 depth
+  expr0 "(((focal / fstop) * ((focus * focal) / (focus - focal)) * fabs((1/units) - (1/focus))) * (input.width / parent.haperture) / 2) * clamp(units < focus ? (1 - smoothstep(focus - max(0, parent.focal_front * parent.Math.units), focus, units)) : smoothstep(focus, focus + max(0, parent.focal_back * parent.Math.units), units), 0, 1)\n"
+  name CircleOfConfusion2
+  knobChanged "n=nuke.thisNode()\nk = nuke.thisKnob()\n\nif k.name() == 'focus' and k.isAnimated() == False:\n \n    i = k.value()\n        \n    px = int(i\[0])\n    py = int(i\[1])\n    \n    r = n.sample('Z', px, py)\n\n    \n    \n    n\['focal_plane'].setValue(r)\n\n\n"
+  tile_color 0x178000ff
+  label "Circle of Confusion - Focal\n\nClassic\n\n-"
+  xpos 2160
+  ypos 3257
+ }
+push $Nbc9b9400
+ Expression {
+  temp_name0 focal
+  temp_expr0 parent.Lens.focal_length
+  temp_name1 fstop
+  temp_expr1 parent.Lens.fstop
+  temp_name2 focus
+  temp_expr2 "parent.Lens.focal_plane * parent.Math.units"
+  temp_name3 units
+  temp_expr3 "deep.front * parent.Math.units"
+  channel0 depth
+  expr0 "(((focal / fstop) * ((focus * focal) / (focus - focal)) * fabs((1/units) - (1/focus))) * parent.Math.coc) / 2\n"
+  name CircleOfConfusion1
+  knobChanged "n=nuke.thisNode()\nk = nuke.thisKnob()\n\nif k.name() == 'focus' and k.isAnimated() == False:\n \n    i = k.value()\n        \n    px = int(i\[0])\n    py = int(i\[1])\n    \n    r = n.sample('Z', px, py)\n\n    \n    \n    n\['focal_plane'].setValue(r)\n\n\n"
+  tile_color 0x178000ff
+  label "Circle of Confusion - Focal\n\nLegacy\n\n-"
+  xpos 2050
+  ypos 3257
+ }
+ Switch {
+  inputs 4
+  which 3
+  name Switch2
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  note_font "DejaVu Sans"
+  xpos 2050
+  ypos 3465
+ }
+ ZDefocus2 {
+  inputs 2
+  channels {{{parent.channels}}}
+  math {{"parent.math == 0 ? 0 : 4"}}
+  focal_point {0 0}
+  size 1
+  max_size {{parent.blurClip}}
+  autoLayerSpacing {{parent.Slices.automatic_slicing}}
+  layers {{"automatic_slicing == 1 ? 10 : parent.Slices.number_of_slices"}}
+  layerCurve {{parent.layerCurve}}
+  filter_type image
+  legacy_resize_mode false
+  use_input_channels true
+  filter_bounds format
+  name ZDefocus1
+  xpos 2050
+  ypos 4332
+ }
+ Dot {
+  name Dot39
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2084
+  ypos 4843
+ }
+push $Na9936000
+ DeepReformat {
+  type scale
+  scale {{parent.Reformat2.scale}}
+  resize none
+  pbb true
+  name DeepReformat1
+  label overscan
+  xpos 172
+  ypos 2868
+  disable true
+ }
+ Switch {
+  which {{"parent.node == 1 ? 1 : !parent.Menu.deepInputStorage\n"}}
+  name Switch3
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  xpos 172
+  ypos 3294
+ }
+ Dot {
+  name Dot30
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos 4338
+ }
+push 0
+push $Nbc9b8800
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1616
+  ypos 4207
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1616
+  ypos 4335
+ }
+push $Nbca9ba00
+ Bokeh {
+  inputs 4
+  bokehChannels all
+  frontmultiplier {{parent.front_multiplier}}
+  backmultiplier {{parent.back_multiplier}}
+  focalPlane {{parent.Lens.focal_plane}}
+  realWorldLens true
+  focalLength {{parent.Lens.focal_length}}
+  fStop {{parent.Lens.fstop}}
+  worldScale mm
+  worldScaleMultiplier {{parent.Math.units}}
+  filmFormat Custom
+  apertureWidth {{"parent.Lens.haperture  * (width / root.width)"}}
+  apertureHeight {{"parent.Lens.vaperture * (height / root.height)"}}
+  kernelType Input
+  correctiveSlices {{"automatic_slicing == 1 ? 10 : parent.Slices.number_of_slices"}}
+  depthSlicesNearAndFar {0.1 100}
+  name Bokeh1
+  onCreate "n = nuke.thisNode()\nk = 'depthChannel'\nt = nuke.thisKnob()\nflag = nuke.NO_CHECKMARKS\n\nn.knob(k).setFlag(flag)"
+  knobChanged "\nn = nuke.thisNode()\nk = nuke.thisKnob()\n\nif k.name() == 'depthChannel':\n    nuke.toNode('ZDefocus1')\['z_channel'].fromScript(k.toScript())\n    nuke.toNode('ZDefocus1')\['z_channel'].enableChannel(4, False)\n    \n    nuke.toNode('Remove1')\['channels2'].fromScript(k.toScript())\n    nuke.toNode('Remove1')\['channels2'].enableChannel(4, False)\n    \n    nuke.toNode('AddChannels2')\['channels'].fromScript(k.toScript())\n    nuke.toNode('AddChannels2')\['channels'].enableChannel(4, False)\n\n   \n    nuke.toNode('DeepToDepth')\['to0'].fromScript(k.toScript())\n    nuke.toNode('DeepToDepth')\['to0'].enableChannel(4, False)\n\n    \n    nuke.toNode('AddChannels1')\['channels'].fromScript(k.toScript())\n    nuke.toNode('AddChannels1')\['channels'].enableChannel(4, False)\n\n    nuke.toNode('RestoreDepth')\['from0'].fromScript(k.toScript())\n    nuke.toNode('RestoreDepth')\['from0'].enableChannel(4, False)\n    nuke.toNode('RestoreDepth')\['to0'].fromScript(k.toScript())\n    nuke.toNode('RestoreDepth')\['to0'].enableChannel(4, False)\n    \n    nuke.toNode('Copy3')\['from0'].fromScript(k.toScript())\n    nuke.toNode('Copy3')\['from0'].enableChannel(4, False)\n    \n    nuke.toNode('CircleOfConfusion1')\['channel0'].fromScript(k.toScript())\n    nuke.toNode('CircleOfConfusion1')\['channel0'].enableChannel(4, False)\n    \n    nuke.toNode('CircleOfConfusion2')\['channel0'].fromScript(k.toScript())\n    nuke.toNode('CircleOfConfusion2')\['channel0'].enableChannel(4, False)    \n \n    nuke.toNode('CircleOfConfusion3')\['channel0'].fromScript(k.toScript())\n    nuke.toNode('CircleOfConfusion3')\['channel0'].enableChannel(4, False)    \n\n    nuke.toNode('CircleOfConfusion4')\['channel0'].fromScript(k.toScript())\n    nuke.toNode('CircleOfConfusion4')\['channel0'].enableChannel(4, False)    "
+  xpos 1422
+  ypos 4332
+ }
+ Switch {
+  inputs 2
+  which {{parent.node}}
+  name Switch1
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  xpos 1422
+  ypos 4836
+ }
+ Copy {
+  inputs 2
+  from0 depth.Z
+  to0 depth.Z
+  name RestoreDepth
+  xpos 1422
+  ypos 5007
+ }
+ Reformat {
+  type scale
+  scale {{1/parent.Reformat2.scale}}
+  resize none
+  pbb true
+  name Reformat3
+  label "\[expr \{\[numvalue type] ? \"(\[value filter])\" : \"(\[lindex \[split \[value format] \" \"] end]\n(\[value filter])\" \}]\ncompute overscan"
+  xpos 1422
+  ypos 5310
+ }
+ Switch {
+  inputs 3
+  which {{parent.output_type}}
+  name Switch4
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  note_font "DejaVu Sans"
+  xpos 1422
+  ypos 5603
+ }
+ Output {
+  name Output1
+  xpos 1422
+  ypos 5802
+ }
+ VectorBlur2 {
+  inputs 0
+  channels none
+  name GPU
+  note_font "DejaVu Sans"
+  xpos 1245
+  ypos -616
+ }
+push $N3ad2f200
+ Dot {
+  name Dot35
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1234
+  ypos 1770
+ }
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1234
+  ypos 1917
+ }
+set N89aa8a00 [stack 0]
+ AddChannels {
+  channels depth
+  name AddChannels3
+  xpos 1200
+  ypos 1979
+ }
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1234
+  ypos 2058
+ }
+push $N89aa8a00
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1124
+  ypos 1917
+ }
+ Remove {
+  name Remove2
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 1090
+  ypos 1979
+ }
+ Copy {
+  inputs 2
+  from0 depth.Z
+  to0 depth.Z
+  name Copy3
+  knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\n\nif k.name() == 'from0':\n    nuke.toNode('AddChannels1')\['channels'].fromScript(k.toScript())\n    nuke.toNode('AddChannels1')\['channels'].enableChannel(4, False)"
+  tile_color 0x802380ff
+  xpos 1090
+  ypos 2051
+ }
+ NoOp {
+  name DepthSampler1
+  onCreate nuke.thisNode().knob('focus').setFlag(nuke.NO_ANIMATION)
+  knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\n\nif k.name() == 'focus' and not k.isAnimated():\n    i = k.value()\n    px = int(i\[0])\n    py = int(i\[1])\n\n    # Sample Z at that point\n    r = n.sample('Z', px, py)\n    \n    # Update local value\n    n\['focal_plane'].setValue(r)\n\n    # Now update parent lens node's focal_plane if it's in picker mode\n    try:\n        parent = nuke.thisGroup()\n        if parent\['focal_plane_mode'].value() == 'picker':\n            parent\['focal_plane'].setValue(r)\n    except Exception as e:\n        nuke.warning(f\"Couldn't update parent focal_plane: \{e\}\")\n"
+  tile_color 0x802380ff
+  xpos 1090
+  ypos 2154
+  addUserKnob {20 DepthSampler}
+  addUserKnob {6 color_panelDropped l "panel dropped state" +HIDDEN +STARTLINE}
+  addUserKnob {6 value_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {6 pixelValues_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {12 focus}
+  addUserKnob {7 focal_plane l "focal plane"}
+  focal_plane 12.59138203
+ }
+ Input {
+  inputs 0
+  name axis
+  label "\[value number]"
+  xpos 2710
+  ypos -1072
+  number 2
+ }
+ Axis2 {
+  name AxisInput
+  xpos 2720
+  ypos -990
+ }
+end_group

@@ -1,0 +1,471 @@
+Group {
+ name RadialBlur1
+ help "Applies a radial blur effect to the incoming channels."
+ onCreate "def onCreate_center():\n    n = nuke.thisGroup()\n    n\['center'].setValue((n.width() * 0.5, n.height() * 0.5))\n\n# Execute the onCreate_center function\nonCreate_center()\n\n# Clean up the onCreate knob\ndef clean_up_onCreate_knob():\n    on_create_knob = nuke.thisNode().knob('onCreate')\n    script = on_create_knob.value()\n    cleaned_script = script.split('def onCreate_center()')\[0].strip()\n    on_create_knob.setValue(cleaned_script)\n\n# Call the clean-up function\nclean_up_onCreate_knob()\n"
+ tile_color 0x752735ff
+ selected true
+ addUserKnob {20 radialBlur l "Radial Blur"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION RadialBlurClassic
+ addUserKnob {41 channels t "The effect is only applied to these channels. \nIf you set this to something other than all or none, you can use the checkboxes on the right to select individual channels." T VectorBlur4.channels}
+ addUserKnob {41 visualizeOutput l "visualize output" t "When enabled this will display the visual overlay ovet the image.\n\nThis is to help show direction of the vectors." T menu.visualizeOutput}
+ addUserKnob {6 crop t "When enabled, the bounding box cannot grow past its incoming bounding/format size. This avoids creating oversized bounding boxes that can take longer to compute." -STARTLINE}
+ crop true
+ addUserKnob {12 center t "Central pivot of radial."}
+ addUserKnob {22 center_button l center t "When clicked on. it will put the center point to the center of the incoming format." -STARTLINE T "n = nuke.thisNode()\n\nn\['center'].setValue((n.width() * 0.5, n.height() * 0.5))\n\n"}
+ addUserKnob {14 size t "The amount of radial blur you want to apply" R 0 100}
+ addUserKnob {7 weight l "central effect" t "Protects the central point of the selected point" R 0 5}
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannelMask l mask t "Enables the associated mask channel to the right. Disabling this checkbox is the same as setting the channel to none. \n\nThe channel to use as a mask. By default, the merge is limited to the non-black areas of this channel.\n" T Multiply1.maskChannelMask}
+ addUserKnob {6 invert t "Inverts the use of the mask channel so that the blur is limited to the non-white areas of the mask." -STARTLINE}
+ addUserKnob {41 fringe t "When enabled, only apply the effect to the edge of the mask. \nWhen disabled, the effect is applied to the entire mask." -STARTLINE T Multiply1.fringe}
+ addUserKnob {7 mix t "Dissolves between the original image at 0 and the full effect at 1."}
+ mix 1
+ addUserKnob {20 visualize l Visualize}
+ addUserKnob {41 visualizeOutput_1 l "visualize output" t "When enabled this will display the visual overlay ovet the image.\n\nThis is to help show direction of the vectors." T menu.visualizeOutput}
+ addUserKnob {3 visualSize l size t "This decrease/increase the size of the dots beings displayed when visualize output is enabled."}
+ visualSize 10
+ addUserKnob {3 number t "This decrease/increase the amount dots being displayed when visualize output is enabled."}
+ number 25
+ addUserKnob {18 visualColor l color t "This changes the colors of the dots being displayed when visualize output is enabled."}
+ visualColor {0 1 0}
+ addUserKnob {6 visualColor_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_rgb_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {7 visualizeMix l mix t "Dissolves between no visualize colour overlay on the image from 0 and 1 when visualize output is enabled.\n\n1 Being full effect"}
+ visualizeMix 1
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Radial Blur</font><font color=#9A4C5A> v1.2  <font color=#747474><i>(classic)</i>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br> \n<b>Radial Blur</b> will apply a radial<br>blur effect to the incoming channel(s).\n</b>\n<br>\n<font color=#747474> <i><br><strong>•</br> This node is a classic version and has been<br>replaced by MutliBlur/FlexiBlur\n\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#9A4C5A;\">John Toth <b>© 2020 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#752735\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nmodel_number = \"1.2.0\"\ncontext = \"Filter\"\n\n\ndate = \"27th July\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2020\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- adds radial blur effect to channel(s)\n<br></i><b> v 1.1 </b><i>\n- center button was added\n<br></i><b> v 1.2 </b><i>\n- this node has become apart of a legacy package\n- onCreate now registers format and puts center to correct spot (similar to tranform)\n- user interface/internals cleanup\n\"\"\"\n\n\n\nthankyou = \"\"\" Special Thanks to Fabian Holtz for the math for the radial effect.\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Model Number: \" + LOWER + model_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + UPPER + site + developer + \"</a>\") \n\n\n" +STARTLINE}
+}
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 412
+  ypos 467
+ }
+ Dot {
+  name Dot17
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 446
+  ypos 618
+ }
+set Nb403ba00 [stack 0]
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 32
+  ypos 618
+ }
+set N16dee200 [stack 0]
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -226
+  ypos 618
+ }
+ AdjBBox {
+  numpixels {{parent.size} {parent.size}}
+  name AdjBBox1
+  xpos -260
+  ypos 1551
+ }
+ Crop {
+  box {{"min(0, Input.bbox.x)"} {"min(0, Input.bbox.y)"} {"max(width, Input.bbox.r)"} {"max(height, Input.bbox.t)"}}
+  intersect true
+  name Crop1
+  label "Safety Crop"
+  xpos -260
+  ypos 1619
+  disable {{!parent.crop}}
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -226
+  ypos 2034
+ }
+ Input {
+  inputs 0
+  name mask
+  label "\[value number]"
+  xpos 1060
+  ypos 443
+  number 1
+ }
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1094
+  ypos 1506
+ }
+push $Nb403ba00
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 446
+  ypos 1002
+ }
+set N57826800 [stack 0]
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 764
+  ypos 1002
+ }
+ Remove {
+  name Remove1
+  xpos 730
+  ypos 1139
+ }
+ Expression {
+  temp_name0 center
+  temp_expr0 center
+  expr0 (y-center.y)*pixel_aspect*width/2048
+  expr1 -(x-center.x)*pixel_aspect/Expression5.ar*width/2048
+  expr2 hypot((x-center.x),(y-center.y)/pixel_aspect/Expression5.ar)
+  expr3 abs(1-abs(atan(x-center.x,(y-center.y)/pixel_aspect/Expression5.ar)/pi)*2)
+  name Expression310
+  xpos 730
+  ypos 1215
+  addUserKnob {20 User}
+  addUserKnob {12 center}
+  center {{parent.center} {parent.center}}
+ }
+ Expression {
+  temp_name0 n
+  temp_expr0 hypot(width/2,height/2/pixel_aspect/ar)
+  temp_name1 p
+  temp_expr1 1/weighting
+  expr0 r/b*pow(b/n,p)
+  expr1 g/b*pow(b/n,p)
+  expr2 1-lerp(a,0,multiply.w)-lerp(1-a,0,multiply.h)
+  name Expression5
+  xpos 730
+  ypos 1287
+  addUserKnob {20 User}
+  addUserKnob {7 weighting}
+  weighting {{weight+0.5}}
+  addUserKnob {14 multiply R 0 100}
+  multiply 1.1
+  addUserKnob {7 ar R 0 5}
+  ar {{width/height*pixel_aspect}}
+ }
+ Expression {
+  expr0 r*b
+  expr1 g*b
+  name Expression7
+  xpos 730
+  ypos 1359
+ }
+ Remove {
+  operation keep
+  channels rgb
+  name Remove3
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 730
+  ypos 1403
+ }
+ Multiply {
+  inputs 1+1
+  value 0
+  invert_mask {{!parent.invert}}
+  name Multiply1
+  label "value: \[value value]"
+  xpos 730
+  ypos 1494
+  disable {{"(\[string first \[value maskChannelMask] \[channels input1]] > -1) ? 0 : 1\n"}}
+ }
+ Dot {
+  name Dot12
+  xpos 764
+  ypos 1654
+ }
+push $N16dee200
+ NoOp {
+  name menu
+  xpos -2
+  ypos 687
+  addUserKnob {20 User}
+  addUserKnob {6 visualizeOutput l "visualize output" t "displays visual overlay" +STARTLINE}
+ }
+ Remove {
+  name Remove2
+  xpos -2
+  ypos 755
+ }
+ Dot {
+  name Dot18
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 32
+  ypos 834
+ }
+set N97be4c00 [stack 0]
+ Dot {
+  name Dot19
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 166
+  ypos 834
+ }
+ Grid {
+  output alpha
+  cliptype none
+  number {{parent.number} 0}
+  size {{parent.visualSize}}
+  color {1 1 1 1}
+  name Grid3
+  xpos 132
+  ypos 905
+ }
+ Dot {
+  name Dot30
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 166
+  ypos 978
+ }
+push $N97be4c00
+ Grid {
+  output alpha
+  cliptype none
+  number {0 {parent.number}}
+  size {{parent.visualSize}}
+  color {1 1 1 1}
+  name Grid4
+  xpos -2
+  ypos 905
+ }
+ Merge2 {
+  inputs 2
+  operation min
+  name Merge8
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -2
+  ypos 971
+ }
+ BlackOutside {
+  name BlackOutside2
+  xpos -2
+  ypos 1031
+ }
+ Add {
+  channels rgb
+  value {{parent.visualColor} {parent.visualColor} {parent.visualColor} 0}
+  unpremult rgba.alpha
+  name Add1
+  xpos -2
+  ypos 1121
+ }
+ Dot {
+  name Dot32
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 32
+  ypos 1203
+ }
+push $N57826800
+ Dot {
+  name Dot33
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 446
+  ypos 1083
+ }
+set N97c06c00 [stack 0]
+ Dot {
+  name Dot34
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 276
+  ypos 1083
+ }
+ Merge2 {
+  inputs 2
+  mix {{parent.visualizeMix}}
+  name Merge9
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 242
+  ypos 1196
+ }
+ Dot {
+  name Dot35
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 276
+  ypos 1323
+ }
+push $N97c06c00
+ Switch {
+  inputs 2
+  which {{parent.menu.visualizeOutput}}
+  name Switch3
+  xpos 412
+  ypos 1320
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 446
+  ypos 1434
+ }
+set N97beec00 [stack 0]
+ Copy {
+  inputs 2
+  from0 rgba.red
+  to0 forward.u
+  from1 rgba.green
+  to1 forward.v
+  name Copy4
+  xpos 412
+  ypos 1642
+ }
+set N97bef000 [stack 0]
+push $N97beec00
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 324
+  ypos 1434
+ }
+set N97bef400 [stack 0]
+ Shuffle {
+  in forward
+  name Shuffle4
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 290
+  ypos 1565
+ }
+ Copy {
+  inputs 2
+  from0 -rgba.alpha
+  to0 -rgba.alpha
+  channels forward
+  name Copy3
+  xpos 290
+  ypos 1642
+ }
+set N97c1e000 [stack 0]
+push $N97bef400
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 189
+  ypos 1434
+ }
+ Shuffle {
+  in backward
+  name Shuffle5
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 155
+  ypos 1565
+ }
+ Copy {
+  inputs 2
+  from0 -rgba.alpha
+  to0 -rgba.alpha
+  channels forward
+  name Copy5
+  xpos 155
+  ypos 1642
+ }
+ VectorBlur {
+  uv motion
+  scale {{parent.size} {parent.size}}
+  maskChannelMask none
+  mix {{parent.mix}}
+  name VectorBlur6
+  xpos 155
+  ypos 1715
+  disable {{"\[expr \{\[value parent.channels] == \"all\" || \[value parent.channels] == \"backwards\" ? 0 : 1\}]\n"}}
+ }
+ Shuffle {
+  out backward
+  name Shuffle8
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 155
+  ypos 1781
+ }
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 189
+  ypos 1938
+ }
+push $N97c1e000
+ VectorBlur {
+  uv motion
+  scale {{parent.size} {parent.size}}
+  maskChannelMask none
+  mix {{parent.mix}}
+  name VectorBlur1
+  xpos 290
+  ypos 1715
+  disable {{"\[expr \{\[value parent.channels] == \"all\" || \[value parent.channels] == \"forward\" ? 0 : 1\}]\n"}}
+ }
+ Shuffle {
+  out forward
+  name Shuffle7
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 290
+  ypos 1781
+ }
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 324
+  ypos 1866
+ }
+push $N97bef000
+ VectorBlur {
+  uv motion
+  scale {{parent.size} {parent.size}}
+  maskChannelMask none
+  mix {{parent.mix}}
+  name VectorBlur4
+  xpos 412
+  ypos 1715
+ }
+ Copy {
+  inputs 2
+  channels forward
+  name Copy7
+  xpos 412
+  ypos 1854
+ }
+ Copy {
+  inputs 2
+  channels backward
+  name Copy8
+  xpos 412
+  ypos 1926
+ }
+ CopyBBox {
+  inputs 2
+  name CopyBBox1
+  selected true
+  xpos 412
+  ypos 2031
+ }
+ Output {
+  name Output1
+  xpos 412
+  ypos 2247
+ }
+end_group

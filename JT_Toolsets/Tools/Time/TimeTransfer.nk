@@ -1,0 +1,44 @@
+Group {
+ name TimeTransfer1
+ help "Snaps a selected frame from the input clip and offsets to the targeted frame\n\ne.g: snapping source frame x1241 to be at target frame x1001\n(This will Time Offset the clip so frames 1241 is now at 1001.)\n\n"
+ tile_color 0xb0a45dff
+ label "\n"
+ selected true
+ addUserKnob {20 timeTransfer l "Time Transfer"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION TimeTransfer
+ addUserKnob {3 sourceFrame l "source frame"}
+ sourceFrame 1001
+ addUserKnob {22 setSourceFrame l "set to current frame" -STARTLINE T "nuke.thisNode()\[\"sourceFrame\"].setValue(nuke.frame())"}
+ addUserKnob {3 targetFrame l "target frame"}
+ targetFrame 1001
+ addUserKnob {22 setTargetFrame l "set to current frame" -STARTLINE T "nuke.thisNode()\[\"targetFrame\"].setValue(nuke.frame())"}
+ addUserKnob {1 output +INVISIBLE}
+ output "\[value sourceFrame] to \[value targetFrame]"
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Time Transfer </font><font color=#978b4f> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br><b>  Time Transfer</b> lets you snap a selected<br>frame from the input clip to a targeted<br>frame.\n</i>\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#978b4f;\">John Toth <b>© 2023 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#978b4f\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#978b4f\">Version Log" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nmodel_number = \"1.0.2\"\ncontext = \"Time\"\n\ndate = \"14th December \"\nyear = \"2024\"\n\ndeveloper =  \"John Toth © 2023\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- snaps a certain frame from the input clip to a targeted frame.\n\"\"\"\n\n\n\nthankyou = \"\"\"\n\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Model Number: \" + LOWER + model_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + UPPER + site + developer + \"</a>\") \n"}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos 519
+  ypos 278
+ }
+ TimeOffset {
+  time_offset {{"parent.targetFrame - parent.sourceFrame"}}
+  time ""
+  name TimeOffset2
+  xpos 519
+  ypos 304
+ }
+ Output {
+  name Output1
+  xpos 519
+  ypos 330
+ }
+end_group

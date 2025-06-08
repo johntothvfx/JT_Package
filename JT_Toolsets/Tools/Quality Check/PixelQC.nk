@@ -1,0 +1,582 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name PixelQC
+ help "Used to Check for Broken Values for the incoming RGBA channels.\n"
+ tile_color 0x27487aff
+ selected true
+ addUserKnob {20 Settings l PixelQC}
+ addUserKnob {26 dpace l "" +STARTLINE}
+ addUserKnob {26 DisplayText l "" +STARTLINE T "<font size='5'>Display Over:</font><br>"}
+ addUserKnob {83 display l "" t "This allows you to display the broken pixels over black which can hel to spot them or over the image input itself." +STARTLINE M {Input Black}}
+ display Black
+ addUserKnob {26 NAN l "" +STARTLINE T "<br><font size='4'>NaN</font>\n\t"}
+ addUserKnob {68 displaynan l "" t "Select colour you want to display NaN values in" +STARTLINE M {Red Green Blue White Off "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+ addUserKnob {6 Boostnan l Boost t "Boosts the NaN values visually so you can spot them easier, encase there are some but only 1 Pixel." -STARTLINE}
+ addUserKnob {6 killNAN l Kill t "Kills NaN Values and makes it go black" -STARTLINE}
+ addUserKnob {26 Infinity l "" +STARTLINE T "<br><font size='4'>Infinity</font>"}
+ addUserKnob {68 displayinfinity l "" t "Select colour you want to display infinity values in" +STARTLINE M {Red Green Blue White Off "" "" "" "" ""}}
+ displayinfinity Green
+ addUserKnob {6 BoostInfinity l Boost t "Boosts the Infinity values visually so you can spot them easier, encase there are some but only 1 Pixel." -STARTLINE}
+ addUserKnob {6 KillInfinity l Kill t "Kills Infinity Values and makes it go black" -STARTLINE}
+ KillInfinity true
+ addUserKnob {26 NEGATIVE l "" +STARTLINE T "<br><font size='4'>Negative</font>\n\t"}
+ addUserKnob {4 displaynegative l "" t "Select colour you want to display Negative values in\n" +STARTLINE M {Red Green Blue White Off "" "" ""}}
+ displaynegative Off
+ addUserKnob {6 BoostNegative l Boost t "Boosts the Negative values visually so you can spot them easier, encase there are some but only 1 Pixel." -STARTLINE}
+ addUserKnob {26 PixelQC l "" t "\n\n\n\n" +STARTLINE T "<br><br><font size='5'>PixelQC</font><font color=#4b75ba> v1.2<br>"}
+ addUserKnob {20 Help}
+ addUserKnob {26 Guide l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 Steps l "" +STARTLINE T "<br><strong>1. </br> Pixel will display <b><i> Nan/Infinity/Negative <b><i>values</b></i> <br><strong>2. </br> </b>Killing the NaN and Infinity Values will make that pixel go black<br><br><strong>Note: </br> This Node works on <b><i>RGBA INPUT ONLY</b></i></strong><br><br>\n<br><strong>Tip: </br> You can use the <b><i>MarkerRemoval</b></i> Node to Fill in the <br>Broken Pixels <i>(It is a slow node)</i><br><br><strong>a. </br> use the <b>RGB Colours</b><i>  from PixelQC and create an <b><i>alpha</b></i> \n<br><strong>b. </br>copy created <b><i>alpha</b></i> into source <i>(make sure you have already <br>killed broken values on input - black)</i>\n<br><strong>c. </br> make sure the <b><i>MarkerRemoval </b></i>after the copy is using alpha\n<br><strong>d. </br> set <b><i> paint type</b></i> to <b><i>radial"}
+ addUserKnob {26 text_1 l "" +STARTLINE T " \n\t\n "}
+ addUserKnob {26 LightWrap_1 l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#4b75ba\">johntothvfx.com</a>"}
+ addUserKnob {26 space001_1 l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 Log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#4b75ba\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool</i><br><br><b>v 1.1</b><br><i>- Display HUD made to be more clear</i><br><br><b>v 1.2</b><br><i>- NaN, infinity would calculate RGB values seperately which would cause the visual representation to be misleading depending on what colour it was set to. This has been fixed and now calculates it as one.</i><br><br></b>\")"}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos 490
+  ypos -1282
+ }
+ Dot {
+  name Dot19
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 524
+  ypos -1062
+ }
+set Na8f0a70 [stack 0]
+ Dot {
+  name Dot20
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 127
+  ypos -1062
+ }
+ Remove {
+  channels rgba
+  name Remove5
+  xpos 93
+  ypos -922
+ }
+ Dot {
+  name Dot18
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 127
+  ypos 1386
+ }
+push $Na8f0a70
+ Remove {
+  operation keep
+  channels rgba
+  name Remove4
+  xpos 490
+  ypos -928
+ }
+ Expression {
+  expr0 isinf(r)?0:r
+  expr1 isinf(g)?0:g
+  expr2 isinf(b)?0:b
+  expr3 isinf(a)?0:a
+  name Expression5
+  label "infinity To Black"
+  xpos 490
+  ypos -808
+  disable {{!KillInfinity}}
+ }
+ Expression {
+  expr0 isnan(r)?0:r
+  expr1 isnan(g)?0:g
+  expr2 isnan(b)?0:b
+  expr3 isnan(a)?0:a
+  name Expression4
+  label nan_To_Black
+  xpos 490
+  ypos -688
+  disable {{!killNAN x1028 1}}
+ }
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 524
+  ypos -405
+ }
+set Na92d790 [stack 0]
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1364
+  ypos -405
+ }
+set Na932670 [stack 0]
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1864
+  ypos -405
+ }
+set Na937440 [stack 0]
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2304
+  ypos -405
+ }
+set Na93c260 [stack 0]
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2744
+  ypos -405
+ }
+ Expression {
+  temp_name0 negDisplay
+  temp_expr0 2000
+  expr0 r<0?negDisplay:0
+  expr1 g<0?negDisplay:0
+  expr2 b<0?negDisplay:0
+  expr3 a<0?negDisplay:0
+  name Expression1
+  label "Neg RGB"
+  xpos 2710
+  ypos -279
+ }
+ Expression {
+  channel0 rgba
+  expr0 clamp(r+g+b+a)
+  channel1 none
+  channel2 none
+  expr3 clamp(r+g+b+a)
+  name Expression8
+  xpos 2710
+  ypos -225
+ }
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2744
+  ypos -67
+ }
+set Na9624f0 [stack 0]
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2884
+  ypos -67
+ }
+ Shuffle {
+  red black
+  green black
+  alpha blue
+  name Shuffle7
+  tile_color 0xffff
+  xpos 2850
+  ypos 38
+ }
+push $Na9624f0
+ Shuffle {
+  red black
+  blue black
+  alpha green
+  name Shuffle8
+  tile_color 0xff00ff
+  xpos 2710
+  ypos 38
+ }
+push $Na9624f0
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2606
+  ypos -67
+ }
+ Shuffle {
+  green black
+  blue black
+  alpha red
+  name Shuffle9
+  tile_color 0xff0000ff
+  xpos 2572
+  ypos 38
+ }
+ Switch {
+  inputs 3
+  which {{displaynegative}}
+  name Switch4
+  xpos 2710
+  ypos 134
+ }
+ Saturation {
+  saturation 0
+  name Saturation2
+  xpos 2710
+  ypos 302
+  disable {{displaynegative-3}}
+ }
+ Blur {
+  channels rgb
+  size 10
+  name Blur2
+  xpos 2710
+  ypos 374
+  disable {{!BoostNegative}}
+ }
+ Gamma {
+  channels rgb
+  value 10
+  name Gamma3
+  xpos 2710
+  ypos 446
+  disable {{!BoostNegative}}
+ }
+ Remove {
+  name Remove3
+  xpos 2710
+  ypos 512
+  disable {{displaynegative-4}}
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2744
+  ypos 652
+ }
+push $Na93c260
+ Expression {
+  temp_name0 infinite
+  temp_expr0 2000
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 "(r == inf || r == -inf) ?infinite:0"
+  channel1 {-rgba.red rgba.green -rgba.blue none}
+  expr1 "(g == inf || g == -inf) ?infinite:0"
+  channel2 {-rgba.red -rgba.green rgba.blue none}
+  expr2 "(b == inf || b == -inf) ?infinite:0"
+  expr3 "(a == inf || a == -inf) ?infinite:0"
+  name Expression
+  label "Infinite RGB"
+  xpos 2270
+  ypos -279
+ }
+ Expression {
+  channel0 rgba
+  expr0 "clamp(r+g+b+a) ? 2000:0"
+  channel1 none
+  channel2 none
+  expr3 clamp(r+g+b+a)
+  name Expression7
+  xpos 2270
+  ypos -249
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2304
+  ypos -67
+ }
+set Na9fbc80 [stack 0]
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2444
+  ypos -67
+ }
+ Shuffle {
+  red black
+  green black
+  alpha blue
+  name Shuffle4
+  tile_color 0xffff
+  xpos 2410
+  ypos 38
+ }
+push $Na9fbc80
+ Shuffle {
+  red black
+  blue black
+  alpha green
+  name Shuffle5
+  tile_color 0xff00ff
+  xpos 2270
+  ypos 39
+ }
+push $Na9fbc80
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2166
+  ypos -67
+ }
+ Shuffle {
+  green black
+  blue black
+  alpha red
+  name Shuffle6
+  tile_color 0xff0000ff
+  xpos 2132
+  ypos 38
+ }
+ Switch {
+  inputs 3
+  which {{displayinfinity}}
+  name Switch3
+  xpos 2270
+  ypos 135
+ }
+ Saturation {
+  saturation 0
+  name Saturation1
+  xpos 2270
+  ypos 302
+  disable {{displayinfinity-3}}
+ }
+ Blur {
+  channels rgb
+  size 10
+  name Blur1
+  xpos 2270
+  ypos 374
+  disable {{!BoostInfinity}}
+ }
+ Gamma {
+  channels rgb
+  value 10
+  name Gamma2
+  xpos 2270
+  ypos 447
+  disable {{!BoostInfinity}}
+ }
+ Remove {
+  name Remove2
+  xpos 2270
+  ypos 512
+  disable {{displayinfinity-4}}
+ }
+ Merge2 {
+  inputs 2
+  operation max
+  name Max3
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 2270
+  ypos 642
+ }
+push $Na937440
+ Expression {
+  temp_name0 NanDisplay
+  temp_expr0 2000
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 "isnan(r) ?NanDisplay:0"
+  expr1 "isnan(g) ?NanDisplay:0"
+  expr2 "isnan(b) ?NanDisplay:0"
+  channel3 rgba
+  expr3 isnan(r)||isnan(g)||isnan(b)||isnan(a)
+  name Expression2
+  label "nan RGBA"
+  xpos 1830
+  ypos -280
+ }
+ Expression {
+  channel0 rgba
+  channel1 none
+  channel2 none
+  channel3 alpha
+  expr3 clamp(r+g+b+a)
+  name Expression9
+  xpos 1830
+  ypos -225
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1864
+  ypos -67
+ }
+set Naaa0470 [stack 0]
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2004
+  ypos -67
+ }
+ Shuffle {
+  red black
+  green black
+  alpha blue
+  name Shuffle3
+  tile_color 0xffff
+  xpos 1970
+  ypos 38
+ }
+push $Naaa0470
+ Shuffle {
+  red black
+  blue black
+  alpha green
+  name Shuffle2
+  tile_color 0xff00ff
+  xpos 1830
+  ypos 38
+ }
+push $Naaa0470
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1726
+  ypos -67
+ }
+ Shuffle {
+  green black
+  blue black
+  alpha red
+  name Shuffle1
+  tile_color 0xff0000ff
+  xpos 1692
+  ypos 38
+ }
+ Switch {
+  inputs 3
+  which {{displaynan}}
+  name Switch2
+  xpos 1830
+  ypos 145
+ }
+ Saturation {
+  saturation 0
+  name Saturation5
+  xpos 1830
+  ypos 302
+  disable {{displaynan-3}}
+ }
+ Blur {
+  channels rgb
+  size 10
+  name Blur28
+  xpos 1830
+  ypos 374
+  disable {{!Boostnan}}
+ }
+ Gamma {
+  channels rgb
+  value 10
+  name Gamma1
+  xpos 1830
+  ypos 446
+  disable {{!Boostnan}}
+ }
+ Remove {
+  name Remove1
+  xpos 1830
+  ypos 512
+  disable {{displaynan-4}}
+ }
+ Merge2 {
+  inputs 2
+  operation max
+  name Max1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 1830
+  ypos 642
+ }
+ Clamp {
+  channels rgba
+  name Clamp1
+  xpos 1830
+  ypos 767
+ }
+push $Na932670
+ Remove {
+  name Remove6
+  xpos 1330
+  ypos -207
+ }
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1364
+  ypos 330
+ }
+set Nab40810 [stack 0]
+ Merge2 {
+  inputs 2
+  operation max
+  bbox B
+  output rgb
+  name Max2
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 1330
+  ypos 761
+ }
+push $Nab40810
+push $Na92d790
+ Expression {
+  expr0 isinf(r)?0:r
+  expr1 isinf(g)?0:g
+  expr2 isinf(b)?0:b
+  expr3 isinf(a)?0:a
+  name Expression3
+  label "infinity To Black"
+  xpos 490
+  ypos -159
+ }
+ Expression {
+  expr0 isnan(r)?0:r
+  expr1 isnan(g)?0:g
+  expr2 isnan(b)?0:b
+  expr3 isnan(a)?0:a
+  name Expression6
+  label nan_To_Black
+  xpos 490
+  ypos -39
+ }
+ Switch {
+  inputs 2
+  which {{display}}
+  name Switch1
+  xpos 490
+  ypos 326
+ }
+ Merge2 {
+  inputs 2
+  bbox B
+  name Max
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 490
+  ypos 761
+ }
+ BlackOutside {
+  name BlackOutside1
+  xpos 490
+  ypos 903
+ }
+ Copy {
+  inputs 2
+  channels all
+  bbox B
+  name Copy1
+  xpos 490
+  ypos 1370
+ }
+ Output {
+  name Output
+  xpos 490
+  ypos 1598
+ }
+ end_group

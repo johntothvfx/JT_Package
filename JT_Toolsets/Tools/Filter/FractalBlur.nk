@@ -1,0 +1,336 @@
+Group {
+ name FractalBlur1
+ onCreate "def onCreate_center():\n    n = nuke.thisGroup()\n    # Replace knob name\n    knob_name = 'center'\n    n\[knob_name].setValue((n.width() * 0.5, n.height() * 0.5))\n\n# Execute the onCreate_center function\nonCreate_center()\n\n# Clean up the onCreate knob\ndef clean_up_onCreate_knob():\n    on_create_knob = nuke.thisNode().knob('onCreate')\n    script = on_create_knob.value()\n    # Find the line with 'def onCreate_center()' and remove everything below it\n    lines = script.split('\\n')\n    cleaned_lines = \[]\n    for line in lines:\n        if 'def onCreate_center()' in line:\n            break\n        cleaned_lines.append(line)\n    cleaned_script = '\\n'.join(cleaned_lines)\n    on_create_knob.setValue(cleaned_script)\n\n# Call the clean-up function\nclean_up_onCreate_knob()\n"
+ tile_color 0xcc804eff
+ selected true
+ addUserKnob {20 fractalBlur l "Fractal Blur"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION FractalBlur
+ addUserKnob {41 channels t "The FractalBlur effect is only applied to these channels. \nIf you set this to something other than all or none, you can use the checkboxes on the right to select individual channels." T IDistort1.channels}
+ addUserKnob {14 size t "Multiply the fractal Blur by this value, making the the distortion stronger as values go higher." R 0 100}
+ addUserKnob {14 scale t "scale of the noise pattern which drives the distortion." R 0 100}
+ scale 10
+ addUserKnob {7 seed t "Changes the noise pattern." R 0 100}
+ addUserKnob {41 filter t "Select the filtering algorithm to use when remapping pixels from their original positions to new positions. This allows you to avoid problems with image quality, particularly in high contrast areas of the frame (where highly aliased, or jaggy, edges may appear if pixels are not filtered and retain their original values). \n<b>• Impulse</b> - remapped pixels carry their original values. \n•<b> Cubic</b> - remapped pixels receive some smoothing. \n<b>• Keys</b> - remapped pixels receive some smoothing, plus minor sharpening (as shown by the negative -y portions of the curve). \n<b>• Simon</b> - remapped pixels receive some smoothing, plus medium sharpening (as shown by the negative -y portions of the curve). \n<b>• Rifman</b> - remapped pixels receive some smoothing, plus significant sharpening (as shown by the negative -y portions of the curve). \n<b>• Mitchell</b> - remapped pixels receive some smoothing, plus blurring to hide pixelation. \n<b>• Parzen</b> - remapped pixels receive the greatest smoothing of all filters. \n<b>• Notch</b> - remapped pixels receive flat smoothing (which tends to hide moire patterns). \n<b>• Lanczos4</b>, <b>Lanczos6</b>, and <b>Sinc4</b> - remapped pixels receive sharpening which can be useful for scaling down. <b>Lanczos4</b> provides the least sharpening and <b>Sinc4</b> the most." T IDistort1.filter}
+ addUserKnob {3 octaves t "Sets the number of Perlin noise functions to add to the noise frequency."}
+ octaves 10
+ addUserKnob {26 ""}
+ addUserKnob {41 mask t "Enables the associated mask channel to the right. Disabling this checkbox is the same as setting the channel to none. \n\nThe channel to use as a mask. By default, the filter effect is limited to the non-black areas of this channel." -STARTLINE T Merge1.maskChannelMask}
+ addUserKnob {6 invert t "Inverts the use of the mask channel, so that the merge is limited to the non-white areas of the mask.\n" -STARTLINE}
+ addUserKnob {20 transform l Transform}
+ addUserKnob {41 translate t "Translates the noise along the x and y axes. You can also adjust translate values by dragging the transform handle in the Viewer." T Noise3.translate}
+ addUserKnob {41 rotate t "\n\nRotates the noise around the center x y coordinates. You can adjust rotate values by dragging the transform handle in the Viewer.\n" T Noise3.rotate}
+ addUserKnob {41 scale_1 l scale t "Scales the noise width and height around the center x y coordinates." T Noise3.scale}
+ addUserKnob {41 center t "Sets the center of rotation and scale on the x and y axes." T Noise3.center}
+ addUserKnob {41 skewX l "skew X" t "Skews the noise on the x axes. \n" T Noise3.skewX}
+ addUserKnob {41 skewY l "skew Y" t "Skews the noise on the y axes. \n" T Noise3.skewY}
+ addUserKnob {41 skew_order l "skew order" t "Operation on what axis is skewed first" T Noise3.skew_order}
+ addUserKnob {41 xrotate t "Rotation around the x axis in 3D noise space. Setting this to zero reveals artifacts in the Perlin noise generator." T Noise3.xrotate}
+ addUserKnob {41 yrotate t "Rotation around the y axis in 3D noise space. Setting this to zero reveals artifacts in the Perlin noise generator.\n" T Noise3.yrotate}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Fractal Blur</font><font color=#CC804E> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>Fractal Blur</b>  using noise pattern to distort<br>the channels.\n<br></b><i>\n<br><strong>•</br> \nThis is useful for distorting the edges<br>of an alpha channel to add imperfections<br>to a matte.\n</i>\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#CC804E;\">John Toth <b>© 2024 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#CC804E\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#CC804E\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.0.2\"\ncontext = \"Filter\"\n\ndate = \"6th February\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- uses noise pattern to distort the channels\n\"\"\"\n\n\n\nthankyou = \"\"\"\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + \"<br>\" + UPPER + site + developer + ENTER + \"</a>\") \n\n"}
+}
+ Input {
+  inputs 0
+  name mask
+  label "\[value number]"
+  xpos -1140
+  ypos -664
+  number 1
+ }
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -1106
+  ypos -102
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos -590
+  ypos -664
+ }
+ Dot {
+  name Dot20
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -556
+  ypos -467
+ }
+set N1a407200 [stack 0]
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -742
+  ypos -467
+ }
+set N49d07c00 [stack 0]
+ AdjBBox {
+  numpixels {{max(0,IDistort1.uv_scale.main)} {max(0,parent.IDistort1.uv_scale.main)}}
+  name AdjBBox2
+  xpos -776
+  ypos -418
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -742
+  ypos -342
+ }
+push $N49d07c00
+ Dot {
+  name Dot17
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -852
+  ypos -467
+ }
+ Remove {
+  name Remove2
+  xpos -886
+  ypos -424
+ }
+ CopyBBox {
+  inputs 2
+  name CopyBBox1
+  xpos -886
+  ypos -346
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -852
+  ypos -246
+ }
+set N1a09ee00 [stack 0]
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -742
+  ypos -246
+ }
+ Noise {
+  output {rgba.red -rgba.green -rgba.blue none}
+  cliptype none
+  replace true
+  invert_mask {{parent.invert}}
+  size {{parent.scale} {parent.scale}}
+  zoffset {{parent.seed}}
+  octaves {{parent.octaves}}
+  gamma 1
+  center {1024 778}
+  name Noise3
+  xpos -776
+  ypos -202
+ }
+ Noise {
+  output {-rgba.red rgba.green -rgba.blue none}
+  cliptype none
+  replace true
+  invert_mask {{parent.invert}}
+  size {{parent.scale} {parent.scale}}
+  zoffset {{"parent.seed + 100"}}
+  octaves {{parent.octaves}}
+  translate {{parent.Noise3.translate} {parent.Noise3.translate}}
+  rotate {{parent.Noise3.rotate}}
+  scale {{parent.Noise3.scale} {parent.Noise3.scale}}
+  skewX {{parent.Noise3.skewX}}
+  skewY {{parent.Noise3.skewY}}
+  center {{parent.Noise3.center} {parent.Noise3.center}}
+  xrotate {{parent.Noise3.xrotate}}
+  yrotate {{parent.Noise3.yrotate}}
+  name Noise1
+  xpos -776
+  ypos -154
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -742
+  ypos -102
+ }
+push $N1a09ee00
+ AddChannels {
+  channels rgb
+  name AddChannels1
+  xpos -886
+  ypos -178
+ }
+ Merge2 {
+  inputs 2+1
+  operation copy
+  Achannels {{{parent.IDistort1.channels}}}
+  Bchannels {{{parent.IDistort1.channels}}}
+  output {{{parent.IDistort1.channels}}}
+  also_merge {{{parent.IDistort1.channels}}}
+  invert_mask {{!parent.invert}}
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -886
+  ypos -118
+ }
+ Clamp {
+  channels rgb
+  name Clamp1
+  xpos -886
+  ypos -34
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -852
+  ypos 66
+ }
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -666
+  ypos 66
+ }
+set N1a454c00 [stack 0]
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -371
+  ypos 66
+ }
+push $N1a407200
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -556
+  ypos -78
+ }
+set N49fa9400 [stack 0]
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -261
+  ypos -78
+ }
+set N1a4b5400 [stack 0]
+ Shuffle {
+  in forward
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -295
+  ypos -20
+ }
+ Copy {
+  inputs 2
+  from0 rgba.red
+  to0 forward.u
+  from1 rgba.green
+  to1 forward.v
+  name Copy2
+  xpos -295
+  ypos 122
+ }
+ IDistort {
+  channels rgba
+  uv forward
+  uv_offset 0.5
+  uv_scale {{parent.size} {parent.size}}
+  name IDistort2
+  xpos -295
+  ypos 206
+ }
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -261
+  ypos 427
+ }
+push $N1a454c00
+push $N49fa9400
+ Copy {
+  inputs 2
+  from0 rgba.red
+  to0 forward.u
+  from1 rgba.green
+  to1 forward.v
+  name Copy1
+  xpos -590
+  ypos 122
+ }
+ IDistort {
+  uv forward
+  uv_offset 0.5
+  uv_scale {{parent.size} {parent.size}}
+  name IDistort1
+  xpos -590
+  ypos 203
+ }
+ Dot {
+  name Dot23
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -556
+  ypos 330
+ }
+set N49fd3e00 [stack 0]
+ Dot {
+  name Dot22
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -407
+  ypos 330
+ }
+ ShuffleCopy {
+  inputs 2
+  red red
+  green green
+  blue blue
+  out {{{parent.Shuffle1.in}}}
+  name ShuffleCopy1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -441
+  ypos 413
+ }
+ Dot {
+  name Dot21
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -407
+  ypos 546
+ }
+push $N49fd3e00
+ Switch {
+  inputs 2
+  which {{"\[if \{ \[lsearch \"all forward backward motion\"  \[value IDistort1.channels]] != -1 \} \{ return \"1\n\" \} else \{ return \"0\"\}]"}}
+  name Switch1
+  xpos -590
+  ypos 542
+ }
+ Output {
+  name Output
+  xpos -590
+  ypos 710
+ }
+push $N1a4b5400
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -116
+  ypos -78
+ }
+end_group

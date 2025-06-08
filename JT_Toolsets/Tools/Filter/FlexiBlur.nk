@@ -1,0 +1,287 @@
+Group {
+ name FlexiBlur1
+ help "Applies either a linear, radial or zoom blur effect to the incoming channel(s)."
+ onCreate "n = nuke.thisNode()\nk = nuke.thisKnob()\nflag = nuke.INVISIBLE\n\n# Locking target if \"useTarget\" is enabled.\nif n.knob('useTarget').value() == 1:\n    n\['target'].setEnabled(True)\n    n\['angle'].setEnabled(False)\nelse:\n    n\['target'].setEnabled(False)\n    n\['angle'].setEnabled(True)\n\n"
+ knobChanged "import nuke\n\nn = nuke.thisNode()\nk = nuke.thisKnob()\n\n# Locking target is \"usetarget\" is not enabled.\nif n.knob('useTarget').value() == 1:    \n    n\['target'].setEnabled(True)\n    n\['angle'].setEnabled(False)\nelse:\n    n\['target'].setEnabled(False)\n    n\['angle'].setEnabled(True)\n\n\n# Will not be able to connect to Deep Nodes\nif k.name() == 'inputChange':\n    classList = \['DeepToImage','DeepToImage2','DeepToImage3','DeepToImage4','DeepToImage5']\n    if n.input(0) is not None:\n        if 'Deep' in n.input(0).Class() not in classList:\n           n.setInput(0, None)"
+ tile_color 0xcc804eff
+ selected true
+ addUserKnob {20 flexiBlur l "Flexi Blur"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION FlexiBlur
+ addUserKnob {41 channels t "The DirBlur effect is only applied to these channels. \nIf you set this to something other than all or none, you can use the checkboxes on the right to select individual channels." T Blur1.channels}
+ addUserKnob {41 operation t "Select the blur type to apply: \n\n<b>• linear </b>- smears pixels in a given direction. You can use this to simulate motion blur on a moving object.\n<b>• radial </b>- smears pixels around a center point. You can use this to simulate motion blur on a rotating object. \n<b>• zoom </b>- smears pixels in all directions from a center point. You can use this to simulate light rays, or to transition between one clip and another. \n" T menu.operation}
+ addUserKnob {41 visualizeOutput l "visualize output" t "This will turn on/off the visualize overlay.\n\nThe settings for the overlay are all in the <b>visualize</b> tab." -STARTLINE T menu.visualizeOutput}
+ addUserKnob {6 useTarget l "use target" t "When enabled, the directional blur is determined by between <b>image center</b> and <b> Target location</b>. \n\nIf this is disabled, the directional blur is determined by angle." +HIDDEN +STARTLINE}
+ addUserKnob {12 target t "When using directional blur with <b>use target</b> enabled, pointer will determines the direction of linear blur. \n\nYou can also adjust Linear Target by dragging the target handle in the Viewer." +DISABLED +HIDDEN}
+ addUserKnob {12 center t "Sets the center of rotation and scale on the x and y axes for the radial and zoom blur effects."}
+ center {1024 778}
+ addUserKnob {22 centerButton l center t "Pressing this button will put the the values of the center to the center based on the image input." -STARTLINE T "n = nuke.thisNode()\n\nn\['center'].setValue((n.width() * 0.5, n.height() * 0.5))\n\n"}
+ addUserKnob {7 size t "The length (in pixels) of the blur applied.\n" R 0 100}
+ addUserKnob {7 angle t "Determines the direction of <b>directional</b> blur when <b>UseTarget</b> is disabled." +HIDDEN R -180 180}
+ addUserKnob {7 quality t "Sets the number of blur samples. A value of 1 should produce reasonable results for most sequences. \nIncrease the value to produce more samples for higher quality, or decrease it to shorten the processing time. The higher the value, the smoother the result." R 0 4}
+ addUserKnob {26 divider001 l "" +STARTLINE}
+ addUserKnob {41 maskChannelMask l mask t "Enables the associated mask channel to the right. Disabling this checkbox is the same as setting the channel to none. \n\nThe channel to use as a mask. By default, the merge is limited to the non-black areas of this channel.\n" -STARTLINE T Blur1.maskChannelMask}
+ addUserKnob {41 inject t "\n\nCopies the mask input to the predefined mask.a channel. Injecting the mask allows you to use the same mask further downstream.\n" -STARTLINE T Blur1.inject}
+ addUserKnob {41 invert_mask l invert t "\n\nInverts the use of the mask channel so that the blur is limited to the non-white areas of the mask.\n" -STARTLINE T Blur1.invert_mask}
+ addUserKnob {41 fringe t "When enabled, only apply the effect to the edge of the mask. \nWhen disabled, the effect is applied to the entire mask." -STARTLINE T Blur1.fringe}
+ addUserKnob {41 mix t "Dissolves between the original image at 0 and the full effect at 1." T Merge1.mix}
+ addUserKnob {20 visualize l Visualize}
+ addUserKnob {41 visualizeOutput_1 l "visualize output" t "This will turn on/off the visualize overlay.\n\nThe settings for the overlay are all in the <b>visualize</b> tab." T menu.visualizeOutput}
+ addUserKnob {3 numberSize l size t "This decrease/increase the size of the dots beings displayed when visualize output is enabled."}
+ numberSize 10
+ addUserKnob {3 number t "This decrease/increase the amount dots being displayed when visualize output is enabled."}
+ number 25
+ addUserKnob {18 visualizeColor l "visualize color" t "This changes the colors of the dots being displayed when visualize output is enabled."}
+ visualizeColor {0 1 0}
+ addUserKnob {6 visualizeColor_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_rgb_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {7 visualizeMix l mix t "Dissolves between no visualize colour overlay on the image from 0 and 1 when visualize output is enabled.\n\n1 Being full effect"}
+ visualizeMix 1
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Flexi Blur</font><font color=#CC804E> v1.1"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br> \n<b>Multi Blur</b> will apply either a linear,<br>radial or a zoom blur effect to the incoming<br>channel(s).\n<br></b>\n\n\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#CC804E;\">John Toth <b>© 2023 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#CC804E\">Tool Demo" t "Opens a web page that will take you to a demo video about this nuke tool." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#CC804E\">Version Log" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nmodel_number = \"1.1.3\"\ncontext = \"Filter\"\n\n\ndate = \"17th January\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2023\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- adds linear,radial or zoom blur effect to channel(s)\n<br></i><b> v 1.1 </b><i>\n- onCreate has been added to mimic the center to format of input image on selected or default to root similar to transform node.\n\"\"\"\n\n\n\nthankyou = \"\"\"Samantha Maiolo for iterative knob control\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Model Number: \" + LOWER + model_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + UPPER + site + developer + \"</a>\") \n\n\n"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x23232301
+  label "<center>Don't Touch\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  note_font_color 0xee453cff
+  xpos 301
+  ypos -1619
+  bdwidth 278
+  bdheight 166
+ }
+ Input {
+  inputs 0
+  name mask
+  label "\[value number]"
+  xpos 840
+  ypos -1648
+  number 1
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 874
+  ypos -414
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 644
+  ypos -1648
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 678
+  ypos -1518
+ }
+set N20a47c00 [stack 0]
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 678
+  ypos -1335
+ }
+set N20f68a00 [stack 0]
+ Remove {
+  name Remove1
+  xpos 230
+  ypos -1345
+ }
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 264
+  ypos -1263
+ }
+set N20eb6400 [stack 0]
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 398
+  ypos -1263
+ }
+ Grid {
+  output alpha
+  cliptype none
+  number {{parent.number} 0}
+  size {{parent.numberSize}}
+  color {1 1 1 1}
+  name Grid2
+  xpos 364
+  ypos -1201
+ }
+ Dot {
+  name Dot30
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 398
+  ypos -1119
+ }
+push $N20eb6400
+ Grid {
+  output alpha
+  cliptype none
+  number {0 {parent.number}}
+  size {{parent.numberSize}}
+  color {1 1 1 1}
+  name Grid1
+  xpos 230
+  ypos -1201
+ }
+ Merge2 {
+  inputs 2
+  operation min
+  name Merge8
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 230
+  ypos -1129
+ }
+ BlackOutside {
+  name BlackOutside1
+  xpos 230
+  ypos -1066
+ }
+ Add {
+  channels rgb
+  value {{parent.visualizeColor.r} {parent.visualizeColor.g} {parent.visualizeColor.b} 1}
+  unpremult rgba.alpha
+  name Add3
+  xpos 230
+  ypos -976
+ }
+ Dot {
+  name Dot32
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 264
+  ypos -894
+ }
+push $N20f68a00
+ Dot {
+  name Dot33
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 678
+  ypos -1014
+ }
+set N20fa6600 [stack 0]
+ Dot {
+  name Dot34
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 508
+  ypos -1014
+ }
+ Merge2 {
+  inputs 2
+  mix {{parent.visualizeMix}}
+  name Merge9
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 474
+  ypos -904
+ }
+ Dot {
+  name Dot35
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 508
+  ypos -774
+ }
+push $N20fa6600
+ Switch {
+  inputs 2
+  which {{menu.visualizeOutput}}
+  name Switch2
+  xpos 644
+  ypos -778
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 678
+  ypos -606
+ }
+set N20feee00 [stack 0]
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 534
+  ypos -606
+ }
+ TransformMasked {
+  channels {{{parent.Blur1.channels}}}
+  translate {{"parent.operation < 1 ? ( parent.useTarget == 0 ?  ((frame-.5-int(frame)) * (size * 2) * sin(radians(90-angle)) + 0 * sin ((frame+0) * pi * 2)) /2 : ((frame-.5-int(frame)) * (size * 2) * sin(radians(90-rotateTarget)) + 0 * sin ((frame+0) * pi * 2)) / 2) : 0"} {"parent.operation < 1 ? (parent.useTarget == 0 ? ((frame-.5-int(frame)) * (size * 2) * cos(radians(90-angle)) + 0 * cos((frame + 0) * pi * 2)) / 2 : ((frame-.5-int(frame)) * (size * 2) * cos(radians(90-rotateTarget)) + 0 * cos((frame + 0) * pi * 2)) / 2) : 0"}}
+  rotate {{"parent.operation  == 1 ?  ((frame - 0.5 - int(frame)) * (size * 2) * sin(radians(90-angle)) + 0 * sin ((frame+0) * pi * 2))  / 50 : 0"}}
+  scale {{"parent.operation  == 2 ?  (-((frame-.5-int(frame)) * (size) * sin(radians(90)) + 0 * sin ((frame+0) * pi * 2))/1000)+1 : 1"} {"parent.operation  == 2 ?  (-((frame-.5-int(frame)) * (size) * sin(radians(90)) + 0 * sin ((frame+0) * pi * 2))/1000)+1 : 1"}}
+  center {{"parent.menu.operation == 0 ? input.width/2 : parent.center"} {"parent.menu.operation == 0 ? input.height/2 : parent.center"}}
+  motionblur {{"parent.quality > 0 ? parent.quality : 0.0001"}}
+  shutter 1
+  shutteroffset centred
+  maskChannelMask none
+  name Transform3
+  xpos 500
+  ypos -520
+  addUserKnob {20 User}
+  addUserKnob {7 rotateTarget R -180 180}
+  rotateTarget {{"degrees((atan2(center.x+translate.x-parent.target.x,center.y+translate.y-parent.target.y)*-1)) + 270"}}
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 534
+  ypos -414
+ }
+push $N20feee00
+ Merge2 {
+  inputs 2+1
+  operation copy
+  output {{{parent.Blur1.channels}}}
+  also_merge {{{parent.Blur1.channels}}}
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 644
+  ypos -430
+ }
+ Output {
+  name Output1
+  xpos 644
+  ypos -274
+ }
+ NoOp {
+  inputs 0
+  name menu
+  knobChanged "grp = nuke.thisGroup()\nk = nuke.thisKnob()\n\n\n#hide/reveal certain knobs based on operation type.\ntarget = \['useTarget','target']\ncenter = \['center','centerButton']\nangle = \['angle']\n             \nif k.name() in ('operation', 'showPanel'):\n    CONTROLS_type = grp\['operation'].value()\n    if CONTROLS_type == 'linear':\n        for i in target:\n            grp\[i].setVisible(True)\n        for i in center:\n            grp\[i].setVisible(False)\n        for i in angle:\n            grp\[i].setVisible(True)\n         \n    elif CONTROLS_type == 'radial':\n        for i in target:\n            grp\[i].setVisible(False)\n        for i in center:\n            grp\[i].setVisible(True)\n        for i in angle:\n            grp\[i].setVisible(False)\n\n                     \n    elif CONTROLS_type == 'zoom':\n        for i in target:\n            grp\[i].setVisible(False)\n        for i in center:\n            grp\[i].setVisible(True)\n        for i in angle:\n            grp\[i].setVisible(False)\n\n         \n            \n\n"
+  xpos 345
+  ypos -1522
+  addUserKnob {20 User}
+  addUserKnob {4 operation M {linear radial zoom "" "" ""}}
+  operation radial
+  addUserKnob {6 visualizeOutput l "visualize output" +STARTLINE}
+ }
+push $N20a47c00
+ Blur {
+  name Blur1
+  label "size: \[value size]"
+  xpos 452
+  ypos -1534
+ }
+end_group

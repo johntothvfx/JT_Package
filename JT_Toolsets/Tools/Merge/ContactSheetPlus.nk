@@ -1,0 +1,17 @@
+ContactSheet {
+ inputs 3
+ width {{"inputs > 0 ? input.width * columns : 100"}}
+ height {{"inputs > 0 ? input.height/input.pixel_aspect * rows : 100"}}
+ rows 1
+ columns 2
+ center true
+ roworder TopBottom
+ startframe 1
+ endframe 1
+ name ContactSheetPlus1
+ selected true
+ addUserKnob {20 connectSelectedNodes l "Connect Selected Nodes"}
+ addUserKnob {22 connectLeftRight l "left to right" T "inputNodes = nuke.selectedNodes()\n\ncontactSheet = nuke.thisNode()\n\nnodePositions = \{node.knob('xpos').value() : node for node in inputNodes\}\nsortedNodes = \[nodePositions\[pos] for pos in sorted(nodePositions.keys())]\n\ncurrentInputs = contactSheet.inputs()\n\nfor index, node in enumerate(sortedNodes):\n    if contactSheet.knob('appendSelection').value():\n        index += currentInputs\n    contactSheet.setInput(index,node)" +STARTLINE}
+ addUserKnob {22 connectRightLeft l "right to left" -STARTLINE T "inputNodes = nuke.selectedNodes()\n\ncontactSheet = nuke.thisNode()\n\nnodePositions = \{node.knob('xpos').value() : node for node in inputNodes\}\nsortedNodes = \[nodePositions\[pos] for pos in sorted(nodePositions.keys())\[::-1]]\n\ncurrentInputs = contactSheet.inputs()\n\nfor index, node in enumerate(sortedNodes):\n    if contactSheet.knob('appendSelection').value():\n        index += currentInputs\n    contactSheet.setInput(index,node)"}
+ addUserKnob {6 appendSelection l append -STARTLINE}
+}
