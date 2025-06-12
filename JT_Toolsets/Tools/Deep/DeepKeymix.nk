@@ -1,0 +1,405 @@
+Group {
+ inputs 2
+ name DeepKeymix1
+ knobChanged "import re\n\nn = nuke.thisNode()\nk = nuke.thisKnob()\n\nclassList = \['NoOp', 'Group', 'Dot', 'Gizmo', 'Switch']\ndeniedList = \['DeepToImage']\n\nacceptedClass_compile = \[re.compile(r'ScanlineRender\\d*'), re.compile(r'DeepToImage\\d*')]\n\nif k.name() == 'inputChange':\n    for i in range(2):\n        inp = n.input(i)\n        if inp:\n            in_class = inp.Class()\n            if in_class is not None:\n                if not any(pattern.match(in_class) for pattern in acceptedClass_compile) and 'Deep' not in in_class and in_class not in classList:\n                    n.setInput(i, None)\n                elif any(pattern.match(in_class) for pattern in acceptedClass_compile if pattern.pattern.startswith('DeepToImage')):\n                    n.setInput(i, None)\n"
+ tile_color 0x5fff
+ label "mix: \[value mix]"
+ selected true
+ addUserKnob {20 deepKeymix l "Deep Keymix"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION DeepKeymix
+ addUserKnob {41 maskChannel l "mask channel" t "Channel to use form mask input." T Copy1.from0}
+ addUserKnob {6 invertMask l invert t "Flip meaning of the mask channel" -STARTLINE}
+ addUserKnob {6 binaryMask l binary t "Makes all values in the mask channel 1 or 0 depending on values." -STARTLINE}
+ addUserKnob {7 mix t "Dissolves between B-only at 0 and full keymix at 1."}
+ mix 1
+ addUserKnob {4 bbox l "set BBox to" t "Clip one input to match the other if wanted." M {union "B Side" "A Side" "" "" "" "" "" ""}}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Deep Keymix</font><font color=#000060> v1.1"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br> \n<b>Deep Keymix</b> layers two deep images together<br>using a specified Roto shape or image as a mask.<br>It copies input A to input B where the mask is non-black.\n<br>\n<br>\n<br>\n<b><a href=\"https://johntothvfx.com\" style=\"color:#000060;\">John Toth <b>© 2020 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#000060\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message(\"Coming Soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#000070\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "version_number = \"1.1.1\"\ncontext = \"Deep\"\nmodified_date = \"30th July 2024\"\ndeveloper = \"John Toth © 2020\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- layers two deep images together based on a layer matte.\n<br></i><b> v 1.1 </b><i>\n- internally rebuild to avoid going into 2D (node overhaul)\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)\n"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode1
+  tile_color 0x999999ff
+  label "<center>All channels\n<i><font size=1>(making sure the color blends between A and B nicer \[less artefacts])\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 24
+  note_font_color 0xee453cff
+  xpos 712
+  ypos 2463
+  bdwidth 337
+  bdheight 641
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode3
+  tile_color 0x999999ff
+  label "<center>alpha\n<i><font size=1>(making sure alpha/deep opacity alpha doesn't break)\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 24
+  note_font_color 0xee453cff
+  xpos -252
+  ypos 1720
+  bdwidth 504
+  bdheight 639
+ }
+ Input {
+  inputs 0
+  name mask
+  label "\[value number]"
+  xpos 1500
+  ypos 128
+  number 2
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1534
+  ypos 258
+ }
+set N8c6fb600 [stack 0]
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1644
+  ypos 258
+ }
+ AddChannels {
+  channels rgba
+  name AddChannels1
+  xpos 1610
+  ypos 326
+ }
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1644
+  ypos 426
+ }
+push $N8c6fb600
+ Remove {
+  name Remove1
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 1500
+  ypos 320
+ }
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy1
+  xpos 1500
+  ypos 416
+ }
+ Expression {
+  channel0 none
+  channel1 none
+  channel2 none
+  channel3 alpha
+  expr3 "a >0? 1 : 0"
+  name Expression1
+  tile_color 0xffffffff
+  label "binary mask"
+  xpos 1500
+  ypos 776
+  disable {{!parent.binaryMask}}
+ }
+ Multiply {
+  channels rgba
+  value {{clamp(parent.mix)}}
+  name Multiply1
+  label "value: \[value value]\nmix"
+  xpos 1500
+  ypos 938
+ }
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1534
+  ypos 1098
+ }
+set N8b80ac00 [stack 0]
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -162
+  ypos 1098
+ }
+ Invert {
+  name Invert3
+  xpos -196
+  ypos 1160
+  disable {{parent.invertMask}}
+ }
+ Clamp {
+  channels alpha
+  name Clamp1
+  label "\[expr \{\[value minimum_enable]? \"\[value minimum] min\" : \"\"\}]\[expr \{\[value minimum_enable] && \[value maximum_enable]? \"\n\" : \"\"\}]\[expr \{\[value maximum_enable]? \"\[value maximum] max\" : \"\"\}]"
+  xpos -196
+  ypos 1244
+ }
+ DeepFromImage {
+  premult true
+  set_z true
+  name DeepFromImage4
+  label "\[expr \{ \[value set_z] ?  \"(Z set to \[value z])\" : \"\"\}]"
+  xpos -196
+  ypos 1403
+ }
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -162
+  ypos 1579
+ }
+ Input {
+  inputs 0
+  name A
+  label "\[value number]"
+  xpos -480
+  ypos 128
+  number 1
+ }
+ DeepMerge {
+  inputs 2
+  operation holdout
+  name DeepMerge1
+  xpos -480
+  ypos 1575
+ }
+ DeepColorCorrect2 {
+  channels alpha
+  gain 1.6
+  name DeepColorCorrect3
+  xpos -480
+  ypos 1643
+ }
+ DeepCrop {
+  use_znear false
+  use_zfar false
+  bbox {{A.bbox.x} {A.bbox.y} {A.bbox.r} {A.bbox.t}}
+  name DeepCrop3
+  label "\[ expr \{ \[value use_znear] ?  \[value znear]: \"\" \}] \[ expr \{ \[value use_znear] ?  \"-\": \"\" \}] \[ expr \{ \[value use_zfar] ?  \[value zfar]: \"\" \}]"
+  xpos -480
+  ypos 1719
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -446
+  ypos 1842
+ }
+set N22df3c00 [stack 0]
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -446
+  ypos 2466
+ }
+push $N8b80ac00
+ Invert {
+  name Invert2
+  xpos 1500
+  ypos 1160
+  disable {{!parent.invertMask}}
+ }
+ Clamp {
+  channels alpha
+  name Clamp2
+  label "\[expr \{\[value minimum_enable]? \"\[value minimum] min\" : \"\"\}]\[expr \{\[value minimum_enable] && \[value maximum_enable]? \"\n\" : \"\"\}]\[expr \{\[value maximum_enable]? \"\[value maximum] max\" : \"\"\}]"
+  xpos 1500
+  ypos 1244
+ }
+ DeepFromImage {
+  set_z true
+  name DeepFromImage3
+  label "\[expr \{ \[value set_z] ?  \"(Z set to \[value z])\" : \"\"\}]"
+  xpos 1500
+  ypos 1400
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1534
+  ypos 1576
+ }
+ Input {
+  inputs 0
+  name B
+  label "\[value number]"
+  xpos 564
+  ypos 128
+ }
+ DeepMerge {
+  inputs 2
+  operation holdout
+  name DeepMerge7
+  xpos 564
+  ypos 1572
+ }
+ DeepColorCorrect2 {
+  channels alpha
+  gain 1.6
+  name DeepColorCorrect1
+  xpos 564
+  ypos 1643
+ }
+ DeepCrop {
+  use_znear false
+  use_zfar false
+  bbox {{B.bbox.x} {B.bbox.y} {B.bbox.r} {B.bbox.t}}
+  name DeepCrop1
+  label "\[ expr \{ \[value use_znear] ?  \[value znear]: \"\" \}] \[ expr \{ \[value use_znear] ?  \"-\": \"\" \}] \[ expr \{ \[value use_zfar] ?  \[value zfar]: \"\" \}]"
+  xpos 564
+  ypos 1719
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 598
+  ypos 1842
+ }
+set N8b84d600 [stack 0]
+ DeepMerge2 {
+  inputs 2
+  name DeepMerge6
+  xpos 564
+  ypos 2462
+ }
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 598
+  ypos 2562
+ }
+set N8b84ea00 [stack 0]
+ Dot {
+  name Dot17
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 874
+  ypos 2562
+ }
+ DeepToImage2 {
+  name DeepToImage3
+  xpos 840
+  ypos 2679
+ }
+ Remove {
+  channels depth
+  channels2 deep
+  name Remove2
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 840
+  ypos 2810
+ }
+ Dot {
+  name Dot18
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 874
+  ypos 2994
+ }
+push $N22df3c00
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -116
+  ypos 1842
+ }
+ DeepToImage2 {
+  name DeepToImage2
+  xpos -150
+  ypos 1910
+ }
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -116
+  ypos 2034
+ }
+push $N8b84d600
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 144
+  ypos 1842
+ }
+ DeepToImage2 {
+  name DeepToImage1
+  xpos 110
+  ypos 1910
+ }
+ ChannelMerge {
+  inputs 2
+  operation plus
+  name ChannelMerge1
+  xpos 110
+  ypos 2018
+ }
+ Clamp {
+  channels alpha
+  name Clamp3
+  label "\[expr \{\[value minimum_enable]? \"\[value minimum] min\" : \"\"\}]\[expr \{\[value minimum_enable] && \[value maximum_enable]? \"\n\" : \"\"\}]\[expr \{\[value maximum_enable]? \"\[value maximum] max\" : \"\"\}]"
+  xpos 110
+  ypos 2137
+ }
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 144
+  ypos 2802
+ }
+push $N8b84ea00
+ DeepRecolor {
+  inputs 2
+  channels none
+  targetInputAlpha true
+  name DeepRecolor1
+  label "\[expr \{ \[value targetInputAlpha] ?  \"(target input alpha)\" : \"\"\}]"
+  xpos 564
+  ypos 2786
+ }
+ DeepRecolor {
+  inputs 2
+  channels all
+  name DeepRecolor2
+  label "\[expr \{ \[value targetInputAlpha] ?  \"(target input alpha)\" : \"\"\}]"
+  xpos 564
+  ypos 2978
+ }
+ DeepCrop {
+  use_znear false
+  use_zfar false
+  bbox {{"parent.bbox == 0 ? \[expr \{\[value bbox.x] > \[value A.bbox.x] ? \[value bbox.x] : \[value A.bbox.x]\}] : \nparent.bbox == 1 ? \[value B.bbox.x] : \[value A.bbox.x]\n\n\n"} {"parent.bbox == 0 ? \[expr \{\[value bbox.y] > \[value A.bbox.y] ? \[value bbox.y] : \[value A.bbox.y]\}] : \nparent.bbox == 1 ? \[value B.bbox.y] : \[value A.bbox.y]"} {"parent.bbox == 0 ? \[expr \{\[value bbox.r] > \[value A.bbox.r] ? \[value bbox.r] : \[value A.bbox.r]\}] : \nparent.bbox == 1 ? \[value B.bbox.r] : \[value A.bbox.r]"} {"parent.bbox == 0 ? \[expr \{\[value bbox.t] > \[value A.bbox.t] ? \[value bbox.t] : \[value A.bbox.t]\}] : \nparent.bbox == 1 ? \[value B.bbox.t] : \[value A.bbox.t]"}}
+  name DeepCrop2
+  xpos 564
+  ypos 3230
+  disable {{"parent.bbox == 0 ? 1 : 0"}}
+ }
+ Output {
+  name Output1
+  xpos 564
+  ypos 3446
+ }
+end_group

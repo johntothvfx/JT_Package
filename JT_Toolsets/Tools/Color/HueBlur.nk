@@ -1,0 +1,183 @@
+Group {
+ name HueBlur1
+ help "Blurs the color while keeping the luminance values of the imag untouched."
+ tile_color 0x7aa9ff00
+ selected true
+ addUserKnob {20 hueBlur l "Hue Blur"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION HueBlur
+ addUserKnob {41 channels t "The effect is only applied to these channels. \nIf you set this to something other than all or none, you can use the checkboxes on the right to select individual channels." T Blur1.channels}
+ addUserKnob {41 size t "Blurs the color values on the image and keeps luminance values intact." T Blur1.size}
+ addUserKnob {41 filter t "Select the filter algorithm to use: \n• box \n• triangle \n• quadratic \n• gaussian" T Blur1.filter}
+ addUserKnob {41 quality l "" -STARTLINE T Blur1.quality}
+ addUserKnob {41 crop l "crop to format" t "When enabled, the bounding box cannot grow past its incoming bounding/format size. This avoids creating oversized bounding boxes that can take longer to compute." -STARTLINE T Blur1.crop}
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannelMask l mask t "Enables the associated mask channel to the right. Disabling this checkbox is the same as setting the channel to none. \n\n\n\nThe channel to use as a mask. By default, the filter effect is limited to the non-black areas of this channel.\n" -STARTLINE T Merge1.maskChannelMask}
+ addUserKnob {41 inject t "Copies the mask input to the predefined mask.a channel. Injecting the mask allows you to use the same mask further downstream." -STARTLINE T Merge1.inject}
+ addUserKnob {41 invert_mask l invert t "Inverts the use of the mask channel, so that the merge is limited to the non-white areas of the mask.\n" -STARTLINE T Merge1.invert_mask}
+ addUserKnob {41 fringe t "When enabled, only apply the effect to the edge of the mask. \nWhen disabled, the effect is applied to the entire mask." -STARTLINE T Merge1.fringe}
+ addUserKnob {41 mix t "Dissolves between the original image at 0 and the full effect at 1." T Merge1.mix}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" t "Node version info, for more information look at version log" +STARTLINE T "<br><font size='5'>Hue Blur</font><font color=#7AA9FF> v1.1"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "Overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>Hue Blur</b> blurs the color while<br>keeping the luminance of the image<br>untouched.\n\n<br></b>\n\n\n\n</i>\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#7AA9FF;\">John Toth <b>© 2020 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#7AA9FF\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#7AA9FF\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nversion_number = \"1.1.1\"\ncontext = \"Color\"\nmodified_date = \"16th September 2024\"\ndeveloper = \"John Toth © 2020\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- blurs the color while keeping luminance intact.\n<br></i><b> v 1.1 </b><i>\n- internals have been rebuilt to not go through colorspace operations.\n- 'out' was remove as it was not useful.\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)\n"}
+}
+ Input {
+  inputs 0
+  name mask
+  label "\[value number]"
+  xpos 730
+  ypos -13
+  number 1
+ }
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 764
+  ypos 834
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 620
+  ypos -13
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 654
+  ypos 66
+ }
+set N1bbfe600 [stack 0]
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  selected true
+  xpos 434
+  ypos 66
+ }
+ Dot {
+  name Dot117
+  xpos 434
+  ypos 162
+ }
+set N586f3c00 [stack 0]
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 290
+  ypos 162
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 290
+  ypos 234
+ }
+set N5836ba00 [stack 0]
+ Dot {
+  name Dot5
+  xpos 180
+  ypos 234
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 180
+  ypos 378
+ }
+push $N5836ba00
+ Saturation {
+  channels {{{Blur1.channels}}}
+  saturation 0
+  mode Maximum
+  maskChannelInput -rgba.alpha
+  unpremult -rgba.alpha
+  name Saturation1
+  label "\[value saturation] (\[string tolower \[value mode]])"
+  xpos 256
+  ypos 299
+ }
+ Merge2 {
+  inputs 2
+  operation divide
+  Achannels {{{Blur1.channels}}}
+  Bchannels {{{Blur1.channels}}}
+  output {{{Blur1.channels}}}
+  also_merge {{{Blur1.channels}}}
+  name Merge4
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 256
+  ypos 371
+ }
+ Blur {
+  name Blur1
+  label "size: \[value size]"
+  xpos 256
+  ypos 491
+ }
+ Dot {
+  name Dot119
+  xpos 290
+  ypos 594
+ }
+push $N586f3c00
+ Saturation {
+  channels {{{Blur1.channels}}}
+  saturation 0
+  mode Maximum
+  maskChannelInput -rgba.alpha
+  unpremult -rgba.alpha
+  name Saturation3
+  label "\[value saturation] (\[string tolower \[value mode]])"
+  xpos 400
+  ypos 299
+ }
+ Merge2 {
+  inputs 2
+  operation multiply
+  Achannels {{{Blur1.channels}}}
+  Bchannels {{{Blur1.channels}}}
+  output {{{Blur1.channels}}}
+  also_merge {{{Blur1.channels}}}
+  name Merge3
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 400
+  ypos 587
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 434
+  ypos 834
+ }
+push $N1bbfe600
+ Merge2 {
+  inputs 2+1
+  operation copy
+  Achannels {{{Blur1.channels}}}
+  Bchannels {{{Blur1.channels}}}
+  output {{{Blur1.channels}}}
+  also_merge {{{Blur1.channels}}}
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 620
+  ypos 827
+ }
+ Output {
+  name Output1
+  xpos 620
+  ypos 951
+ }
+end_group

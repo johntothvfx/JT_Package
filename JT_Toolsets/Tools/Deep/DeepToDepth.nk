@@ -1,0 +1,215 @@
+Group {
+ name DeepToDepth1
+ help "Outputs the depth channel with real world units (Z)"
+ knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\n\nclassList = \['NoOp', 'Group', 'Gizmo' 'ScanlineRender', 'ScanlineRender2',  'ScanlineRender3', 'Dot']\ndeniedList = \['DeepToImage', 'DeepToImage2', 'DeepToImage3']\n\nif k.name() == 'inputChange':\n    in_class = n.input(0).Class()\n    if in_class is not None:\n        if 'Deep' not in in_class and in_class not in classList:\n            n.setInput(0, None)\n        elif in_class in deniedList:\n            n.setInput(0, None)"
+ tile_color 0x5fff
+ selected true
+ addUserKnob {20 deepToDepth l "Deep To Depth"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION DeepToDepth
+ addUserKnob {6 antialiasing l anti-aliasing t "When enabled the depth channel will be anti-aliased." +STARTLINE}
+ antialiasing true
+ addUserKnob {6 replace0WithInf l "replace 0 with inf" t "Any pixel with a value of black (0) will be replaced as an inf pixel." +STARTLINE}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Deep To Depth</font><font color=#000060> v1.1"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "overview of the node" +STARTLINE T "<br><strong>•</br><b> Deep To Depth</b> outputs the depth channel with <br>real world units.\n<br>\n<br><i>\n<b>• (1/z) Normalize depth</b> -\nvalues between 0-1, <br>it is Nuke's default format (DeepToImage).\n<br>\n<b>• (Z) Real World Units</b> -  is distance from camera<br> (e.g CG renders).\n</i>\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#000060;\">John Toth <b>© 2021 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#000060\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message(\"Coming Soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#000060\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.1.2\"\ncontext = \"Deep\"\n\ndate = \"29th November\"\nyear = \" 2021\"\n\ndeveloper = \"John Toth © \" + year\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- Outputs the depth channel with real world units (Z)\n<br></i><b> v 1.1 </b><i>\n- anti-alisaing was added\n- user interface was updated to match set package\n\"\"\"\n\n\n\nthankyou = \"\"\"\n\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + UPPER + site + developer + \"</a>\") \n"}
+}
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 4674
+  ypos -2080
+ }
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4708
+  ypos -1972
+ }
+set Nc854e200 [stack 0]
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 5278
+  ypos -1972
+ }
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 5278
+  ypos -1900
+ }
+set Nf07ffc00 [stack 0]
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 5134
+  ypos -1900
+ }
+ DeepToImage2 {
+  name DeepToImage2
+  xpos 5100
+  ypos -1832
+ }
+ Shuffle {
+  red white
+  green white
+  blue white
+  alpha white
+  name Shuffle7
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 5100
+  ypos -1772
+ }
+ Dot {
+  name Dot18
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 5134
+  ypos -1660
+ }
+push $Nf07ffc00
+ DeepRecolor {
+  inputs 2
+  name DeepRecolor1
+  label "\[expr \{ \[value targetInputAlpha] ?  \"(target input alpha)\" : \"\"\}]"
+  xpos 5244
+  ypos -1664
+ }
+ Dot {
+  name Dot22
+  xpos 5278
+  ypos -1516
+ }
+set Ndee05000 [stack 0]
+ Dot {
+  name Dot24
+  xpos 4948
+  ypos -1516
+ }
+ DeepExpression {
+  chans1 deep
+  rgba.red deep.front*rgba.alpha
+  rgba.green deep.front*rgba.alpha
+  rgba.blue deep.front*rgba.alpha
+  name DeepExpression13
+  xpos 4914
+  ypos -1448
+ }
+ DeepToImage {
+  name DeepToImage9
+  xpos 4914
+  ypos -1352
+ }
+ Unpremult {
+  name Unpremult7
+  xpos 4914
+  ypos -1256
+ }
+ Shuffle {
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 4914
+  ypos -1172
+ }
+ Dot {
+  name Dot25
+  xpos 4948
+  ypos -1060
+ }
+set Ndef8ac00 [stack 0]
+ Dot {
+  name Dot45
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4948
+  ypos -916
+ }
+push $Ndef8ac00
+push $Ndee05000
+ DeepExpression {
+  chans1 deep
+  rgba.red deep.front
+  rgba.green deep.front
+  rgba.blue deep.front
+  rgba.alpha 1
+  name DeepExpression5
+  xpos 5244
+  ypos -1448
+ }
+ DeepToImage {
+  name DeepToImage3
+  xpos 5244
+  ypos -1352
+ }
+ Unpremult {
+  name Unpremult4
+  xpos 5244
+  ypos -1256
+ }
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy2
+  xpos 5244
+  ypos -1070
+ }
+ Switch {
+  inputs 2
+  which {{parent.antialiasing}}
+  name Switch5
+  xpos 5244
+  ypos -920
+ }
+ Expression {
+  expr0 "r == 0 ? inf : r"
+  name Expression1
+  label "0 to inf"
+  xpos 5244
+  ypos -832
+  disable {{!parent.replace0WithInf}}
+ }
+ Shuffle {
+  out depth
+  name Shuffle2
+  tile_color 0x802380ff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 5244
+  ypos -740
+ }
+ Dot {
+  name Dot46
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 5278
+  ypos -628
+ }
+push $Nc854e200
+ DeepToImage2 {
+  name DeepToImage4
+  xpos 4674
+  ypos -1354
+ }
+ Copy {
+  inputs 2
+  channels depth
+  name Copy4
+  xpos 4674
+  ypos -644
+ }
+ Output {
+  name Output
+  xpos 4674
+  ypos -418
+ }
+end_group

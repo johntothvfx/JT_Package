@@ -1,0 +1,83 @@
+Group {
+ inputs 0
+ name Rainbow1
+ help "Outputs a rainbow colored constant"
+ selected true
+ postage_stamp true
+ addUserKnob {20 rainbow l Rainbow}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION Rainbow
+ addUserKnob {41 format T Constant1.format}
+ addUserKnob {14 numpixels l "add pixels" R 0 100}
+ addUserKnob {26 ""}
+ addUserKnob {7 offset R -1000 1000}
+ addUserKnob {7 rotate R -180 180}
+ addUserKnob {7 scale R 0.1 10}
+ scale 1
+ addUserKnob {6 invert +STARTLINE}
+ invert true
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Rainbow</font><font color=#747474> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br><b> Rainbow</b> ouputs a rainbow colored<br>constant\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#777;\">John Toth <b>© 2024 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#747474\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message(\"Coming Soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#747474\">Version Log</a>\n" t "Contains information about the node with version log information." -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nmodel_number = \"1.0.0\"\ncontext = \"Draw\"\n\ndate = \"13th July,\"\nyear = \"2024\"\n\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- outputs rainbow colored constant\n\"\"\"\n\n\n\nthankyou = \"\"\"\n\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Model Number: \" + LOWER + model_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + UPPER + site + developer + \"</a>\") \n"}
+}
+ Constant {
+  inputs 0
+  channels rgb
+  color 1
+  name Constant1
+  xpos -5
+  ypos -609
+ }
+ AdjBBox {
+  numpixels {{parent.numpixels} {parent.numpixels}}
+  name AdjBBox1
+  xpos -5
+  ypos -513
+ }
+ Expression {
+  expr0 "parent.invert ? 1 - (((y - height / 2) * cos(parent.rotate * (pi / 180)) - (x - width / 2) * sin(parent.rotate * (pi / 180)) + height / 2 + parent.offset) / (height * parent.scale)) : (((y - height / 2) * cos(parent.rotate * (pi / 180)) - (x - width / 2) * sin(parent.rotate * (pi / 180)) + height / 2 + parent.offset) / (height * parent.scale))\n"
+  channel1 none
+  channel2 none
+  channel3 none
+  name Expression3
+  label Rainbow
+  xpos -5
+  ypos -469
+ }
+ Colorspace {
+  colorspace_in HSV
+  name Colorspace1
+  label "\[ expr \{\[string match \[value colorspace_in] \"RGB\"] ? \"Linear\" : \[value colorspace_in] \}] > \[ expr \{\[string match \[value colorspace_out] \"RGB\"] ? \"Linear\" : \[value colorspace_out] \}]"
+  xpos -5
+  ypos -421
+ }
+set N908d5c00 [stack 0]
+ Output {
+  name Output1
+  xpos -5
+  ypos -345
+ }
+ Expression {
+  inputs 0
+  expr0 "((y - height / 2) * cos(parent.rotate * (pi / 180)) - (x - width / 2) * sin(parent.rotate * (pi / 180)) + height / 2 + parent.offset) / (height * parent.scale)\n"
+  channel1 none
+  channel2 none
+  channel3 none
+  name Expression2
+  label Rainbow
+  xpos 109
+  ypos -469
+ }
+push $N908d5c00
+ Viewer {
+  frame_range 1-100
+  monitorOutNDISenderName "NukeX - untitled - Viewer1"
+  name Viewer1
+  xpos 124
+  ypos -345
+ }
+end_group

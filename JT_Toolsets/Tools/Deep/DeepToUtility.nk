@@ -1,0 +1,384 @@
+Group {
+ inputs 2
+ name DeepToUtility1
+ help "Outputs all layers with real-world unit depth and a generated unpremultiplied position layer."
+ knobChanged "k = nuke.thisKnob()\nn = nuke.thisNode()\n\nif k.name() == 'inputChange':\n    c_cls = set(\['Camera'] + \[f'Camera\{i\}' for i in range(1, 100)])\n    g_cls = \{'Group', 'NoOp', 'Gizmo', 'Dot', 'Switch'\}\n    s_cls = set(\['ScanlineRender'] + \[f'ScanlineRender\{i\}' for i in range(1, 100)])\n    a_cls_0 = g_cls.union(s_cls, \{'Deep'\})\n    d_cls = set(\['DeepToImage'] + \[f'DeepToImage\{i\}' for i in range(1, 100)])\n\n    for i in range(2):\n        inp = n.input(i)\n        if inp:\n            cls = inp.Class()\n            if i == 0 and (not any(d in cls for d in d_cls) and (cls.startswith('Deep') or cls in a_cls_0)):\n                continue\n            elif i == 1 and (cls in g_cls or cls in c_cls):\n                continue\n            n.setInput(i, None)\n"
+ tile_color 0x60ff
+ selected true
+ addUserKnob {20 deepToUtility l "Deep To Utility"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION DeepToUtility
+ addUserKnob {1 output l INVISIBLE +INVISIBLE}
+ output "\[expr \{\[numvalue pass] == 0 ? \"all\" : (\[numvalue pass] == 1 ? \"depth\" : \"position\")\}]"
+ addUserKnob {41 pass l output T menu.pass}
+ addUserKnob {26 ""}
+ addUserKnob {41 channels l position t "The generated position pass will be output to the selected channel." T ShuffleCopy1.out}
+ addUserKnob {4 positionOut l "  " t "The position generated will be either:\n\n<b>• World space</b> - is the coordinate system for the entire scene. Its origin is at the center of the scene. The grid you see in 3D is in the world space.\n\n<b>• Camera space</b> -  is the coordinate system from the camera's point of view." -STARTLINE +HIDDEN M {world camera "" "" "" "" "" "" "" "" "" ""}}
+ addUserKnob {26 ""}
+ addUserKnob {6 antialiasing l "anti-aliasing depth" t "When enabled the depth channel will be anti-aliased." +STARTLINE}
+ addUserKnob {6 replace0WithInf l "replace 0 with inf for depth" t "Any pixel with a value of black (0) will be replaced as an inf pixel." +STARTLINE}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" t "Node version info, for more information look at version log" +STARTLINE T "<br><font size='5'>Deep To Utility</font><font color=#000060> v1.0</font>"}
+ addUserKnob {26 divider_001 l "" +STARTLINE}
+ addUserKnob {26 bulletpoints l "" t "Overview of the node" +STARTLINE T "<br><strong>•</strong><b>Deep To Utility</b> outputs selective layers. \n<br><br>\n\n<i><b>• Depth</b> - real-world unit depth (Z) \n<br><b>• Position</b> - generated unpremultiplied position<br>\n\n</i><br><br>\n<b><a href=\"https://johntothvfx.com\" style=\"color:#000060;\">John Toth © 2024</a></b><br>"}
+ addUserKnob {26 divider_002 l "" +STARTLINE}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#000060\">Tool Demo</span></a>" t "Launches the web page where it will have more documentation or a video about the node." -STARTLINE +INVISIBLE T "nuke.message(\"coming soon\")"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#000060\">Version Log</span></a>" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "# Constants\nversion_number = \"1.0.1\"\ncontext = \"Deep\"\nmodified_date = \"30th July 2024\"\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- outputs layers with real-world unit depth and a generated unpremultiplied position layer\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x23232301
+  label "<center>Don't Touch\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  note_font_color 0xee453cff
+  xpos 11
+  ypos -232
+  bdwidth 199
+  bdheight 272
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos -100
+  ypos -301
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -66
+  ypos 114
+ }
+set N2060a000 [stack 0]
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 154
+  ypos 114
+ }
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 154
+  ypos 215
+ }
+set Nd4a9de00 [stack 0]
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 264
+  ypos 215
+ }
+ DeepToImage2 {
+  name DeepToImage3
+  xpos 230
+  ypos 279
+ }
+ Shuffle {
+  red white
+  green white
+  blue white
+  alpha white
+  name Shuffle7
+  tile_color 0xddddddff
+  label "<center><b>\[value in]</b> &rarr; \[value out]\n\nrgba to 1\nto crate rgba\nchannels in the\ndeep pass"
+  xpos 230
+  ypos 338
+ }
+ Dot {
+  name Dot18
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 264
+  ypos 502
+ }
+push $Nd4a9de00
+ DeepRecolor {
+  inputs 2
+  name DeepRecolor2
+  label "\[expr \{ \[value targetInputAlpha] ?  \"(target input alpha)\" : \"\"\}]"
+  xpos 120
+  ypos 499
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 154
+  ypos 714
+ }
+set Ne16cde00 [stack 0]
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 605
+  ypos 714
+ }
+ Dot {
+  name Dot22
+  xpos 605
+  ypos 858
+ }
+set Ne177a600 [stack 0]
+ Dot {
+  name Dot24
+  xpos 935
+  ypos 858
+ }
+ DeepExpression {
+  chans1 deep
+  rgba.red deep.front*rgba.alpha
+  rgba.green deep.front*rgba.alpha
+  rgba.blue deep.front*rgba.alpha
+  name DeepExpression13
+  xpos 901
+  ypos 927
+ }
+ DeepToImage {
+  name DeepToImage9
+  xpos 901
+  ypos 975
+ }
+ Unpremult {
+  name Unpremult7
+  xpos 901
+  ypos 1094
+ }
+ Shuffle {
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 901
+  ypos 1178
+ }
+ Dot {
+  name Dot25
+  xpos 935
+  ypos 1314
+ }
+set Nd4b57c00 [stack 0]
+ Dot {
+  name Dot45
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 935
+  ypos 1434
+ }
+push $Nd4b57c00
+push $Ne177a600
+ DeepExpression {
+  chans1 deep
+  rgba.red deep.front
+  rgba.green deep.front
+  rgba.blue deep.front
+  rgba.alpha 1
+  name DeepExpression6
+  xpos 571
+  ypos 927
+ }
+ DeepToImage {
+  name DeepToImage4
+  xpos 571
+  ypos 998
+ }
+ Unpremult {
+  name Unpremult4
+  xpos 571
+  ypos 1094
+ }
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy2
+  xpos 571
+  ypos 1307
+ }
+ Switch {
+  inputs 2
+  which {{parent.antialiasing}}
+  name Switch5
+  xpos 571
+  ypos 1431
+ }
+ Expression {
+  expr0 "r == 0 ? inf : r"
+  name Expression1
+  label "0 to inf"
+  xpos 571
+  ypos 1523
+  disable {{!parent.replace0WithInf}}
+ }
+ Shuffle {
+  out depth
+  name Shuffle2
+  tile_color 0x802380ff
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 571
+  ypos 1610
+ }
+ Dot {
+  name Dot46
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 605
+  ypos 1722
+ }
+push $Ne16cde00
+ Dot {
+  name Dot6
+  note_font "DejaVu Sans"
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 154
+  ypos 885
+ }
+set Nfd5a3000 [stack 0]
+ Dot {
+  name Dot7
+  note_font "DejaVu Sans"
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 264
+  ypos 885
+ }
+ DeepExpression {
+  chans1 deep
+  rgba.red "(rgba.blue == 0) ? 0 : ((rgba.blue > 0) ? ((cx * ((\[value camera].haperture / 2) / \[value camera].focal) * deep.front)) : ((rgba.red * -deep.front) / rgba.blue))\n"
+  rgba.green "(rgba.blue == 0) ? 0 : ((rgba.blue > 0) ? ((cy * ((\[value camera].haperture / 2) / \[value camera].focal) * deep.front)) : ((rgba.green * -deep.front) / rgba.blue))\n"
+  rgba.blue (-deep.front)
+  rgba.alpha 1
+  name DeepExpression4
+  label DeepToCworld
+  xpos 230
+  ypos 971
+  addUserKnob {20 Camera}
+  addUserKnob {1 camera}
+  camera CameraInput
+ }
+ Dot {
+  name Dot8
+  note_font "DejaVu Sans"
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 264
+  ypos 1077
+ }
+push $Nfd5a3000
+ DeepExpression {
+  temp_name0 pos_x
+  temp_expr0 "cx * ((\[value camera].haperture/2) / \[value camera].focal) *deep.front"
+  temp_name1 pos_y
+  temp_expr1 "cy * ((\[value camera].haperture/2) / \[value camera].focal) *deep.front"
+  temp_name2 pos_z
+  temp_expr2 -deep.front
+  chans1 deep
+  rgba.red "((( pos_x * \[value camera].world_matrix.0) + (pos_y * \[value camera].world_matrix.1) + (pos_z * \[value camera].world_matrix.2)) + \[value camera].world_matrix.3) * rgba.alpha"
+  rgba.green "((( pos_x * \[value camera].world_matrix.4) + (pos_y * \[value camera].world_matrix.5) + (pos_z * \[value camera].world_matrix.6)) + \[value camera].world_matrix.7) * rgba.alpha"
+  rgba.blue "((( pos_x * \[value camera].world_matrix.8) + (pos_y * \[value camera].world_matrix.9) + (pos_z * \[value camera].world_matrix.10)) + \[value camera].world_matrix.11) * rgba.alpha"
+  name DeepExpression1
+  label DeepToPworld
+  xpos 120
+  ypos 971
+  addUserKnob {20 Camera}
+  addUserKnob {1 camera}
+  camera CameraInput
+ }
+ Switch {
+  inputs 2
+  which {{parent.positionOut}}
+  name Switch1
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  note_font "DejaVu Sans"
+  xpos 120
+  ypos 1067
+ }
+ DeepToImage2 {
+  name DeepToImage2
+  xpos 120
+  ypos 1287
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 154
+  ypos 1482
+ }
+push $N2060a000
+ DeepToImage2 {
+  name DeepToImage1
+  xpos -100
+  ypos 1287
+ }
+ ShuffleCopy {
+  inputs 2
+  red red
+  green green
+  blue blue
+  name ShuffleCopy1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -100
+  ypos 1469
+  disable {{"parent.pass == 0 ? 0 : parent.pass == 2 ? 0 : 1"}}
+  addUserKnob {20 User}
+  addUserKnob {4 pass l output M {all depth position "" "" ""}}
+ }
+ Copy {
+  inputs 2
+  channels depth
+  name Copy4
+  xpos -100
+  ypos 1710
+  disable {{"parent.pass == 0 ? 0 : parent.pass == 1 ? 0 : 1"}}
+ }
+ Output {
+  name Output
+  xpos -100
+  ypos 1983
+ }
+ Input {
+  inputs 0
+  name Camera
+  label "\[value number]"
+  xpos -370
+  ypos -301
+  number 1
+ }
+ Axis2 {
+  name CameraInput
+  tile_color 0xffff
+  xpos -360
+  ypos -6
+  addUserKnob {20 User}
+  addUserKnob {7 focal}
+  focal {{"\[value \[topnode parent.input1].focal]"}}
+  addUserKnob {7 haperture}
+  haperture {{"\[value \[topnode parent.input1].haperture]"}}
+  addUserKnob {26 ""}
+  addUserKnob {30 win_translate l "window translate"}
+  win_translate {{"\[value \[topnode parent.input1].win_translate.u]"} {"\[value \[topnode parent.input1].win_translate.v]"}}
+  addUserKnob {30 win_scale l "window scale"}
+  win_scale {{"\[value \[topnode parent.input1].win_scale.u]"} {"\[value \[topnode parent.input1].win_scale.v]"}}
+  addUserKnob {7 winroll l "window roll"}
+  winroll {{"\[value \[topnode parent.input01].winroll]"}}
+  addUserKnob {7 _2 l double}
+  _2 {{"2 * focal / haperture"}}
+ }
+ NoOp {
+  inputs 0
+  name menu
+  knobChanged "grp = nuke.thisGroup()\nk = nuke.thisKnob()\n\ndepth = \['antialiasing', 'replace0WithInf']\nposition = \['channels', 'positionOut']\n        \nif k.name() in ('pass', 'showPanel'):\n    CONTROLS_type = grp\['pass'].value()\n    if CONTROLS_type == 'all':\n        for i in depth:\n            grp\[i].setEnabled(True)\n        for i in position:\n            grp\[i].setEnabled(True)\n\n    elif CONTROLS_type == 'depth':\n        for i in depth:\n            grp\[i].setEnabled(True)\n        for i in position:\n            grp\[i].setEnabled(False)\n\n    elif CONTROLS_type == 'position':\n        for i in depth:\n            grp\[i].setEnabled(False)\n        for i in position:\n            grp\[i].setEnabled(True)\n"
+  selected true
+  xpos 70
+  ypos -57
+  addUserKnob {20 User}
+  addUserKnob {4 pass l output M {all depth position "" "" "" "" "" "" ""}}
+ }
+end_group

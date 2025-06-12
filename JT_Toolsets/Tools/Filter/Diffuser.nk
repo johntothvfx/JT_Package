@@ -1,0 +1,273 @@
+Group {
+ name Diffuser1
+ help "Softely soften the input using multiple blur nodes to give this diffuse effect."
+ tile_color 0xcc804eff
+ selected true
+ addUserKnob {20 diffuser l Diffuser}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION Diffuser
+ addUserKnob {41 channels t "The Diffuse Glow effect is only applied to these channels. \nIf you set this to something other than all or none, you can use the checkboxes on the right to select individual channels." T Blur_0.channels}
+ addUserKnob {26 space000 l "" +STARTLINE T "\t"}
+ addUserKnob {4 type t "\n<b>exponential</b> will multiply the effect creating a exponential effect as shown below.\n<b><I>example 2,4,8,16,32 etc</b></i>\n\n\n<b>linear</b> will add the effect creating a linear effect as shown below\n\n<b><I>example 5,10,15,20,25 etc</b></i>" M {exponential linear "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+ addUserKnob {26 space001 l "" +STARTLINE T "                "}
+ addUserKnob {14 size t "The softeness of the diffuse effect." R 0 100}
+ addUserKnob {41 iteration l amount t "This value represents how many Blur iterations are being generated to create the diffuser effect.\n\n<b>This has a quality control added to it so it cannot go below or above a certain value. By default it's set to 0 - 100\n" T menu.iteration}
+ addUserKnob {26 space003 l "" +STARTLINE T " \t"}
+ addUserKnob {41 filter t "Select the filter algorithm to use: \n• box \n• triangle \n• quadratic \n• gaussian" T Blur_0.filter}
+ addUserKnob {41 quality l "" -STARTLINE T Blur_0.quality}
+ addUserKnob {6 crop l "crop to format" t "When enabled, the bounding box cannot grow past its incoming bounding/format size. This avoids creating oversized bounding boxes that can take longer to compute." -STARTLINE}
+ crop true
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannelMask l mask t "\nEnables the associated mask channel to the right. Disabling this checkbox is the same as setting the channel to none. \n\n\n\nThe channel to use as a mask. By default, the filter effect is limited to the non-black areas of this channel.\n" T Copy.maskChannelMask}
+ addUserKnob {41 inject t "Copies the mask input to the predefined mask.a channel. Injecting the mask allows you to use the same mask further downstream." -STARTLINE T Copy.inject}
+ addUserKnob {41 invert_mask l invert t "Inverts the use of the mask channel, so that the merge is limited to the non-white areas of the mask.\n" -STARTLINE T Copy.invert_mask}
+ addUserKnob {41 fringe t "When enabled, only apply the effect to the edge of the mask. \nWhen disabled, the effect is applied to the entire mask." -STARTLINE T Copy.fringe}
+ addUserKnob {7 mix t "Dissolves between the original image at 0 and the full effect at 1."}
+ mix 1
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Diffuser</font><font color=#CC804E> v1.1"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>Diffuser</b> uses multiple Blur node <br> with a certain value based on the falloff <br>to soften the image and create a diffuse look.\n\n\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#CC804E;\">John Toth <b>© 2022 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#CC804E\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#CC804E\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- data last modified\n- developer notes\n- version\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.1.1\"\ncontext = \"Filter\"\n\n\ndate = \"17th January\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2022\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- softens the input by creating a diffusion look\n<br></i><b> v 1.1 </b><i>\n- quality control was added to the amount knob\n- crop option was added (safety crop is still apart of the node and works in conjunction)\n\"\"\"\n\n\n\nthankyou = \"\"\"\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + UPPER + site + developer + \"</a>\") \n\n\n"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x23232301
+  label "<center>Don't Touch\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  note_font_color 0xee453cff
+  xpos -231
+  ypos -1035
+  bdwidth 243
+  bdheight 149
+ }
+ Input {
+  inputs 0
+  name mask
+  label "\[value number]"
+  xpos -260
+  ypos -136
+  number 1
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos -410
+  ypos -1024
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -376
+  ypos -678
+ }
+set N32b69e00 [stack 0]
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -6
+  ypos -678
+ }
+set N32d1ea00 [stack 0]
+ NoOp {
+  name Begin
+  tile_color 0x3066ff
+  xpos 180
+  ypos -682
+ }
+set N32cfd200 [stack 0]
+ Blur {
+  channels {{{parent.Blur_0.channels}}}
+  size {{"parent.type == 0 ? parent.size*pow(2,int(\[string range \[value name] 5 end])) : parent.size*2*int(\[string range \[value name] 5 end])"} {"parent.type == 0 ? parent.size*pow(2,int(\[string range \[value name] 5 end])) : parent.size*2*int(\[string range \[value name] 5 end])"}}
+  filter {{parent.Blur_0.filter}}
+  quality {{parent.Blur_0.quality}}
+  crop {{parent.Blur_0.crop}}
+  name Blur_6
+  xpos 780
+  ypos -400
+ }
+push $N32cfd200
+ Blur {
+  channels {{{parent.Blur_0.channels}}}
+  size {{"parent.type == 0 ? parent.size*pow(2,int(\[string range \[value name] 5 end])) : parent.size*2*int(\[string range \[value name] 5 end])"} {"parent.type == 0 ? parent.size*pow(2,int(\[string range \[value name] 5 end])) : parent.size*2*int(\[string range \[value name] 5 end])"}}
+  filter {{parent.Blur_0.filter}}
+  quality {{parent.Blur_0.quality}}
+  crop {{parent.Blur_0.crop}}
+  name Blur_5
+  xpos 680
+  ypos -400
+ }
+push $N32cfd200
+ Blur {
+  channels {{{parent.Blur_0.channels}}}
+  size {{"parent.type == 0 ? parent.size*pow(2,int(\[string range \[value name] 5 end])) : parent.size*2*int(\[string range \[value name] 5 end])"} {"parent.type == 0 ? parent.size*pow(2,int(\[string range \[value name] 5 end])) : parent.size*2*int(\[string range \[value name] 5 end])"}}
+  filter {{parent.Blur_0.filter}}
+  quality {{parent.Blur_0.quality}}
+  crop {{parent.Blur_0.crop}}
+  name Blur_4
+  xpos 580
+  ypos -400
+ }
+push $N32cfd200
+ Blur {
+  channels {{{parent.Blur_0.channels}}}
+  size {{"parent.type == 0 ? parent.size*pow(2,int(\[string range \[value name] 5 end])) : parent.size*2*int(\[string range \[value name] 5 end])"} {"parent.type == 0 ? parent.size*pow(2,int(\[string range \[value name] 5 end])) : parent.size*2*int(\[string range \[value name] 5 end])"}}
+  filter {{parent.Blur_0.filter}}
+  quality {{parent.Blur_0.quality}}
+  crop {{parent.Blur_0.crop}}
+  name Blur_3
+  xpos 480
+  ypos -400
+ }
+push $N32cfd200
+ Blur {
+  channels {{{parent.Blur_0.channels}}}
+  size {{"parent.type == 0 ? parent.size*pow(2,int(\[string range \[value name] 5 end])) : parent.size*2*int(\[string range \[value name] 5 end])"} {"parent.type == 0 ? parent.size*pow(2,int(\[string range \[value name] 5 end])) : parent.size*2*int(\[string range \[value name] 5 end])"}}
+  filter {{parent.Blur_0.filter}}
+  quality {{parent.Blur_0.quality}}
+  crop {{parent.Blur_0.crop}}
+  name Blur_2
+  xpos 380
+  ypos -400
+ }
+push $N32cfd200
+ Blur {
+  channels {{{parent.Blur_0.channels}}}
+  size {{"parent.type == 0 ? parent.size*pow(2,int(\[string range \[value name] 5 end])) : parent.size*2*int(\[string range \[value name] 5 end])"} {"parent.type == 0 ? parent.size*pow(2,int(\[string range \[value name] 5 end])) : parent.size*2*int(\[string range \[value name] 5 end])"}}
+  filter {{parent.Blur_0.filter}}
+  quality {{parent.Blur_0.quality}}
+  crop {{parent.Blur_0.crop}}
+  name Blur_1
+  xpos 280
+  ypos -400
+ }
+push $N32cfd200
+ Blur {
+  size {{parent.size} {parent.size}}
+  crop {{parent.crop}}
+  name Blur_0
+  xpos 180
+  ypos -400
+ }
+ Dissolve {
+  inputs 2
+  which {{"1/pow(2,int(\[string range \[value name] 9 end]))"}}
+  name Dissolve_1
+  xpos 280
+  ypos -300
+ }
+ Dissolve {
+  inputs 2
+  which {{"1/pow(2,int(\[string range \[value name] 9 end]))"}}
+  name Dissolve_2
+  xpos 380
+  ypos -300
+ }
+ Dissolve {
+  inputs 2
+  which {{"1/pow(2,int(\[string range \[value name] 9 end]))"}}
+  name Dissolve_3
+  xpos 480
+  ypos -300
+ }
+ Dissolve {
+  inputs 2
+  which {{"1/pow(2,int(\[string range \[value name] 9 end]))"}}
+  name Dissolve_4
+  xpos 580
+  ypos -300
+ }
+ Dissolve {
+  inputs 2
+  which {{"1/pow(2,int(\[string range \[value name] 9 end]))"}}
+  name Dissolve_5
+  xpos 680
+  ypos -300
+ }
+ Dissolve {
+  inputs 2
+  which {{"1/pow(2,int(\[string range \[value name] 9 end]))"}}
+  name Dissolve_6
+  xpos 780
+  ypos -300
+ }
+ NoOp {
+  name End
+  tile_color 0x3066ff
+  xpos 180
+  ypos -130
+ }
+push $N32d1ea00
+ Merge2 {
+  inputs 2+1
+  operation copy
+  Achannels {{{parent.Blur_0.channels}}}
+  Bchannels {{{parent.Blur_0.channels}}}
+  output {{{parent.Blur_0.channels}}}
+  also_merge {{{parent.Blur_0.channels}}}
+  name Copy
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -40
+  ypos -142
+ }
+ Crop {
+  box {{"min(0, Input.bbox.x)"} {"min(0, Input.bbox.y)"} {"max(width, Input.bbox.r)"} {"max(height, Input.bbox.t)"}}
+  intersect true
+  name Crop1
+  label "Safety Crop"
+  xpos -40
+  ypos 38
+  disable {{!parent.crop}}
+ }
+ Expression {
+  expr0 isnan(r)?0:r
+  expr1 isnan(g)?0:g
+  expr2 isnan(b)?0:b
+  expr3 isnan(a)?0:a
+  name NAN
+  label Safety
+  xpos -40
+  ypos 200
+ }
+push $N32b69e00
+ Dissolve {
+  inputs 2
+  which {{parent.mix}}
+  name Mix
+  xpos -409
+  ypos 200
+ }
+ Clamp {
+  channels alpha
+  name Clamp1
+  xpos -409
+  ypos 344
+ }
+ Output {
+  name Output1
+  xpos -409
+  ypos 470
+ }
+ NoOp {
+  inputs 0
+  name menu
+  knobChanged "\ngrp = nuke.thisGroup()\nk = nuke.thisKnob()\n\n\n#quality control\nqualityLow = nuke.thisNode().knob('qualityLowEnd').getValue()\nqualityHigh = nuke.thisNode().knob('qualityHighEnd').getValue()\nqualityValue = nuke.thisNode().knob('iteration').getValue()\n\n\n\n\nif k.name() == 'iteration' :\n#quality control settings\n    if qualityValue < qualityLow:\n        qualityValue = qualityLow\n    elif qualityValue > qualityHigh:\n          qualityValue = qualityHigh\n    grp\['iteration'].setValue(qualityValue)\n    \n    \n    \n    iteration = int(grp\['iteration'].value())\n    \n    grp.begin()\n    begin = nuke.toNode('Begin')\n    end = nuke.toNode('End')\n    blur0 = nuke.toNode('Blur_0')\n    addChannel = nuke.toNode('AddChannels1')\n    Xpos = blur0.xpos()\n    Ypos = blur0.ypos()\n   \n    \n    for n in nuke.allNodes('Blur'):\n        if n.name() not in \['Blur_0'] and n is not blur0:\n            nuke.delete(n)\n    for n in nuke.allNodes('Dissolve'):\n        if n.name() not in \['Mix']:\n            nuke.delete(n)\n            \n  \n            \n    \n    new=\[]    \n    \n    for n in range(0,iteration+1):\n\n        blur=nuke.nodes.Blur(xpos = Xpos+(n+1)*100,ypos= Ypos-0)\n        blur.setName('Blur_'+str(n+1))\n        blur\['channels'].setExpression('parent.Blur_0.channels')\n        blur\['size'].setValue(\[0,0])\n        blur\['size'].setExpression('parent.type == 0 ? parent.size*pow(2,int(\[string range \[value name] 5 end])) : parent.size*2*int(\[string range \[value name] 5 end])')\n        blur\['crop'].setExpression('parent.Blur_0.crop')\n        blur\['quality'].setExpression('parent.Blur_0.quality')\n        blur\['filter'].setExpression('parent.Blur_0.filter')\n        blur.setInput(0,begin)\n\n \n        dissolve = nuke.nodes.Dissolve(xpos = Xpos+(n+1)*100,ypos= Ypos+100)\n        dissolve.setName('Dissolve_'+str(n+1))\n        dissolve\['which'].setExpression('1/pow(2,int(\[string range \[value name] 9 end]))')\n        new.append(dissolve)\n        dissolve.setInput(1,blur)\n        if n != 0:\n            dissolve.setInput(0, new\[n-1])\n        else:\n            dissolve.setInput(0, blur0)\n  \n\n        \n    end.setInput(0,dissolve)"
+  xpos -150
+  ypos -946
+  hide_input true
+  addUserKnob {20 User}
+  addUserKnob {7 iteration R 0 10}
+  iteration 5
+  addUserKnob {26 qualityControl l "<b>Quality Control</b>"}
+  addUserKnob {3 qualityLowEnd l quality}
+  addUserKnob {3 qualityHighEnd l "" -STARTLINE}
+  qualityHighEnd 100
+ }
+end_group

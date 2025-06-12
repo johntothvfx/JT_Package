@@ -1,0 +1,642 @@
+Group {
+ inputs 2
+ name LightWrap1
+ help "LightWrap can help composite objects into a very bright background by ’wrapping’ or spilling light from the background onto the foreground object. The node creates a reflection of light around the edges of your foreground object by blending in whatever is in the background. \nYou should apply LightWrap on your foreground element before you composite the foreground over the background with the Merge node."
+ tile_color 0xcc804eff
+ selected true
+ addUserKnob {20 lightwrapTab l LightWrap}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION LightWrap
+ addUserKnob {1 output l INVISIBLE +INVISIBLE}
+ output "\[value Source]"
+ addUserKnob {41 channels t "The Exponential Glow effect is only applied to these channels. \nIf you set this to something other than all or none, you can use the checkboxes on the right to select individual channels." +INVISIBLE T Blur_0.channels}
+ addUserKnob {26 ""}
+ addUserKnob {4 Source l output t "<b>• Effect Only -</b>The Exponential glow effect will be over black with the no alpha channel.\n\n\n<b>• Result -</b>The Exponential glow effect will be applied over the input source image.\n" M {"effect only" result "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+ Source result
+ addUserKnob {4 type t "\n<b>Exponential</b> will multiply the effect creating a exponential effect as shown below.\n<b><I>Example 2,4,8,16,32 etc</b></i>\n\n\n<b>Linear</b> will add the effect creating a linear effect as shown below\n\n<b><I>Example 5,10,15,20,25 etc</b></i>" M {exponential linear "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+ addUserKnob {6 normalize t "This will divide the effect result by the  exponential value to normalize the output intensity." -STARTLINE}
+ normalize true
+ addUserKnob {6 inputPremult l "premultipled input" t "If thie input is premultipled this will make sure to unpremultiply the input and add the lightwrap effect to then premultiply the result afterwards." -STARTLINE}
+ inputPremult true
+ addUserKnob {26 space000 l "" +STARTLINE T " \t"}
+ addUserKnob {7 intensity t "This will increase the brightness of the lightwrap result." R 0 10}
+ intensity 1
+ addUserKnob {41 iteration l exponential t "This value represents how many Blur iterations are being generated to create the exponential lightwrap effect.\n\nWARNING: \nThis has a parental control (Quality Control) on it so people don't accidently break something.\nBy default the quality control is 0 - 100 (this mean you can go above or below a certain value).\nThis can be lifted inside the node under the quality control section. \n\nPLEASE ONLY DO THIS IF YOU KNOW WHAT YOU ARE DOING.\n\n\n" T menu.iteration}
+ addUserKnob {14 diffusion t "Softness of the lightwrap itself. (Each Exponential Blur will widen it's value)." R 0 100}
+ diffusion 1.5
+ addUserKnob {7 falloff t "Falloff of the glow effect can be controls using this.\n<i>\nUses a mutliple <b>Multiply nodes</b> which exponentially increased or decreased for falloff" R 0 4}
+ falloff 1
+ addUserKnob {26 space003 l "" +STARTLINE T " \t"}
+ addUserKnob {7 bleeding l "color bleeding" t "Bleeds the <b>A</b> colour into the <b>B</b> compositing element based on the lightwrap amount."}
+ bleeding 0.1
+ addUserKnob {7 threshold t "This controls the luminance threshold of what will be selected to glow from using a Keyer node on the <b>A</b> input.\n\nHaving the knob on 0 will exponential glow the entire image input as it is and not apply the keyer.\n\n\n\n\n\n" R 0 4}
+ threshold 0.05
+ addUserKnob {4 colorSpace l "" t "The Threshold will go through a colorspace for different range value selection." -STARTLINE M {" linear" log "" "" "" ""}}
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannelMask l mask t "\nEnables the associated mask channel to the right. Disabling this checkbox is the same as setting the channel to none. \n\n\nThe channel to use as a mask. By default, the merge is limited to the non-black areas of this channel.\n" T Copy.maskChannelMask}
+ addUserKnob {41 inject t "Copies the mask input to the predefined mask.a channel. Injecting the mask allows you to use the same mask further downstream." -STARTLINE T Copy.inject}
+ addUserKnob {41 invert_mask l invert t "Inverts the use of the mask channel, so that the merge is limited to the non-white areas of the mask.\n" -STARTLINE T Copy.invert_mask}
+ addUserKnob {41 fringe t "When enabled, only apply the effect to the edge of the mask. \nWhen disabled, the effect is applied to the entire mask." -STARTLINE T Copy.fringe}
+ addUserKnob {7 mix t "Dissolves between the original image at 0 and the full merge at 1."}
+ mix 1
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>LightWrap</font><font color=#CC804E> v1.2"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>LightWrap</b> can help composite objects into a very<br>bright background by wrapping or spilling light from<br>the background onto the foreground object. \n<br></b><i>\n<br><strong>•</br> \nYou should apply LightWrap on your foreground element<br>before you composite the foreground over the background with<br>the Merge node.\n<br></b><i>\n<br><strong>•</br> \n<b>B</b> is your foreground Composite element\n<br><strong>•</br> \n<b>A</b> goes into your bright background</i></i>\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#CC804E;\">John Toth <b>© 2020 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#CC804E\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#CC804E\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nversion_number = \"1.2.3\"\ncontext = \"Draw\"\nmodified_date = \"13th August 2024\"\ndeveloper = \"John Toth © 2020\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- wrap the background light around the foreground element\n<br></i><b> v 1.1 </b><i>\n- color bleeding was added\n<br></i><b> v 1.2 </b><i>\n- user interace was updated\n- range has not been put into threshold knob\n- exponential knob is now iterative and can go past 10\n- iterative safety lock has been added 0-100 as default.\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x23232301
+  label "<center>Don't Touch\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  note_font_color 0xee453cff
+  xpos -980
+  ypos -1336
+  bdwidth 200
+  bdheight 367
+ }
+ Input {
+  inputs 0
+  name B
+  label "\[value number]"
+  xpos -630
+  ypos -1336
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -596
+  ypos -1110
+ }
+set N4d73b600 [stack 0]
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -596
+  ypos 1122
+ }
+set N4d64ac00 [stack 0]
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -886
+  ypos 1122
+ }
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -886
+  ypos 2394
+ }
+set N6cd2dc00 [stack 0]
+ AddChannels {
+  channels alpha
+  name AddChannels2
+  xpos -920
+  ypos 2634
+ }
+ Remove {
+  channels {{{parent.Blur_0.channels}}}
+  name Remove2
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos -920
+  ypos 2672
+ }
+ Remove {
+  channels alpha
+  name Remove3
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos -920
+  ypos 2710
+  disable {{parent.Source}}
+ }
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -886
+  ypos 2956
+ }
+push $N6cd2dc00
+ Input {
+  inputs 0
+  name mask
+  label "\[value number]"
+  xpos 840
+  ypos -1360
+  number 2
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 874
+  ypos -270
+ }
+push $N4d73b600
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -226
+  ypos -1110
+ }
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -226
+  ypos -510
+ }
+set N4d26e800 [stack 0]
+ Input {
+  inputs 0
+  name A
+  label "\[value number]"
+  xpos 250
+  ypos -1360
+  number 1
+ }
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 284
+  ypos -1014
+ }
+set N4d26f000 [stack 0]
+ Log2Lin {
+  operation lin2log
+  name Log2Lin1
+  xpos 400
+  ypos -1018
+  disable {{!colorSpace}}
+ }
+ Keyer {
+  operation "luminance key"
+  range {{threshold} {threshold+1} {threshold+1} {threshold+1}}
+  name Keyer1
+  xpos 400
+  ypos -872
+ }
+push $N4d26f000
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy1
+  xpos 250
+  ypos -872
+  disable {{"threshold > 0 ? 0 : 1"}}
+ }
+ Grade {
+  channels {{{parent.Blur_0.channels}}}
+  white {{parent.intensity}}
+  name Intensity
+  xpos 250
+  ypos -730
+ }
+ Premult {
+  channels {{{parent.Blur_0.channels}}}
+  name Premult1
+  xpos 250
+  ypos -634
+  disable {{"threshold > 0 ? 0 : 1"}}
+ }
+ Merge2 {
+  inputs 2
+  operation stencil
+  bbox B
+  Achannels {{{parent.Blur_0.channels}}}
+  Bchannels {{{parent.Blur_0.channels}}}
+  output {{{parent.Blur_0.channels}}}
+  also_merge {{{parent.Blur_0.channels}}}
+  name Stencil
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 250
+  ypos -520
+ }
+push $N4d26e800
+ Remove {
+  name Remove1
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos -260
+  ypos -400
+ }
+ AddChannels {
+  channels rgba
+  name AddChannels1
+  xpos -260
+  ypos -346
+ }
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -226
+  ypos -270
+ }
+set N95094e00 [stack 0]
+ Merge2 {
+  inputs 2+1
+  operation copy
+  bbox B
+  Achannels {{{parent.Blur_0.channels}}}
+  Bchannels {{{parent.Blur_0.channels}}}
+  output {{{parent.Blur_0.channels}}}
+  also_merge {{{parent.Blur_0.channels}}}
+  name Copy
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 250
+  ypos -280
+ }
+ NoOp {
+  name Begin
+  tile_color 0x3066ff
+  xpos 250
+  ypos -29
+ }
+set N23eeb400 [stack 0]
+ Blur {
+  channels {{{parent.Blur.channels}}}
+  size {{"parent.type == 0 ? parent.diffusion*pow(2,int(\[string range \[value name] 5 end])) : parent.diffusion*2*int(\[string range \[value name] 5 end])"} {"parent.type == 0 ? parent.diffusion*pow(2,int(\[string range \[value name] 5 end])) : parent.diffusion*2*int(\[string range \[value name] 5 end])"}}
+  filter {{parent.Blur_0.filter}}
+  quality {{parent.Blur_0.quality}}
+  crop {{parent.Blur_0.crop}}
+  name Blur_4
+  xpos 650
+  ypos 209
+ }
+ Multiply {
+  channels {{{parent.Blur.channels}}}
+  value {{"1/pow((1/falloff),int(\[string range \[value name] 9 end]))"}}
+  name Multiply_4
+  xpos 650
+  ypos 328
+ }
+push $N23eeb400
+ Blur {
+  channels {{{parent.Blur.channels}}}
+  size {{"parent.type == 0 ? parent.diffusion*pow(2,int(\[string range \[value name] 5 end])) : parent.diffusion*2*int(\[string range \[value name] 5 end])"} {"parent.type == 0 ? parent.diffusion*pow(2,int(\[string range \[value name] 5 end])) : parent.diffusion*2*int(\[string range \[value name] 5 end])"}}
+  filter {{parent.Blur_0.filter}}
+  quality {{parent.Blur_0.quality}}
+  crop {{parent.Blur_0.crop}}
+  name Blur_3
+  xpos 550
+  ypos 209
+ }
+ Multiply {
+  channels {{{parent.Blur.channels}}}
+  value {{"1/pow((1/falloff),int(\[string range \[value name] 9 end]))"}}
+  name Multiply_3
+  xpos 550
+  ypos 328
+ }
+push $N23eeb400
+ Blur {
+  channels {{{parent.Blur.channels}}}
+  size {{"parent.type == 0 ? parent.diffusion*pow(2,int(\[string range \[value name] 5 end])) : parent.diffusion*2*int(\[string range \[value name] 5 end])"} {"parent.type == 0 ? parent.diffusion*pow(2,int(\[string range \[value name] 5 end])) : parent.diffusion*2*int(\[string range \[value name] 5 end])"}}
+  filter {{parent.Blur_0.filter}}
+  quality {{parent.Blur_0.quality}}
+  crop {{parent.Blur_0.crop}}
+  name Blur_2
+  xpos 450
+  ypos 209
+ }
+ Multiply {
+  channels {{{parent.Blur.channels}}}
+  value {{"1/pow((1/falloff),int(\[string range \[value name] 9 end]))"}}
+  name Multiply_2
+  xpos 450
+  ypos 328
+ }
+push $N23eeb400
+ Blur {
+  channels {{{parent.Blur.channels}}}
+  size {{"parent.type == 0 ? parent.diffusion*pow(2,int(\[string range \[value name] 5 end])) : parent.diffusion*2*int(\[string range \[value name] 5 end])"} {"parent.type == 0 ? parent.diffusion*pow(2,int(\[string range \[value name] 5 end])) : parent.diffusion*2*int(\[string range \[value name] 5 end])"}}
+  filter {{parent.Blur_0.filter}}
+  quality {{parent.Blur_0.quality}}
+  crop {{parent.Blur_0.crop}}
+  name Blur_1
+  xpos 350
+  ypos 209
+ }
+ Multiply {
+  channels {{{parent.Blur.channels}}}
+  value {{"1/pow((1/falloff),int(\[string range \[value name] 9 end]))"}}
+  name Multiply_1
+  xpos 350
+  ypos 328
+ }
+push $N23eeb400
+ Blur {
+  channels rgb
+  size {{diffusion}}
+  crop false
+  name Blur_0
+  xpos 250
+  ypos 206
+ }
+ Multiply {
+  channels {{{parent.Blur.channels}}}
+  name Multiply_0
+  xpos 250
+  ypos 328
+ }
+ Merge2 {
+  inputs 2
+  operation plus
+  Achannels {{{parent.Blur_0.channels}}}
+  Bchannels {{{parent.Blur_0.channels}}}
+  output {{{parent.Blur_0.channels}}}
+  also_merge {{{parent.Blur_0.channels}}}
+  name Merge_1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 350
+  ypos 428
+ }
+set N95037400 [stack 0]
+ Merge2 {
+  inputs 2
+  operation plus
+  Achannels {{{parent.Blur_0.channels}}}
+  Bchannels {{{parent.Blur_0.channels}}}
+  output {{{parent.Blur_0.channels}}}
+  also_merge {{{parent.Blur_0.channels}}}
+  name Merge_2
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 450
+  ypos 428
+ }
+set N95037800 [stack 0]
+ Merge2 {
+  inputs 2
+  operation plus
+  Achannels {{{parent.Blur_0.channels}}}
+  Bchannels {{{parent.Blur_0.channels}}}
+  output {{{parent.Blur_0.channels}}}
+  also_merge {{{parent.Blur_0.channels}}}
+  name Merge_3
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 550
+  ypos 428
+ }
+set N95011c00 [stack 0]
+ Merge2 {
+  inputs 2
+  operation plus
+  Achannels {{{parent.Blur_0.channels}}}
+  Bchannels {{{parent.Blur_0.channels}}}
+  output {{{parent.Blur_0.channels}}}
+  also_merge {{{parent.Blur_0.channels}}}
+  name Merge_4
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 650
+  ypos 428
+ }
+push $N95011c00
+push $N95037800
+push 0
+push $N95037400
+push $N95094e00
+ NoOp {
+  name Connect
+  xpos -260
+  ypos 734
+ }
+ Dissolve {
+  inputs 5+1
+  channels {{{parent.Blur_master.channels}}}
+  which {{parent.menu.iteration}}
+  name Exponent
+  xpos 250
+  ypos 728
+ }
+ NoOp {
+  name End
+  tile_color 0x3066ff
+  xpos 250
+  ypos 950
+ }
+ Crop {
+  box {{"min(0, Input.bbox.x)"} {"min(0, Input.bbox.y)"} {"max(width, Input.bbox.r)"} {"max(height, Input.bbox.t)"}}
+  intersect true
+  name Crop1
+  label "Safety Crop"
+  xpos 250
+  ypos 1040
+ }
+ Multiply {
+  channels {{{parent.Blur_0.channels}}}
+  value {{1/parent.Exponent.which}}
+  name normalize
+  label "value: \[value value]"
+  xpos 250
+  ypos 1160
+  disable {{"iteration == 0 ? 1 : !parent.normalize "}}
+ }
+ Expression {
+  expr0 isnan(r)?0:r
+  expr1 isnan(g)?0:g
+  expr2 isnan(b)?0:b
+  expr3 isnan(a)?0:a
+  name NAN
+  label Safety
+  xpos 250
+  ypos 1376
+ }
+ Multiply {
+  channels {{{parent.Blur_0.channels}}}
+  value {{parent.mix}}
+  name Mix
+  label "value: \[value value]"
+  xpos 250
+  ypos 1424
+ }
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 284
+  ypos 1602
+ }
+set N23dbcc00 [stack 0]
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 285
+  ypos 1794
+ }
+set N23e50c00 [stack 0]
+ Remove {
+  channels alpha
+  name Remove4
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 251
+  ypos 1952
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 285
+  ypos 2112
+ }
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -226
+  ypos 2112
+ }
+set N23e51e00 [stack 0]
+ Merge2 {
+  inputs 2
+  operation mask
+  name Mask
+  label "Effect Only"
+  xpos -260
+  ypos 2384
+  disable {{!parent.inputPremult}}
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -226
+  ypos 2788
+ }
+push $N23e51e00
+push $N23e50c00
+push $N23dbcc00
+ Colorspace {
+  colorspace_out HSV
+  name Colorspace2
+  xpos -376
+  ypos 1598
+ }
+push $N4d64ac00
+ Unpremult {
+  channels {{{parent.Blur_0.channels}}}
+  name Unpremult1
+  xpos -630
+  ypos 1310
+  disable {{!parent.inputPremult}}
+ }
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -596
+  ypos 1530
+ }
+set N9500ca00 [stack 0]
+ Colorspace {
+  colorspace_out HSV
+  name Colorspace1
+  xpos -486
+  ypos 1526
+ }
+ ShuffleCopy {
+  inputs 2
+  red red
+  green green
+  alpha alpha2
+  name ShuffleCopy3
+  label "\[value in] to \[value out]"
+  xpos -486
+  ypos 1592
+ }
+ Colorspace {
+  colorspace_in HSV
+  name Colorspace3
+  xpos -486
+  ypos 1670
+ }
+push $N9500ca00
+ Merge2 {
+  inputs 2+1
+  operation copy
+  bbox B
+  Achannels {{{parent.Blur_0.channels}}}
+  Bchannels {{{parent.Blur_0.channels}}}
+  output {{{parent.Blur_0.channels}}}
+  also_merge {{{parent.Blur_0.channels}}}
+  mix {{parent.bleeding}}
+  name Color_Bleeding
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -630
+  ypos 1784
+ }
+ Merge2 {
+  inputs 2
+  operation plus
+  bbox B
+  Achannels {{{parent.Blur_0.channels}}}
+  Bchannels {{{parent.Blur_0.channels}}}
+  output {{{parent.Blur_0.channels}}}
+  also_merge {{{parent.Blur_0.channels}}}
+  name Plus
+  label "mix: \[value mix] (\[value bbox])"
+  xpos -630
+  ypos 2102
+ }
+ Premult {
+  channels {{{parent.Blur_0.channels}}}
+  name Premult2
+  xpos -630
+  ypos 2270
+  disable {{!parent.inputPremult}}
+ }
+ Switch {
+  inputs 2
+  which {{!parent.Source}}
+  name Switch1
+  xpos -630
+  ypos 2784
+ }
+ Copy {
+  inputs 2
+  channels all
+  name Copy2
+  xpos -630
+  ypos 2940
+ }
+ Clamp {
+  channels alpha
+  name Clamp1
+  xpos -630
+  ypos 3042
+ }
+ Output {
+  name Output1
+  xpos -630
+  ypos 3192
+ }
+ NoOp {
+  inputs 0
+  name menu
+  knobChanged "\ngrp = nuke.thisGroup()\nk = nuke.thisKnob()\nn = nuke.thisNode()\n\n\n# setting quality control for iterative knob\nqualityLow = nuke.thisNode().knob('qualityLowEnd').getValue()\nqualityHigh = nuke.thisNode().knob('qualityHighEnd').getValue()\nqualityValue = nuke.thisNode().knob('iteration').getValue()\n\n\n#iterations quality control\nif k.name() == 'iteration' :\n    if qualityValue < qualityLow:\n        qualityValue = qualityLow\n    elif qualityValue > qualityHigh:\n          qualityValue = qualityHigh\n    grp\['iteration'].setValue(qualityValue)\n    \n\n#iterations done here\nif k.name() == 'iteration' :\n    \n    iteration = int(grp\['iteration'].value())\n    \n    grp.begin()\n    begin = nuke.toNode('Begin')\n    end = nuke.toNode('End')\n    dissolve = nuke.toNode('Exponent')\n    blur0 = nuke.toNode('Multiply_0')\n    connect = nuke.toNode('Connect')\n    Xpos = blur0.xpos()\n    Ypos = blur0.ypos()\n   \n    \n    for n in nuke.allNodes('Blur'):\n        if n.name() not in \['Blur_0'] and n is not blur0:\n            nuke.delete(n)\n    for n in nuke.allNodes('Multiply'):\n        if n.name() not in \['Multiply_0','normalize','AlphaClamp','Mix']:\n            nuke.delete(n)\n    for n in nuke.allNodes('Merge2'):\n        if n.name() not in \['Merge','Plus','Mask','Copy','Stencil','Mask','Color_Bleeding']:\n            nuke.delete(n)\n    for n in nuke.allNodes('Dissolve'):\n        if n.name() not in \['Exponent','Plus','Mask','Copy']:\n            nuke.delete(n)\n            \n    nuke.delete(dissolve)\n    dissolve = nuke.nodes.Dissolve(xpos = Xpos,ypos = Ypos+400)\n    dissolve.setName('Exponent')\n    dissolve.setInput(0, connect)\n    dissolve\['channels'].setExpression('parent.Blur_master.channels')\n    dissolve\['which'].setExpression('parent.menu.iteration')\n    end.setInput(0,dissolve)   \n            \n    \n    new=\[]    \n    \n    for n in range(0,iteration + 1):\n\n        blur=nuke.nodes.Blur(xpos = Xpos+(n+1)*100,ypos= Ypos-119)\n        blur.setName('Blur_'+str(n+1))\n        blur\['channels'].setExpression('parent.Blur.channels')\n        blur\['size'].setValue(\[0,0])\n        blur\['size'].setExpression('parent.type == 0 ? parent.diffusion*pow(2,int(\[string range \[value name] 5 end])) : parent.diffusion*2*int(\[string range \[value name] 5 end])')\n        blur\['crop'].setExpression('parent.Blur_0.crop')\n        blur\['quality'].setExpression('parent.Blur_0.quality')\n        blur\['filter'].setExpression('parent.Blur_0.filter')\n        blur.setInput(0,begin)\n\n\n\n        CC=nuke.nodes.Multiply(xpos = Xpos+(n+1)*100,ypos= Ypos+0)\n        CC.setName('Multiply_'+str(n+1))\n        CC\['channels'].setExpression('parent.Blur.channels')\n        CC\['value'].setExpression('1/pow((1/falloff),int(\[string range \[value name] 9 end]))')\n        CC.setInput(0,blur)\n        \n             \n        merge = nuke.nodes.Merge2(xpos = Xpos+(n+1)*100,ypos= Ypos+100)\n        merge.setName('Merge_'+str(n+1))\n        merge\['operation'].setValue('plus')\n        merge\['Achannels'].setExpression('parent.Blur_0.channels')\n        merge\['Bchannels'].setExpression('parent.Blur_0.channels')\n        merge\['output'].setExpression('parent.Blur_0.channels')\n        merge\['also_merge'].setExpression('parent.Blur_0.channels')\n        merge\['label'].setValue('mix: \[value mix] (\[value bbox])')\n        new.append(merge)\n        merge.setInput(1,CC)\n        if n != 0:\n            merge.setInput(0, new\[n-1])\n        else:\n            merge.setInput(0, blur0)\n  \n\n        \n\n        if n==0:\n            dissolve.setInput(n+1,merge)\n        else :\n            dissolve.setInput(n+2,merge)\n\n\n\n\n\n\n\n\n"
+  label "Quality Control"
+  xpos -920
+  ypos -1162
+  hide_input true
+  addUserKnob {20 User}
+  addUserKnob {7 iteration R 0 10}
+  iteration 3
+  addUserKnob {26 qualityControl l "<b>Quality Control</b>"}
+  addUserKnob {3 qualityLowEnd l quality}
+  addUserKnob {3 qualityHighEnd l "" -STARTLINE}
+  qualityHighEnd 100
+ }
+end_group

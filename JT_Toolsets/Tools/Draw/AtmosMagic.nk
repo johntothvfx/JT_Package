@@ -1,0 +1,401 @@
+Group {
+ name AtmosMagic1
+ help "Adds atmos using a controller input, usually a depth channel."
+ knobChanged "n=nuke.thisNode()\nk=nuke.thisKnob()\n\n\n\nif k.Class()=='XY_Knob'and k.isAnimated()==False:\n    i = k.value()\n\n    inp = n.node('Shuffle1')\n    \n    fpx = int(i\[0])\n    fpy = int(i\[1])\n    \n    far = inp.sample('alpha', fpx, fpy)\n    \n    nuke.Undo.disable()\n    n.node('SetDepth').knob('whitepoint').setValue(far)\n    nuke.Undo.enable()\n "
+ tile_color 0x7aa9ffff
+ label "\n"
+ selected true
+ addUserKnob {20 atmosMagic l "Atmos Magic"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION AtmosMagic
+ addUserKnob {41 channels t "The effect is only applied to these channels. \nIf you set this to something other than all or none, you can use the checkboxes on the right to select individual channels." T Blur_0.channels}
+ addUserKnob {41 inputChannel l depth t "Enables the associated controller channel to the right. Disabling this checkbox is the same as setting the channel to none. \n\nThe channel to use as the controller to evaluate which depth channel will be used to calculate the atmos applied to the image.\nBy default, the effect is limited to the non-black areas of this channel. (Brighter the pixel the stronger the softeness)" T Copy1.from0}
+ addUserKnob {26 ""}
+ addUserKnob {4 out l output t "<b>• result -</b>The effect will be applied over the input source image.\n\n\n<b>• effect only -</b>The effect will be over black.\n" M {result "effect only" "" ""}}
+ addUserKnob {6 inputPremult l "premultiplied input" t "If thie input is premultipled this will make sure to unpremultiply the input and add the effect to then premultiply the result afterwards." -STARTLINE}
+ inputPremult true
+ addUserKnob {26 ""}
+ addUserKnob {41 near t "Adjust the position to extract the pixel value of the depth layer of the image's near clipping plane. (objects closer towards the camera)\n" T Controller.near}
+ addUserKnob {7 nearValue l "" t "This is the value of the depth layer for the near extact pixel value." -STARTLINE R 0 100}
+ addUserKnob {41 far t "Adjust the position to extract the pixel value of the depth layer of the image's far clipping plane. (objects further away the camera)\n" T Controller.far}
+ addUserKnob {7 farValue l "" t "This is the value of the depth layer for the far extact pixel value." -STARTLINE R 0 100}
+ addUserKnob {26 ""}
+ addUserKnob {18 color t "Constant color of the atmos that will be applied to the image."}
+ color {0.6000000238 0.9600000381 1}
+ addUserKnob {6 color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_rgb_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {26 ""}
+ addUserKnob {41 falloff T falloff6.falloff}
+ addUserKnob {7 white l gain t "Adjusting the white levels of the atmospherics." R 0 4}
+ white 1
+ addUserKnob {7 add l offset t "Adjusted the near and far points and offsets the position." R -1 1}
+ addUserKnob {7 gamma t "Applies a constant gamma value to the result of the result. This lightens or darkens the midtones." R 0.2 5}
+ gamma 1
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannelMask l mask t "\nEnables the associated mask channel to the right. Disabling this checkbox is the same as setting the channel to none. \n\n\nThe channel to use as a mask. By default, the merge is limited to the non-black areas of this channel.\n" T Grade1.maskChannelMask}
+ addUserKnob {41 inject t "Copies the mask input to the predefined mask.a channel. Injecting the mask allows you to use the same mask further downstream." -STARTLINE T Grade1.inject}
+ addUserKnob {41 invert_mask l invert t "Inverts the use of the mask channel, so that the merge is limited to the non-white areas of the mask.\n" -STARTLINE T Grade1.invert_mask}
+ addUserKnob {41 fringe t "When enabled, only apply the effect to the edge of the mask. \nWhen disabled, the effect is applied to the entire mask." -STARTLINE T Grade1.fringe}
+ addUserKnob {7 mix t "Dissolves between the original image at 0 and the full merge at 1."}
+ mix 1
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Atmos Magic</font><font color=#7AA9FF> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br><b> Atmos Magic</b> uses the depth channel to<br>generate atmospherics over the image<br>using the near/far pickers.\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#7AA9FF;\">John Toth <b>© 2024 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#7AA9FF\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message(\"Coming Soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#7AA9FF\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nversion_number = \"1.0.2\"\ncontext = \"Draw\"\nmodified_date = \"13th August 2024\"\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- generates atmospherics over the image using controller channel\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode1
+  tile_color 0x23232301
+  label "<center>Don't Touch\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  note_font_color 0xee453cff
+  xpos 4826
+  ypos 2853
+  bdwidth 249
+  bdheight 294
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 4674
+  ypos 2720
+ }
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4708
+  ypos 2946
+ }
+set N4d62ec00 [stack 0]
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4944
+  ypos 2946
+ }
+ Blur {
+  crop false
+  name Blur_0
+  xpos 4910
+  ypos 3056
+ }
+push $N4d62ec00
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4708
+  ypos 3238
+ }
+set N4d473800 [stack 0]
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4284
+  ypos 3238
+ }
+set N4d12ec00 [stack 0]
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3954
+  ypos 3238
+ }
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3954
+  ypos 3879
+ }
+set N4d174a00 [stack 0]
+ Remove {
+  channels {{{parent.Blur_0.channels}}}
+  name Remove1
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 3920
+  ypos 4424
+ }
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3954
+  ypos 4554
+ }
+push $N4d174a00
+ AddChannels {
+  channels alpha
+  name AddChannels2
+  xpos 4094
+  ypos 3872
+ }
+set N23dae400 [stack 0]
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4128
+  ypos 4362
+ }
+ Input {
+  inputs 0
+  name mask
+  label "\[value number]"
+  xpos 5350
+  ypos 2696
+  number 1
+ }
+ Dot {
+  name Dot17
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 5384
+  ypos 3642
+ }
+push $N4d473800
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 5033
+  ypos 3238
+ }
+set N23e63a00 [stack 0]
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 5164
+  ypos 3238
+ }
+ AddChannels {
+  channels depth
+  name AddChannels1
+  xpos 5130
+  ypos 3299
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 5164
+  ypos 3378
+ }
+push $N23e63a00
+ Remove {
+  name Remove2
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 4999
+  ypos 3296
+ }
+ Copy {
+  inputs 2
+  from0 depth.Z
+  to0 rgba.alpha
+  name Copy1
+  xpos 4999
+  ypos 3371
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  out alpha
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 4999
+  ypos 3461
+ }
+ NoOp {
+  name Controller
+  onCreate "nuke.thisNode().knob('near').setFlag(nuke.NO_ANIMATION)\nnuke.thisNode().knob('far').setFlag(nuke.NO_ANIMATION)"
+  knobChanged "grp = nuke.thisGroup()\nn = nuke.thisNode()\nk = nuke.thisKnob()\n\nif k.name() == 'near' and not k.isAnimated():\n    \n    i = k.value()\n    \n    px = int(i\[0])\n    py = int(i\[1])\n\n    # Placeholder logic for alpha value at (px, py)\n    alpha_value = n.sample('alpha', px, py)\n    \n    grp\['nearValue'].setValue(\[alpha_value])\n\n\n\nif k.name() == 'far' and not k.isAnimated():\n    \n    i = k.value()\n    \n    px = int(i\[0])\n    py = int(i\[1])\n\n    # Placeholder logic for alpha value at (px, py)\n    alpha_value = n.sample('alpha', px, py)\n    \n    grp\['farValue'].setValue(\[alpha_value])\n"
+  tile_color 0x7aa9ffff
+  xpos 4999
+  ypos 3567
+  addUserKnob {20 controller l Controller}
+  addUserKnob {12 near t "Using the XY coordination of sampling the values of a pixel."}
+  addUserKnob {12 far}
+  addUserKnob {6 color_panelDropped l "panel dropped state" +HIDDEN +STARTLINE}
+  addUserKnob {6 value_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+  addUserKnob {6 pixelValues_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ }
+ Grade {
+  inputs 1+1
+  channels alpha
+  blackpoint {{parent.nearValue}}
+  whitepoint {{parent.farValue}}
+  white {{parent.white}}
+  add {{parent.add}}
+  gamma {{parent.gamma}}
+  white_clamp true
+  name Grade1
+  xpos 4999
+  ypos 3635
+ }
+ Expression {
+  temp_name0 gfo
+  temp_expr0 "alpha * (1/ clamp( 1 ,0.00001,1) )"
+  channel0 none
+  channel1 none
+  channel2 none
+  expr3 "falloff == 0 ? gfo : falloff == 1 ? smoothstep( 0 , 1 , gfo ) : falloff == 2 ? clamp( pow2 ( gfo ) ) : falloff == 3 ? clamp( gfo ** 3 ) : pow( 1 - pow( 1 - gfo , 1 ) , 4 )"
+  name falloff6
+  xpos 4999
+  ypos 3759
+  addUserKnob {20 Misc}
+  addUserKnob {4 falloff M {linear smooth quadratic cubic exponential ""}}
+ }
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 5033
+  ypos 4074
+ }
+set N4d680a00 [stack 0]
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle2
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 4999
+  ypos 4180
+ }
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 5033
+  ypos 4290
+ }
+push $N23dae400
+push $N4d12ec00
+ Multiply {
+  value 0
+  name Multiply1
+  label "value: \[value value]"
+  xpos 4250
+  ypos 3386
+ }
+ Add {
+  channels {{{parent.Blur_0.channels}}}
+  value {{parent.color.r} {parent.color.g} {parent.color.b} 1}
+  name Add1
+  xpos 4250
+  ypos 3488
+ }
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy2
+  xpos 4250
+  ypos 3872
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4284
+  ypos 4070
+ }
+set N23f29200 [stack 0]
+ Merge2 {
+  inputs 2
+  operation multiply
+  Achannels {{{parent.Blur_0.channels}}}
+  Bchannels {{{parent.Blur_0.channels}}}
+  output {{{parent.Blur_0.channels}}}
+  also_merge {{{parent.Blur_0.channels}}}
+  mix {{parent.mix}}
+  name Copy4
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 4250
+  ypos 4278
+ }
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy5
+  xpos 4250
+  ypos 4355
+ }
+ Premult {
+  channels all
+  name Premult2
+  xpos 4250
+  ypos 4424
+  disable {{!parent.inputPremult}}
+ }
+ Copy {
+  inputs 2
+  channels all
+  name Copy3
+  xpos 4250
+  ypos 4538
+ }
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4284
+  ypos 4914
+ }
+push $N4d680a00
+push $N23f29200
+push $N4d473800
+ Unpremult {
+  channels {{{parent.Premult1.channels}}}
+  name Unpremult1
+  xpos 4674
+  ypos 3512
+  disable {{!parent.inputPremult}}
+ }
+ Merge2 {
+  inputs 2+1
+  operation copy
+  Achannels {{{parent.Blur_0.channels}}}
+  Bchannels {{{parent.Blur_0.channels}}}
+  output {{{parent.Blur_0.channels}}}
+  also_merge {{{parent.Blur_0.channels}}}
+  mix {{parent.mix}}
+  name Copy
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 4674
+  ypos 4058
+ }
+ Premult {
+  channels all
+  name Premult1
+  xpos 4674
+  ypos 4424
+  disable {{!parent.inputPremult}}
+ }
+ Switch {
+  inputs 2
+  which {{parent.out}}
+  name Switch1
+  label "\[value which] / \[expr \{\[value inputs] - (\[value inputs] > 1 ? 1 : 0)\}]"
+  xpos 4674
+  ypos 4904
+ }
+ Output {
+  name Output
+  xpos 4674
+  ypos 5102
+ }
+end_group
