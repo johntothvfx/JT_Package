@@ -1,6 +1,0 @@
-Shuffle {
- name Shuffle1
- tile_color 0x192633ff
- label "<b>\[value in]</b> &rarr; \[value out]"
- selected true
-}
