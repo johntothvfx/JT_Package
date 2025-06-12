@@ -1,0 +1,54 @@
+Dot {
+ name Dot1
+ selected true
+ xpos -6
+ ypos 201
+}
+set N3b00e800 [stack 0]
+Dot {
+ name Dot2
+ selected true
+ xpos -116
+ ypos 201
+}
+Shuffle {
+ green red
+ blue red
+ alpha red
+ name Shuffle1
+ tile_color 0x9c2828ff
+ label "<b>\[value in]</b> &rarr; \[value out]"
+ selected true
+ xpos -150
+ ypos 269
+}
+push $N3b00e800
+Shuffle {
+ red green
+ blue green
+ alpha green
+ name Shuffle2
+ tile_color 0x2e9c27ff
+ label "<b>\[value in]</b> &rarr; \[value out]"
+ selected true
+ xpos -40
+ ypos 269
+}
+push $N3b00e800
+Dot {
+ name Dot3
+ selected true
+ xpos 111
+ ypos 201
+}
+Shuffle {
+ red blue
+ green blue
+ alpha blue
+ name Shuffle4
+ tile_color 0x274d9cff
+ label "<b>\[value in]</b> &rarr; \[value out]"
+ selected true
+ xpos 77
+ ypos 269
+}

@@ -1,0 +1,362 @@
+Group {
+ name PositionConvert1
+ help "Generates a depth pass using the position information."
+ onCreate "n = nuke.thisNode()\nn\['positionOut'].setEnabled(False)\n"
+ knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\n\n\n\nif k.name() == 'inputChange':\n    classList = \['Camera','Camera2','Camera3','Axis','Axis2','Axis3','Group','Light','Light2','Light3','Light4','DirectLight','Spotlight','Environment','Gizmo','NoOp','Dot']\n\n    if n.input(1) is not None:\n        if n.input(1).Class() not in classList:\n           n.setInput(1, None)\n"
+ tile_color 0x119911ff
+ selected true
+ addUserKnob {20 positionConvert l "Position Convert"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION PositionConvert
+ addUserKnob {1 output l INVISIBLE +INVISIBLE}
+ output "\[expr \{\[numvalue positionOut] ? \"World to Cam\" : \"Cam to World\" \}]"
+ addUserKnob {41 channels t "Select your position channel that you want to use to generate a depth channel." T Shuffle1.in}
+ addUserKnob {26 space001 l "" -STARTLINE T "   "}
+ addUserKnob {41 positionInfo l " " t "Select what kind of position information you are using.\n\n<b>• World space</b> - is the coordinate system for the entire scene. Its origin is at the center of the scene. The grid you see in 3D is in the world space.\n\n<b>• Camera space</b> -  is the coordinate system from the camera's point of view.\n" -STARTLINE T menu.positionInfo}
+ addUserKnob {41 out l output t "The effect is rendered into these output channels. \nIf you set this to something other than none, you can use the checkboxes on the right to select individual channels." T Merge2.Achannels}
+ addUserKnob {26 space002 l "" +STARTLINE T "\t"}
+ addUserKnob {41 positionOut l position t "This is the output that will be converted to.\nIf your input is World Space it will convert it to Camera Space. If you select Camera Space it will convert it to World Space\n\n\n<b>• World space</b> - is the coordinate system for the entire scene. Its origin is at the center of the scene. The grid you see in 3D is in the world space.\n\n<b>• Camera space</b> -  is the coordinate system from the camera's point of view." T menu.positionOut}
+ addUserKnob {6 usePositionAlpha l "use position as alpha" t "Set whether your input image has an alpha or not.\nWhen enabled, Position to Depth will use the selected position channel to generate an alpha channel to premultiply the result.\n\n<b>Note:</b> The antialisaing edge feature is disabled and is not taken into account.\n" +STARTLINE}
+ usePositionAlpha true
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Position Convert</font><font color=#119911> v1.1"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>Position convert</b> </b> - The selected channel position<br>data will be converted from World to Camera Space<br>or Camera to World Space \n\n<br><br>\n<i>\n<b>• World space</b> -\nis the coordinate system for the<br>entire scene. \n<br>\n<b>• Camera space</b> -  is the coordinate system from<br>the camera's point of view.\n\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#119911;\">John Toth <b>© 2020 <br>\n\n"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#119911\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message(\"Coming Soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#119911\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.1.0\"\ncontext = \"AOV\"\n\n\ndate = \"31th January\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2020\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- converts the position data from world to camera space or camera to world space\n<br></i><b> v 1.1 </b><i>\n- user interface updated to match the package in this set\n- automatically outputs world or camera based on input data\n- information tab was re-written\n- output channel was added\n- input (World)/(Camera) is now selectable\n\"\"\"\n\n\n\n\n\nthankyou = \"\"\"- Daniel Velikov for the help of the calculation of the conversion of position data\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + \"<b>Thankyou:</b><br>\" + thankyou + \"<br>\" + UPPER + site + developer + ENTER + \"</a>\") \n\n\n"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode1
+  tile_color 0x8e08ff
+  label "<center>Conversion\n<i><font size=1>(conversion of camera/World space)\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 24
+  note_font_color 0xee453cff
+  xpos -719
+  ypos 147
+  bdwidth 559
+  bdheight 713
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x23232301
+  label "<center>Don't Touch\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  note_font_color 0xee453cff
+  xpos 649
+  ypos -183
+  bdwidth 243
+  bdheight 149
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode3
+  tile_color 0x999999ff
+  label "<center>alpha\n<i><font size=1>(generating alpha from position or using default input)\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 24
+  note_font_color 0xee453cff
+  xpos -113
+  ypos 267
+  bdwidth 516
+  bdheight 285
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 290
+  ypos -196
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 324
+  ypos -54
+ }
+set Nbc8aa800 [stack 0]
+ Dot {
+  name Dot2
+  xpos -626
+  ypos -54
+ }
+ Shuffle {
+  in none
+  in2 rgba
+  alpha alpha2
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -660
+  ypos 28
+ }
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -626
+  ypos 221
+ }
+set Nbc9ddc00 [stack 0]
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -336
+  ypos 221
+ }
+set Nbc9d9400 [stack 0]
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 38
+  ypos 221
+ }
+ Expression {
+  temp_name0 maxR
+  temp_expr0 r==0?r:r/r
+  temp_name1 maxG
+  temp_expr1 g==0?g:g/g
+  temp_name2 maxB
+  temp_expr2 b==0?b:b/b
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 0
+  expr1 0
+  expr2 0
+  expr3 max(maxR,maxG,maxB)
+  name Expression11
+  label "generate alpha of position"
+  xpos 4
+  ypos 368
+ }
+push $Nbc8aa800
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 324
+  ypos 378
+ }
+set N79a05800 [stack 0]
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos 378
+ }
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos 498
+ }
+ Switch {
+  inputs 2
+  which {{parent.usePositionAlpha}}
+  name Switch3
+  xpos 4
+  ypos 494
+ }
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 38
+  ypos 964
+ }
+push $Nbc9d9400
+ Add {
+  channels rgb
+  value {{-parent.Camera_INPUT.world_matrix.3} {-parent.Camera_INPUT.world_matrix.7} {-parent.Camera_INPUT.world_matrix.11} 0}
+  name Add2
+  label "inverse translation"
+  xpos -370
+  ypos 368
+ }
+ ColorMatrix {
+  matrix {
+      {{parent.Camera_INPUT.world_matrix.0} {parent.Camera_INPUT.world_matrix.1} {parent.Camera_INPUT.world_matrix.2}}
+      {{parent.Camera_INPUT.world_matrix.4} {parent.Camera_INPUT.world_matrix.5} {parent.Camera_INPUT.world_matrix.6}}
+      {{parent.Camera_INPUT.world_matrix.8} {parent.Camera_INPUT.world_matrix.9} {parent.Camera_INPUT.world_matrix.10}}
+    }
+  invert true
+  name ColorMatrix3
+  label "world to cam"
+  xpos -370
+  ypos 464
+ }
+ Dot {
+  name Dot4
+  tile_color 0xff0000ff
+  gl_color 0xffff
+  label "  <font color = \"RED\" >  CAMERA SPACE OUT</font>"
+  note_font "Sans Serif"
+  note_font_size 12
+  note_font_color 0xffff
+  xpos -336
+  ypos 642
+ }
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -336
+  ypos 749
+ }
+push $Nbc9ddc00
+ Expression {
+  expr0 "Camera_INPUT.world_matrix.0 * r + Camera_INPUT.world_matrix.1 * g +Camera_INPUT.world_matrix.2 * b + Camera_INPUT.world_matrix.3 "
+  expr1 "Camera_INPUT.world_matrix.4 * r + Camera_INPUT.world_matrix.5* g + Camera_INPUT.world_matrix.6 * b + Camera_INPUT.world_matrix.7"
+  expr2 "Camera_INPUT.world_matrix.8 * r + Camera_INPUT.world_matrix.9 * g + Camera_INPUT.world_matrix.10 * b + Camera_INPUT.world_matrix.11"
+  channel3 alpha
+  expr3 "Camera_INPUT.world_matrix.12 * r + Camera_INPUT.world_matrix.13 * g + Camera_INPUT.world_matrix.14 * b + Camera_INPUT.world_matrix.15"
+  name Expression2
+  label "Camera To World"
+  xpos -660
+  ypos 416
+ }
+ Dot {
+  name Dot8
+  tile_color 0xffff
+  gl_color 0xffff
+  label "  <font color = \"blue\" >  WORLD SPACE OUT</font>"
+  note_font "Sans Serif"
+  note_font_size 12
+  note_font_color 0xffff
+  xpos -626
+  ypos 642
+ }
+ Switch {
+  inputs 2
+  which {{!parent.positionInfo}}
+  name Switch1
+  xpos -660
+  ypos 745
+ }
+ Copy {
+  inputs 2
+  from0 -rgba.alpha
+  to0 -rgba.alpha
+  channels alpha
+  name Copy1
+  xpos -660
+  ypos 948
+ }
+ Premult {
+  name Premult1
+  xpos -660
+  ypos 1022
+ }
+ Expression {
+  expr0 isinf(r)?0:r
+  expr1 isinf(g)?0:g
+  expr2 isinf(b)?0:b
+  expr3 isinf(a)?0:a
+  name Expression1
+  label "infinity To Black"
+  xpos -660
+  ypos 1092
+ }
+ Expression {
+  expr0 isnan(r)?0:r
+  expr1 isnan(g)?0:g
+  expr2 isnan(b)?0:b
+  expr3 isnan(a)?0:a
+  name Expression8
+  label nan_To_Black
+  xpos -660
+  ypos 1130
+ }
+ Shuffle {
+  out {{{parent.Merge2.Achannels}}}
+  name Shuffle2
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -660
+  ypos 1324
+ }
+push $N79a05800
+ Merge2 {
+  inputs 2
+  operation copy
+  Achannels rgb
+  Bchannels none
+  output {{{Achannels}}}
+  name Merge2
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 290
+  ypos 1328
+  disable {{"\[string match -nocase \"none\" \[value Shuffle1.in] ] ? 1 : 0"}}
+ }
+ Output {
+  name Output1
+  xpos 290
+  ypos 1556
+ }
+ NoOp {
+  inputs 0
+  name menu
+  knobChanged "positionInfo = int(nuke.thisNode().knob('positionInfo').getValue())\n\nif positionInfo == 1:\n    int(nuke.thisNode().knob('positionOut').setValue(0))\nelse:\n    int(nuke.thisNode().knob('positionOut').setValue(1))\n       \n\n"
+  xpos 730
+  ypos -106
+  addUserKnob {20 menu l Menu}
+  addUserKnob {4 positionInfo l " " t "Select what kind of position information you are using.\n\n<b>• World space</b> - is the coordinate system for the entire scene. Its origin is at the center of the scene. The grid you see in 3D is in the world space.\n\n<b>• Camera space</b> -  is the coordinate system from the camera's point of view.\n" M {world camera "" "" "" "" ""}}
+  addUserKnob {4 positionOut l position t "This is the output that will be converted to.\nIf your input is World Space it will convert it to Camera Space. If you select Camera Space it will convert it to World Space\n\n\n<b>• World space</b> - is the coordinate system for the entire scene. Its origin is at the center of the scene. The grid you see in 3D is in the world space.\n\n<b>• Camera space</b> -  is the coordinate system from the camera's point of view." +DISABLED M {world camera "" "" "" "" "" ""}}
+  positionOut camera
+  addUserKnob {22 lockToggle l lock/unlock -STARTLINE T "nuke.thisNode()\['positionOut'].setEnabled( not nuke.thisNode()\['positionOut'].enabled() )"}
+ }
+ Input {
+  inputs 0
+  name camera
+  label "\[value number]"
+  xpos 510
+  ypos -196
+  number 1
+ }
+ Axis2 {
+  display off
+  selectable false
+  name Camera_INPUT
+  tile_color 0xffff
+  xpos 520
+  ypos -102
+  addUserKnob {20 User}
+  addUserKnob {7 focal}
+  focal {{"\[exists parent.input1] > 1 ? 0 : \[value \[topnode parent.input1].focal] "}}
+  addUserKnob {7 haperture}
+  haperture {{"\[exists parent.input1] > 1 ? 0 : \[value \[topnode parent.input1].haperture]"}}
+  addUserKnob {26 ""}
+  addUserKnob {7 winroll}
+  winroll {{"\[exists parent.input1] > 1 ? 0 : \[value \[topnode parent.input1].winroll]"}}
+  addUserKnob {30 wintranslate}
+  wintranslate {{"\[exists parent.input1] > 1 ? 0 : \[value \[topnode parent.input1].win_translate.u]"} {"\[exists parent.input1] > 1 ? 0 : \[value \[topnode parent.input1].win_translate.v]"}}
+  addUserKnob {30 winscale}
+  winscale {{"\[exists parent.input1] > 1 ? 0 : \[value \[topnode parent.input1].win_scale.u]"} {"\[exists parent.input1] > 1 ? 0 : \[value \[topnode parent.input1].win_scale.v]"}}
+ }
+ ColorMatrix {
+  inputs 0
+  matrix {
+      {{parent.Camera_INPUT.world_matrix.0} {parent.Camera_INPUT.world_matrix.1} {parent.Camera_INPUT.world_matrix.2}}
+      {{parent.Camera_INPUT.world_matrix.4} {parent.Camera_INPUT.world_matrix.5} {parent.Camera_INPUT.world_matrix.6}}
+      {{parent.Camera_INPUT.world_matrix.8} {parent.Camera_INPUT.world_matrix.9} {parent.Camera_INPUT.world_matrix.10}}
+    }
+  name ColorMatrix2
+  label "Camera to World"
+  xpos -545
+  ypos 368
+ }
+ Add {
+  channels rgb
+  value {{parent.Camera_INPUT.world_matrix.3} {parent.Camera_INPUT.world_matrix.7} {parent.Camera_INPUT.world_matrix.11} 0}
+  name Add1
+  label "inverse translation"
+  xpos -545
+  ypos 464
+ }
+end_group

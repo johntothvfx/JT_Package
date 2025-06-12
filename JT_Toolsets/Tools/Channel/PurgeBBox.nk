@@ -1,0 +1,38 @@
+Group {
+ name PurgeBBox1
+ help "Kills all channel layers and keeps existing format"
+ tile_color 0x9e3c63ff
+ selected true
+ addUserKnob {20 info l Info}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION PurgeBBox
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Purge BBox</font><font color=#9E3C63> v1.0"}
+ addUserKnob {26 divider04 l "" +STARTLINE}
+ addUserKnob {26 bulletpoints l "" t "overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>Purge BBox</b> will kill all channels and<br> keep existing format.\n\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#9E3C63;\">John Toth <b>© 2024 <br>\n"}
+ addUserKnob {26 divider05 l "" +STARTLINE}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#9E3C63\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message(\"Coming Soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#913c63\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.0.0\"\ncontext = \"Channel\"\n\n\ndate = \"19th July\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- removes all channel layers and keeps existing format\n\"\"\"\n\n\n\n\nthankyou = \"\"\"\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + UPPER + site + developer + ENTER + \"</a>\") \n\n\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos -123
+  ypos -277
+ }
+ Remove {
+  name Remove1
+  xpos -123
+  ypos -206
+ }
+ CopyBBox {
+  name CopyBBox1
+  xpos -123
+  ypos -105
+ }
+ Output {
+  name Output1
+  xpos -123
+  ypos -33
+ }
+end_group

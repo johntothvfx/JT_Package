@@ -1,0 +1,10 @@
+Shuffle {
+ red white
+ green white
+ blue white
+ alpha white
+ name Shuffle1
+ tile_color 0xbbbbbbff
+ label "<b>\[value in]</b> &rarr; \[value out]"
+ selected true
+}

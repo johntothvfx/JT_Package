@@ -1,0 +1,394 @@
+Group {
+ name AOVRotation1
+ help "Used to rotate input channel (usually Position, Normals) in X Y Z"
+ tile_color 0x184789ff
+ selected true
+ addUserKnob {20 aovRotation l "AOV Rotation"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION AOVRotation
+ addUserKnob {41 channels T Shuffle1.in}
+ addUserKnob {41 out l output T Merge2.Achannels}
+ addUserKnob {26 space000 l "" +STARTLINE T "\t"}
+ addUserKnob {4 order l "rotation order" t "What axis rotation is being calculated first to last." M {XYZ XZY YXZ YZX ZXY ZYX "" "" "" ""}}
+ order XZY
+ addUserKnob {13 rotate t "Rotates the input channel on the X,Y,Z axis."}
+ addUserKnob {26 ""}
+ addUserKnob {4 exportOptions l export t "Exports a ColorMatrix and Axis node.\nYou can then rotate the Axis node and the ColorMatrix connected to input channel will achieve the same look.\n\nThe exported ColorMatrix is expression linked to the export Axis node based on it's name (Can Check parent tab).\n\n<b>• rotation from axis (empty):</b> Creates a empty ColorMatrix & Axis node.\n\n<b>• rotation from axis (AOV settings):</b> Grabs the values from this node (rotation order and rotate values. When the ColorMatrix & Axis node is created these settings will be copied into the nodes\n\nThis is mostly used for tool development like \"Pmattes\"" M {"rotation from axis (empty)" "rotation from axis (AOV settings)" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+ exportOptions "rotation from axis (AOV settings)"
+ addUserKnob {22 export t "Exports a ColorMatrix and Axis node.\n\nBased on the settings:\n<b>• rotation from axis (empty)\n• rotation from axis (AOV settings)\n</b>" -STARTLINE T "# John Toth\n\n# Defining shortcuts\nn = nuke.thisNode()\n\n#position of nodes to when exported\nx_pos = n.xpos() + 150\ny_pos = n.ypos() + 150\n\n# gathering node information\norder = int(n\['order'].getValue())\n\nrotate_X = n\['rotate'].getValue(0)\nrotate_Y = n\['rotate'].getValue(1)\nrotate_Z = n\['rotate'].getValue(2)\n\nexport = int(n\['exportOptions'].getValue())\n\n\n#knobs to create\ntab = nuke.Tab_Knob ('Parent', 'Parent',)\nparent = nuke.String_Knob ('parentName', 'parent')\nfindParentButton = nuke.PyScript_Knob ('findParent', 'Find')\nparentMessageButton = nuke.PyScript_Knob ('parentMessage', 'INVISIBLE')\nparentMessageButton.setFlag(nuke.INVISIBLE)\n\n\n# create outside group\nnuke.root().end()\n\n# create axis node\naxis = nuke.createNode('Axis3', inpanel = False)\nname = axis\['name'].value()\naxis\['rot_order'].setValue(order)\naxis.setXpos(x_pos + 100)\naxis.setYpos(y_pos - 14)\nif export == 1:\n    axis\['rotate'].setValue(\[rotate_X, rotate_Y, rotate_Z])\nelse:\n    pass\n\n\n# creating Matrix node\nmatrix = nuke.createNode('ColorMatrix', inpanel = False)\nmatrix\['label'].setValue('(connected to \[value parent])')\nmatrix.setXpos(x_pos - 50)\nmatrix.setYpos(y_pos)\n\n#adding knobs\nmatrix.addKnob(tab)\nmatrix.addKnob(parent)\nmatrix.addKnob(findParentButton)\nmatrix.addKnob(parentMessageButton)\n#setting created knob values & tooltips\nmatrix\['parentName'].setValue(name)\nmatrix\['parentName'].setTooltip(\"\"\"Copy the name of the axis you want to use to rotate the matrix/AOV<br><br>This is Captial senstive\"\"\")\nmatrix\['findParent'].setValue(\"\"\"def findParent(knobName):\n    \n    n = nuke.thisNode()\n    \n    # make functions available\n    n.knob(\"parentMessage\").execute()\n    \n    parentName = nuke.thisNode().knob(knobName).value()\n    FindParent(parentName)\n    \nfindParent(\"parentName\")\"\"\")    \nmatrix\['findParent'].setTooltip(\"\"\"Zooms in the node that is the same name as the what is written in the parent knob\"\"\")\nmatrix\['parentMessage'].setVisible(False)\nmatrix\['parentMessage'].setValue(\"\"\"def FindParent(parentName):\n    \n    #Jump to node in the nodegraph \n    \n    \n    if not parentName:\n        nuke.message('No Tag Found')\n        return\n        \n    parentNode = nuke.toNode(parentName)\n    if not parentNode:\n        nuke.message('No node named \{\}'.format(parentName))\n        return\n        \n    nuke.zoom( 2, \[parentNode.xpos(), parentNode.ypos()])\"\"\")\n\n\n#setting label from parent\nmatrix\['label'].setValue('(\[value parentName])')\n\n\n# Set expression link between 'matrix' knob and modified 'world_matrix' values\nmatrix\['matrix'].setExpression('\[value parentName].world_matrix.0', 0)\nmatrix\['matrix'].setExpression('\[value parentName].world_matrix.1', 1)\nmatrix\['matrix'].setExpression('\[value parentName].world_matrix.2', 2)\nmatrix\['matrix'].setExpression('\[value parentName].world_matrix.4', 3)\nmatrix\['matrix'].setExpression('\[value parentName].world_matrix.5', 4)\nmatrix\['matrix'].setExpression('\[value parentName].world_matrix.6', 5)\nmatrix\['matrix'].setExpression('\[value parentName].world_matrix.8', 6)\nmatrix\['matrix'].setExpression('\[value parentName].world_matrix.9', 7)\nmatrix\['matrix'].setExpression('\[value parentName].world_matrix.10', 8)\n"}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>AOV Rotation</font><font color=#184789> v1.1"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>AOV Rotation:</b> Rotates the channel<br>in either X,Y, Z axis\n\n<br></b><i>\n<br><strong>•</br> This is useful for rotating Normals, position<br>passes or tool development.\n\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#184789;\">John Toth <b>© 2019 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#184789\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#184789\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.1.0\"\ncontext = \"AOV\"\n\n\ndate = \"2nd February\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2019\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- rotates the image based on XYZ axis\n<br></i><b> v 1.1 </b><i>\n- user interface update\n- rotation order was added\n- colormatrix/axis export setup was added\n- replace has been replaced with output feature\n\"\"\"\n\n\n\n\nthankyou = \"\"\"\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + UPPER + site + developer + ENTER + \"</a>\") \n\n\n"}
+}
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 180
+  ypos -928
+ }
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos -798
+ }
+set Na703320 [stack 0]
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -435
+  ypos -798
+ }
+ Shuffle {
+  in none
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -469
+  ypos -740
+ }
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -435
+  ypos -630
+ }
+set N4c1f890 [stack 0]
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -336
+  ypos -630
+ }
+set N4c24270 [stack 0]
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -226
+  ypos -630
+ }
+set N4c28b60 [stack 0]
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -116
+  ypos -630
+ }
+set N4c3ffa0 [stack 0]
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -6
+  ypos -630
+ }
+set N4c44b80 [stack 0]
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 104
+  ypos -630
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix7
+  label Z
+  xpos 70
+  ypos -568
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.z}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+    }
+  name ColorMatrix8
+  label Y
+  xpos 70
+  ypos -520
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.y}}
+ }
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name ColorMatrix9
+  label X
+  xpos 70
+  ypos -472
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.x}}
+ }
+push $N4c44b80
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix22
+  label Z
+  xpos -40
+  ypos -568
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.z}}
+ }
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name ColorMatrix23
+  label X
+  xpos -40
+  ypos -520
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.x}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+    }
+  name ColorMatrix24
+  label Y
+  xpos -40
+  ypos -472
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.y}}
+ }
+push $N4c3ffa0
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+    }
+  name ColorMatrix25
+  label Y
+  xpos -150
+  ypos -568
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.y}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix26
+  label Z
+  xpos -150
+  ypos -520
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.z}}
+ }
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name ColorMatrix27
+  label X
+  xpos -150
+  ypos -472
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.x}}
+ }
+push $N4c28b60
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+    }
+  name ColorMatrix28
+  label Y
+  xpos -260
+  ypos -568
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.y}}
+ }
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name ColorMatrix29
+  label X
+  xpos -260
+  ypos -520
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.x}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix30
+  label Z
+  xpos -260
+  ypos -472
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.z}}
+ }
+push $N4c24270
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name ColorMatrix31
+  label X
+  xpos -370
+  ypos -568
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.x}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix32
+  label Z
+  xpos -370
+  ypos -520
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.z}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+    }
+  name ColorMatrix33
+  label Y
+  xpos -370
+  ypos -472
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.y}}
+ }
+push $N4c1f890
+ ColorMatrix {
+  matrix {
+      {1 0 0}
+      {0 {cos(radians(angle))} {-sin(radians(angle))}}
+      {0 {sin(radians(angle))} {cos(radians(angle))}}
+    }
+  name ColorMatrix34
+  label X
+  xpos -469
+  ypos -568
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.x}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} 0 {sin(radians(angle))}}
+      {0 1 0}
+      {{-sin(radians(angle))} 0 {cos(radians(angle)) x1001 1}}
+    }
+  name ColorMatrix35
+  label Y
+  xpos -469
+  ypos -520
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.y}}
+ }
+ ColorMatrix {
+  matrix {
+      {{cos(radians(angle))} {-sin(radians(angle))} 1.224646799e-16}
+      {{sin(radians(angle))} {cos(radians(angle))} 0}
+      {0 0 1}
+    }
+  name ColorMatrix36
+  label Z
+  selected true
+  xpos -469
+  ypos -472
+  addUserKnob {20 User}
+  addUserKnob {7 angle R 0 360}
+  angle {{parent.rotate.z}}
+ }
+ Switch {
+  inputs 6
+  which {{parent.order}}
+  name Switch2
+  label "\[value which]/\[expr \{\[value inputs]\}]"
+  xpos -469
+  ypos -280
+ }
+ Shuffle {
+  out {{{parent.Merge2.Achannels}}}
+  name Shuffle2
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -469
+  ypos -116
+ }
+push $Na703320
+ Merge2 {
+  inputs 2
+  operation copy
+  Achannels rgb
+  Bchannels none
+  output {{{Achannels}}}
+  name Merge2
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 180
+  ypos -112
+  disable {{"\[string match -nocase \"none\" \[value Shuffle1.in] ] ? 1 : 0"}}
+ }
+ Output {
+  name Output1
+  xpos 180
+  ypos 158
+ }
+end_group

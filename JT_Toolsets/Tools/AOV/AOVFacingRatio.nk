@@ -1,0 +1,572 @@
+Group {
+ inputs 2
+ name AOVFacingRatio1
+ help "Creates a Fresnel effect based on the normals, position and the camera data."
+ tile_color 0x184789ff
+ selected true
+ addUserKnob {20 AOVFacingRatio l "AOV Facing Ratio"}
+ addUserKnob {26 ""}
+ addUserKnob {41 normalsin l "normals channel" t "Input thenormals channel input" T Shuffle2.in}
+ addUserKnob {41 positonin l "position channel" t "Input the Position channel data" T shuffe.in}
+ addUserKnob {26 ""}
+ addUserKnob {6 inverteffect l invert t "Inverting Facing ratio effect giving you Fresnel effect." +STARTLINE}
+ addUserKnob {7 radius t "Radius will effect the grazing angles in relation to the camera viewer."}
+ radius 0.5
+ addUserKnob {26 ""}
+ addUserKnob {41 operation l "Alpha mode" t "using a channelmerge internally you may constrain the effect ot the alpha channel coming in." T ChannelMerge1.operation}
+ addUserKnob {26 space_2 l "" -STARTLINE T "\t"}
+ addUserKnob {4 output l "Alpha falloff" t "falloff of the fresnel effect. This is different from the radius effect" M {linear smoothstep cubic Exponent "" "" "" "" "" ""}}
+ addUserKnob {26 space111 l "" -STARTLINE T "\t"}
+ addUserKnob {41 disable_1 l "Disable alpha oversampling" t "alpha channel wil get upscaled and reformated back to get a smoother alias." -STARTLINE T Copy1.disable}
+ addUserKnob {41 mix t "mix the alpha mode 1 taking effect and 0 being no effect" T ChannelMerge1.mix}
+ addUserKnob {26 space l "" +STARTLINE T "\t   \t"}
+ addUserKnob {26 ""}
+ addUserKnob {20 Visualgroup l Visualize n 1}
+ Visualgroup 0
+ addUserKnob {6 overlay l "Show 2D overlay" t "display overlayin 2D" +STARTLINE}
+ overlay true
+ addUserKnob {18 overlayCC l "overlay Color" t "Color overlay"}
+ overlayCC {1 0 0}
+ addUserKnob {6 overlayCC_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {7 mixcc l mix t "mix the  overlay color 1 taking effect and 0 being no effect"}
+ mixcc 1
+ addUserKnob {26 ""}
+ addUserKnob {6 in3D l "Show in 3D" t "This will make 2D goe black and in 3D will see a point cloud of the effect taking place." +STARTLINE}
+ addUserKnob {41 detail l "Point detail" t "Density of the point cloud" T PositionToPoints1.detail}
+ addUserKnob {41 pointSize l "Point size" t "point size" T PositionToPoints1.pointSize}
+ addUserKnob {20 endGroup n -1}
+ addUserKnob {26 ""}
+ addUserKnob {26 title l "" +STARTLINE T "<br><font size='5'>AOV Facing Ratio</font><font color=#194d95> v1.1<br>"}
+ addUserKnob {26 ""}
+ addUserKnob {20 helptab l Help}
+ addUserKnob {26 ""}
+ addUserKnob {26 setup l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 steps l "" +STARTLINE T "<br><strong>1. </br> \nCreates a facing ratio effect based on <br> normals & position input.\n\n\n<br><br><b>John Toth © 2021 <br>"}
+ addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:#194d95\">johntothvfx.com</a>\n"}
+ addUserKnob {26 space_1 l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#194d95\">Version Log</a>\n" -STARTLINE T "nuke.message(\"<i><b>Version Log:</i></b><br><br><b>v 1.0</b><br><i>- creation of the tool</i></b><br><br><b>v 1.1</b><br><i>- updating the information<br>- removing oversampling doubleup.</i><br><br></i><b>John Toth © 2021\")\n"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode10
+  tile_color 0x23232301
+  label "<center><font size='5'></font><font color=#ee453c> Falloff filter can be applied\n</center><font size='1'>\n- falloff of the matte\n"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  xpos 1491
+  ypos -204
+  bdwidth 994
+  bdheight 541
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode11
+  tile_color 0x23232301
+  label <center>channel
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  xpos 1384
+  ypos -1324
+  bdwidth 1249
+  bdheight 286
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode12
+  tile_color 0x23232301
+  label "<center><font size='5'></font><font color=#ee453c> generating Fresnel\n</center><font size='1'>\n- \n"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  xpos 1361
+  ypos -907
+  bdwidth 861
+  bdheight 604
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode5
+  tile_color 0x23232301
+  label "<center><font size='5'></font><font color=#ee453c> 3D visualization\n</center><font size='1'>\n- Pos to Points from input \n- Mate selected matte RED to view what is selected (expression)"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  xpos 758
+  ypos 824
+  bdwidth 684
+  bdheight 559
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode6
+  tile_color 0x23232301
+  label "<center><font size='5'></font><font color=#ee453c> matte sampling\n</center><font size='1'>\n- upscale then rescale back down for better result"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  xpos 1624
+  ypos 398
+  bdwidth 571
+  bdheight 404
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode7
+  tile_color 0x23232301
+  label "<center><font size='5'></font><font color=#ee453c> Matte Combining\n</center><font size='1'>\n- Pos to Points from input \n- Mate selected matte RED to view what is selected (expression)"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  xpos 1601
+  ypos 1387
+  bdwidth 815
+  bdheight 441
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode8
+  tile_color 0x23232301
+  label "<center><font size='5'></font><font color=#ee453c> 2D visualization\n</center><font size='1'>\n- Creates a 2D overlay visualization for viewer"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  xpos 1599
+  ypos 1884
+  bdwidth 815
+  bdheight 441
+ }
+ Input {
+  inputs 0
+  name camera
+  label "input \[value number]"
+  xpos 1060
+  ypos -1648
+  number 1
+ }
+ Axis2 {
+  name Camera_INPUT
+  tile_color 0xffff
+  xpos 1070
+  ypos -1446
+  addUserKnob {20 User}
+  addUserKnob {7 focal}
+  focal {{"\[value \[topnode parent.input1].focal]"}}
+  addUserKnob {7 haperture}
+  haperture {{"\[value \[topnode parent.input1].haperture]"}}
+  addUserKnob {26 ""}
+  addUserKnob {7 winroll}
+  winroll {{"\[value \[topnode parent.input1].winroll]"}}
+  addUserKnob {30 wintranslate}
+  wintranslate {{"\[value \[topnode parent.input1].win_translate.u]"} {"\[value \[topnode parent.input1].win_translate.v]"}}
+  addUserKnob {30 winscale}
+  winscale {{"\[value \[topnode parent.input1].win_scale.u]"} {"\[value \[topnode parent.input1].win_scale.v]"}}
+ }
+ Input {
+  inputs 0
+  name Input
+  xpos 1474
+  ypos -1642
+ }
+ Dot {
+  name Dot26
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1508
+  ypos -1235
+ }
+set N7a179d00 [stack 0]
+ Shuffle {
+  in none
+  alpha black
+  name shuffe
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  note_font "source code pro lighty"
+  xpos 1474
+  ypos -1172
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1508
+  ypos -942
+ }
+set N7a178f00 [stack 0]
+ Add {
+  channels rgb
+  value {{-Camera_INPUT.world_matrix.3} {-Camera_INPUT.world_matrix.7} {-Camera_INPUT.world_matrix.11} 0}
+  name Add2
+  xpos 1474
+  ypos -783
+ }
+ Expression {
+  temp_name0 t
+  temp_expr0 1/sqrt(r*r+g*g+b*b)
+  channel0 {rgba.red -rgba.green -rgba.blue rgba.alpha}
+  expr0 r*t
+  expr1 g*t
+  expr2 b*t
+  name Expression3
+  xpos 1474
+  ypos -615
+ }
+push $N7a179d00
+ Dot {
+  name Dot27
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1838
+  ypos -1235
+ }
+set N7a147200 [stack 0]
+ Shuffle {
+  in none
+  out rgb
+  name Shuffle2
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 1804
+  ypos -1177
+ }
+ Dot {
+  name Dot30
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1838
+  ypos -779
+ }
+set N7a146400 [stack 0]
+ MergeExpression {
+  inputs 2
+  channel0 rgb
+  expr0 -(Ar*Br+Ag*Bg+Ab*Bb)
+  channel1 none
+  channel2 none
+  name MergeExpression
+  xpos 1804
+  ypos -615
+ }
+push $N7a146400
+ ColorMatrix {
+  matrix {
+      {{Camera_INPUT.world_matrix.0} {Camera_INPUT.world_matrix.1} {Camera_INPUT.world_matrix.2}}
+      {{Camera_INPUT.world_matrix.4} {Camera_INPUT.world_matrix.5} {Camera_INPUT.world_matrix.6}}
+      {{Camera_INPUT.world_matrix.8} {Camera_INPUT.world_matrix.9} {Camera_INPUT.world_matrix.10}}
+    }
+  invert true
+  name ColorMatrix1
+  xpos 1981
+  ypos -783
+ }
+ Expression {
+  expr3 1-clamp(b)
+  name Expression
+  xpos 1981
+  ypos -437
+ }
+ ShuffleCopy {
+  inputs 2
+  blue blue
+  alpha blue
+  name ShuffleCopy
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 1804
+  ypos -447
+ }
+ Invert {
+  channels alpha
+  name Invert1
+  xpos 1804
+  ypos -376
+  disable {{!inverteffect}}
+ }
+ Gamma {
+  channels alpha
+  value {{radius+.1}}
+  name Gamma1
+  xpos 1804
+  ypos -88
+ }
+ Dot {
+  name Dot31
+  xpos 1838
+  ypos 44
+ }
+set N7a116b00 [stack 0]
+ Dot {
+  name Dot32
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1964
+  ypos 44
+ }
+set N7a116400 [stack 0]
+ Dot {
+  name Dot33
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2107
+  ypos 44
+ }
+set N7a115d00 [stack 0]
+ Dot {
+  name Dot34
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2267
+  ypos 44
+ }
+ Expression {
+  channel0 none
+  channel1 none
+  channel2 none
+  channel3 {{{parent.Cubic.channel3}}}
+  expr3 clamp(pow(pow,2))
+  maskChannelMask {{{parent.Cubic.maskChannelMask}}}
+  name Exponent1
+  xpos 2233
+  ypos 105
+  addUserKnob {20 User}
+  addUserKnob {7 mult R 1 10}
+ }
+ Dot {
+  name Dot35
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2267
+  ypos 262
+ }
+push $N7a116400
+ Expression {
+  expr3 "clamp(pow(a, 2))"
+  name Cubic1
+  xpos 1930
+  ypos 105
+ }
+ Dot {
+  name Dot36
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1964
+  ypos 164
+ }
+push $N7a115d00
+ Expression {
+  expr3 "clamp(smoothstep(0, 1, a))"
+  name Smoothstep1
+  xpos 2073
+  ypos 105
+ }
+ Dot {
+  name Dot37
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2107
+  ypos 188
+ }
+push $N7a116b00
+ Switch {
+  inputs 4
+  which {{output}}
+  name Switch6
+  xpos 1804
+  ypos 258
+ }
+ Dot {
+  name Dot10
+  xpos 1838
+  ypos 642
+ }
+set N7a08f200 [stack 0]
+ Reformat {
+  type scale
+  scale 5
+  center false
+  pbb true
+  name Oversample3
+  xpos 1988
+  ypos 638
+ }
+ Expression {
+  name Expression10
+  xpos 1988
+  ypos 687
+ }
+ Reformat {
+  type scale
+  scale {{1.0/Oversample3.scale}}
+  resize distort
+  center false
+  pbb true
+  name Oversample6
+  xpos 1988
+  ypos 734
+ }
+push $N7a08f200
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy1
+  xpos 1804
+  ypos 728
+ }
+ Dot {
+  name Dot17
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1838
+  ypos 906
+ }
+set N7a0bb900 [stack 0]
+ Dot {
+  name Dot6
+  xpos 1204
+  ypos 906
+ }
+ Expression {
+  channel0 {rgba.red -rgba.green -rgba.blue none}
+  expr0 a
+  channel1 {-rgba.red rgba.green rgba.blue none}
+  expr1 0
+  channel2 {-rgba.red -rgba.green -rgba.blue rgba.alpha}
+  expr2 1
+  channel3 none
+  name Expression1
+  xpos 1170
+  ypos 1118
+ }
+push $N7a178f00
+ Dot {
+  name Dot3
+  xpos 984
+  ypos -942
+ }
+ Dot {
+  name Dot4
+  xpos 984
+  ypos 1248
+ }
+ PositionToPoints {
+  inputs 2
+  display textured
+  selectable false
+  render_mode off
+  cast_shadow false
+  receive_shadow false
+  detail 0.025
+  name PositionToPoints1
+  xpos 1170
+  ypos 1245
+  disable {{!in3D}}
+ }
+ Dot {
+  name Dot5
+  xpos 1204
+  ypos 2590
+ }
+push $N7a147200
+ Dot {
+  name Dot28
+  xpos 2524
+  ypos -1230
+ }
+ Shuffle {
+  in alpha
+  red white
+  out alpha
+  name IF_NO_ALPHA2
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 2490
+  ypos -1172
+  disable {{"\[string first \".alpha\" \[channels \[input this 0]]]>-1\n\n"}}
+ }
+ Dot {
+  name Dot2
+  xpos 2524
+  ypos 1554
+ }
+set N7a08f900 [stack 0]
+push $N7a0bb900
+ ChannelMerge {
+  inputs 2
+  operation in
+  name ChannelMerge1
+  xpos 1804
+  ypos 1538
+  disable {{replace}}
+ }
+push $N7a08f900
+ Dot {
+  name Dot23
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2524
+  ypos 1691
+ }
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy2
+  xpos 1804
+  ypos 1682
+ }
+ Dot {
+  name Dot21
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1838
+  ypos 2082
+ }
+set N7a063900 [stack 0]
+ Dot {
+  name Dot24
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1996
+  ypos 2082
+ }
+set N7a063200 [stack 0]
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 2123
+  ypos 2068
+ }
+ Grade {
+  multiply {{overlayCC} {overlayCC} {overlayCC} {curve}}
+  white_clamp true
+  name Grade1
+  xpos 2123
+  ypos 2254
+ }
+push $N7a063200
+ Merge2 {
+  inputs 2
+  output rgb
+  mix {{mixcc}}
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 1962
+  ypos 2248
+ }
+push $N7a063900
+ Switch {
+  inputs 2
+  which {{parent.overlay}}
+  name Switch4
+  xpos 1804
+  ypos 2254
+ }
+ Switch {
+  inputs 2
+  which {{in3D}}
+  name Switch3
+  xpos 1804
+  ypos 2587
+ }
+ Output {
+  name Output1
+  xpos 1804
+  ypos 2798
+ }
+end_group
