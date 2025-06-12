@@ -1,0 +1,657 @@
+BackdropNode {
+ inputs 0
+ name BackdropNode1
+ tile_color 0xbbbbbbff
+ label "\[value output]"
+ note_font "DejaVu Sans"
+ note_font_size 24
+ selected true
+ xpos 4438
+ ypos -1411
+ border_width 15
+ bdwidth 2209
+ bdheight 2774
+ addUserKnob {20 templateBackdrop l Template}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION Template
+ addUserKnob {43 output l INVISIBLE +INVISIBLE}
+ output "<center><font size=5>\[expr \{\[numvalue capital01] ? \[string tolower \[value passName]] : \[string toupper \[value passName]]\}]<font size=1><font color=#222222>\t\[expr \{\[numvalue capital02] ? \[string tolower \[value version]] : \[string toupper \[value version]]\}]\n\[expr \{\[numvalue capital03] ? \[string tolower \[value template]] : \[string toupper \[value template]]\}]</font></center>\n</font></center>\n\[knob tile_color \[expr \{\[value initialize] ? \[value presets] : \[knob tile_color]\}]]\n\n"
+ addUserKnob {4 presets t "Context of the template and this will change the color of the backdrop to match operation" +INVISIBLE M {"555819519\tdefault" "808464639\tdefault 2" "2341178367\tdefault 3" "1360471295\t3D" "1197908479\taov" "3141102335\tchannel" "2057961471\tcolor" "522994687\tdeep" "3149642751\tdraw" "3429379327\tfilter" "11600127\tkeyer" "1264502527\tmerge" "791630335\toptical" "2057961471\tother" "3722305023\tparticles" "679634175\tutility" "2963561983\ttime" "2776279807\ttransform" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+ presets 3722305023
+ addUserKnob {6 initialize -STARTLINE +INVISIBLE}
+ addUserKnob {3 padding l Padding t "This is the value of the scale distance between the nodes closest to the edge of the backdrop will be."}
+ padding 100
+ addUserKnob {22 snap l "snap to selected nodes" t "The backdrop will snap to the scale of the selected node and include a padding value." -STARTLINE T "this = nuke.thisNode()\nselNodes = nuke.selectedNodes()\npadding = this.knob('padding').value()\nif len(selNodes)== 0:\n\tpass\nelse:\n\tbdX = min(\[node.xpos() for node in selNodes]) - padding\n\tbdY = min(\[node.ypos() for node in selNodes]) - padding - 60\n\tbdW = max(\[node.xpos() + node.screenWidth() for node in selNodes]) + padding\n\tbdH = max(\[node.ypos() + node.screenHeight() for node in selNodes]) + padding\n\tthis.knob('xpos').setValue(bdX)\n\tthis.knob('ypos').setValue(bdY)\n\tthis.knob('bdwidth').setValue(bdW-bdX)\n\tthis.knob('bdheight').setValue(bdH-bdY)"}
+ addUserKnob {26 ""}
+ addUserKnob {1 passName l name t "Title of the template operation" +DISABLED}
+ passName "Particle atmospherics at camera"
+ addUserKnob {4 capital01 l "" t "Will make the <b>name</b> message all capital letters, regardless how it's written." -STARTLINE M {upper lower "" "" "" "" "" ""}}
+ addUserKnob {1 version t "version of template" +DISABLED}
+ version v1.0
+ addUserKnob {4 capital02 l "" t "Will make the <b>version</b> message all capital letters, regardless how it's written." -STARTLINE M {upper lower "" "" "" ""}}
+ capital02 lower
+ addUserKnob {1 template t "Default to be written \"template\" but can add additional notes here instead." +DISABLED}
+ template template
+ addUserKnob {4 capital03 l "" t "Will make the <b>template</b> message all capital letters, regardless how it's written." -STARTLINE M {upper lower "" "" "" ""}}
+ addUserKnob {26 ""}
+ addUserKnob {22 lock l lock/unlock T "nuke.thisNode()\['passName'].setEnabled( not nuke.thisNode()\['passName'].enabled() )\n\nnuke.thisNode()\['version'].setEnabled( not nuke.thisNode()\['version'].enabled() )\n\nnuke.thisNode()\['template'].setEnabled( not nuke.thisNode()\['template'].enabled() )\n" +STARTLINE}
+ addUserKnob {22 export l "   export info   " -STARTLINE +INVISIBLE}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 Te l "" t "<br><font size='5'>Deep To Position</font><font color=#000060> v1.0</font>" +STARTLINE T "<br><font size='5'>Template Backdrop</font><font color=#747474> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "Overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>Template Backdrop </b> backdrop setup for<br>template purposes\n</i>\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#747474;\">John Toth <b>© 2024 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#747474\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message(\"Coming Soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#747474\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made\n\n\nThis only looks at the backdrop and not the template within." -STARTLINE T "\nversion_number = \"1.0.0\"\ncontext = \"Template\"\nmodified_date = \"13th August 2024\"\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n-  backdrop template setup\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode3
+ tile_color 0x1f2c4301
+ label "<center>Fade Particles Close to Camera"
+ note_font_size 42
+ selected true
+ xpos 5167
+ ypos 613
+ bdwidth 925
+ bdheight 673
+ z_order 100
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode7
+ tile_color 0x511724ff
+ label "<center>Replace Camera"
+ note_font_size 42
+ selected true
+ xpos 4616
+ ypos -1000
+ bdwidth 481
+ bdheight 338
+ z_order 100
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode9
+ tile_color 0x222222ff
+ label "<center>Particle Sprites"
+ note_font_size 42
+ selected true
+ xpos 6045
+ ypos -1251
+ bdwidth 502
+ bdheight 1099
+ z_order 100
+}
+StickyNote {
+ inputs 0
+ name StickyNote1
+ label "<center><b>Particle Sprites</center></b>\n<br>•</br> Feel free to replace the particle sprite image."
+ selected true
+ xpos 6170
+ ypos -1052
+}
+StickyNote {
+ inputs 0
+ name StickyNote3
+ label "<center><b>Particle Sprites</center></b>\n<br>•</br> Offsetting particles here to get variety"
+ selected true
+ xpos 6186
+ ypos -692
+}
+StickyNote {
+ inputs 0
+ name StickyNote4
+ label "<center><b>Curve</center></b>\n<center><br>•</br> This to change in the Particle Curve </center>\n\n<br>•</br> Particle curve r,g,b,a will change how to appear into the shot and how they will die. \n<i>(this meaning if they will pop into frame or slowly fade off etc)</i>"
+ selected true
+ xpos 5924
+ ypos -26
+}
+StickyNote {
+ inputs 0
+ name StickyNote5
+ label "<center><b>Camera</center></b>\n<br>•</br> Plug your camera into the<br> \"CameraData\" node.\n\n<br>•</br> This is done to make Camera flexible<br>and changable"
+ selected true
+ xpos 4538
+ ypos -525
+}
+Dot {
+ inputs 0
+ name Dot1
+ label Holdouts
+ note_font_size 35
+ note_font_color 0xffffff
+ selected true
+ xpos 5400
+ ypos 992
+}
+Dot {
+ name Dot2
+ note_font_size 35
+ note_font_color 0xffffff
+ selected true
+ xpos 5400
+ ypos 1088
+}
+Camera3 {
+ inputs 0
+ name Camera1
+ selected true
+ xpos 4826
+ ypos -813
+}
+NoOp {
+ name CameraData1
+ label "\n(plug in Camera here)\n\n-"
+ selected true
+ xpos 4816
+ ypos -504
+ addUserKnob {20 User}
+ addUserKnob {13 translate}
+ translate {{"\[value \[topnode input0].translate.x]"} {"\[value \[topnode input0].translate.y]"} {"\[value \[topnode input0].translate.z]"}}
+ addUserKnob {13 rotate}
+ rotate {{"\[value \[topnode input0].rotate.x]"} {"\[value \[topnode input0].rotate.y]"} {"\[value \[topnode input0].rotate.z]"}}
+ addUserKnob {26 ""}
+ addUserKnob {7 focal}
+ focal {{"\[value \[topnode input0].focal]"}}
+ addUserKnob {7 haperture l "horizontal aperture"}
+ haperture {{"\[value \[topnode input0].haperture]"}}
+ addUserKnob {7 vaperture l "vertical aperture"}
+ vaperture {{"\[value \[topnode input0].vaperture]"}}
+}
+Dot {
+ name Dot3
+ note_font_size 35
+ note_font_color 0xffffff
+ selected true
+ xpos 4850
+ ypos 410
+}
+Dot {
+ name Dot4
+ note_font_size 35
+ note_font_color 0xffffff
+ selected true
+ xpos 5730
+ ypos 410
+}
+Constant {
+ inputs 0
+ channels rgb
+ color 1
+ format "256 256 0 0 256 256 1 square_256"
+ name Constant1
+ selected true
+ xpos 6411
+ ypos -1131
+}
+Dot {
+ name Dot5
+ note_font_size 35
+ note_font_color 0xffffff
+ selected true
+ xpos 6445
+ ypos -982
+}
+set Nb8906400 [stack 0]
+Dot {
+ name Dot6
+ note_font_size 35
+ note_font_color 0xffffff
+ selected true
+ xpos 6335
+ ypos -982
+}
+set Nb8906800 [stack 0]
+Dot {
+ name Dot7
+ note_font_size 35
+ note_font_color 0xffffff
+ selected true
+ xpos 6225
+ ypos -982
+}
+Radial {
+ output alpha
+ premult alpha
+ area {0 0 256 256}
+ name Radial2
+ selected true
+ xpos 6191
+ ypos -917
+}
+Dot {
+ name Dot8
+ note_font_size 35
+ note_font_color 0xffffff
+ selected true
+ xpos 6225
+ ypos -838
+}
+push $Nb8906800
+Noise {
+ output alpha
+ size 90
+ zoffset {{frame/150+30}}
+ gamma 0.8
+ center {960 540}
+ name Noise1
+ selected true
+ xpos 6301
+ ypos -920
+}
+Merge2 {
+ inputs 2
+ operation multiply
+ name Multiply1
+ label "mix: \[value mix] (\[value bbox])"
+ selected true
+ xpos 6301
+ ypos -845
+}
+push $Nb8906400
+Noise {
+ output alpha
+ size 80
+ zoffset {{frame/200+100}}
+ gamma 0.7
+ center {960 540}
+ name Noise2
+ selected true
+ xpos 6411
+ ypos -920
+}
+Merge2 {
+ inputs 2
+ operation multiply
+ name Multiply3
+ label "mix: \[value mix] (\[value bbox])"
+ selected true
+ xpos 6411
+ ypos -845
+}
+Shuffle {
+ red alpha
+ green alpha
+ blue alpha
+ name Shuffle1
+ tile_color 0xbbbbbbff
+ label "<b>\[value in]</b> &rarr; \[value out]"
+ selected true
+ xpos 6411
+ ypos -755
+}
+Dot {
+ name Dot9
+ selected true
+ xpos 6445
+ ypos -622
+}
+set Nb8912a00 [stack 0]
+TimeOffset {
+ time_offset 300
+ time ""
+ name TimeOffset1
+ label "\[expr \[frame] - \[value time_offset]] (\[expr \{\[value time_offset] > 0 ? \"+\" : \"\"\}]\[value time_offset])"
+ selected true
+ xpos 6411
+ ypos -575
+}
+BlendMat {
+ surfaceblend modulate
+ name BlendMat5
+ selected true
+ xpos 6411
+ ypos -475
+}
+Dot {
+ name Dot10
+ note_font_size 35
+ note_font_color 0xffffff
+ selected true
+ xpos 6445
+ ypos -286
+}
+push $Nb8912a00
+Dot {
+ name Dot11
+ note_font_size 35
+ note_font_color 0xffffff
+ selected true
+ xpos 6335
+ ypos -622
+}
+set Nb8913c00 [stack 0]
+TimeOffset {
+ time_offset 200
+ time ""
+ name TimeOffset2
+ label "\[expr \[frame] - \[value time_offset]] (\[expr \{\[value time_offset] > 0 ? \"+\" : \"\"\}]\[value time_offset])"
+ selected true
+ xpos 6301
+ ypos -575
+}
+BlendMat {
+ surfaceblend modulate
+ name BlendMat6
+ selected true
+ xpos 6301
+ ypos -477
+}
+Dot {
+ name Dot12
+ note_font_size 35
+ note_font_color 0xffffff
+ selected true
+ xpos 6335
+ ypos -334
+}
+push $Nb8913c00
+Dot {
+ name Dot13
+ note_font_size 35
+ note_font_color 0xffffff
+ selected true
+ xpos 6225
+ ypos -622
+}
+set Nb8914e00 [stack 0]
+TimeOffset {
+ time_offset 100
+ time ""
+ name TimeOffset3
+ label "\[expr \[frame] - \[value time_offset]] (\[expr \{\[value time_offset] > 0 ? \"+\" : \"\"\}]\[value time_offset])"
+ selected true
+ xpos 6191
+ ypos -575
+}
+BlendMat {
+ surfaceblend modulate
+ name BlendMat7
+ selected true
+ xpos 6191
+ ypos -477
+}
+Dot {
+ name Dot14
+ note_font_size 35
+ note_font_color 0xffffff
+ selected true
+ xpos 6225
+ ypos -358
+}
+push $Nb8914e00
+Dot {
+ name Dot15
+ note_font_size 35
+ note_font_color 0xffffff
+ selected true
+ xpos 6115
+ ypos -622
+}
+TimeOffset {
+ time ""
+ name TimeOffset8
+ label "\[expr \[frame] - \[value time_offset]] (\[expr \{\[value time_offset] > 0 ? \"+\" : \"\"\}]\[value time_offset])"
+ selected true
+ xpos 6081
+ ypos -575
+}
+BlendMat {
+ surfaceblend modulate
+ name BlendMat8
+ selected true
+ xpos 6081
+ ypos -477
+}
+Dot {
+ name Dot16
+ note_font_size 35
+ note_font_color 0xffffff
+ selected true
+ xpos 6115
+ ypos -382
+}
+push $cut_paste_input
+Noise {
+ size 37
+ zoffset 1.98
+ lacunarity 2.9
+ gain 0.41
+ gamma 0.31
+ center {1112 774}
+ name Noise6
+ selected true
+ xpos 5790
+ ypos -672
+}
+Card2 {
+ z 1000
+ lens_in_focal {{parent.CameraData1.focal}}
+ lens_in_haperture {{parent.CameraData1.haperture}}
+ translate {{parent.CameraData1.translate} {parent.CameraData1.translate} {parent.CameraData1.translate}}
+ rotate {{parent.CameraData1.rotate} {parent.CameraData1.rotate} {parent.CameraData1.rotate}}
+ uniform_scale 2
+ control_points {3 3 3 6 
+
+1 {-0.5 -0.5 0} 0 {0.1666666865 0 0} 0 {0 0 0} 0 {0 0.1666666865 0} 0 {0 0 0} 0 {0 0 0} 
+1 {0 -0.5 0} 0 {0.1666666716 0 0} 0 {-0.1666666716 0 0} 0 {0 0.1666666865 0} 0 {0 0 0} 0 {0.5 0 0} 
+1 {0.5 -0.5 0} 0 {0 0 0} 0 {-0.1666666865 0 0} 0 {0 0.1666666865 0} 0 {0 0 0} 0 {1 0 0} 
+1 {-0.5 0 0} 0 {0.1666666865 0 0} 0 {0 0 0} 0 {0 0.1666666716 0} 0 {0 -0.1666666716 0} 0 {0 0.5 0} 
+1 {0 0 0} 0 {0.1666666716 0 0} 0 {-0.1666666716 0 0} 0 {0 0.1666666716 0} 0 {0 -0.1666666716 0} 0 {0.5 0.5 0} 
+1 {0.5 0 0} 0 {0 0 0} 0 {-0.1666666865 0 0} 0 {0 0.1666666716 0} 0 {0 -0.1666666716 0} 0 {1 0.5 0} 
+1 {-0.5 0.5 0} 0 {0.1666666865 0 0} 0 {0 0 0} 0 {0 0 0} 0 {0 -0.1666666865 0} 0 {0 1 0} 
+1 {0 0.5 0} 0 {0.1666666716 0 0} 0 {-0.1666666716 0 0} 0 {0 0 0} 0 {0 -0.1666666865 0} 0 {0.5 1 0} 
+1 {0.5 0.5 0} 0 {0 0 0} 0 {-0.1666666865 0 0} 0 {0 0 0} 0 {0 -0.1666666865 0} 0 {1 1 0} }
+ name Card2
+ selected true
+ xpos 5790
+ ypos -480
+}
+push 0
+ParticleEmitter {
+ inputs 6
+ start_frame 950
+ emit_from bbox
+ rate 25
+ rate_channel rgba.alpha
+ lifetime 80
+ velocity 25
+ size 500
+ size_variation 0.2
+ color 0.345
+ start_frame_animation random
+ seed 1
+ name ParticleEmitter1
+ label "Start frame: (\[value start_frame])\nlife: (\[value lifetime])\nsize: (\[value size])\nvelocity (\[value velocity])\n"
+ selected true
+ xpos 5790
+ ypos -264
+}
+ParticleCurve {
+ curves {r {curve l 0.006326913834 x0.4796960056 0.9952287078 x1 0.006326913834 s-0.200000003}
+   g {curve l 0.006326913834 x0.4796960056 0.9952287078 x1 0.006326913834 s-0.200000003}
+   b {curve l 0.006326913834 x0.4796960056 0.9952287078 x1 0.006326913834 s-0.200000003}
+   a {curve l 0.006326913834 x0.4796960056 0.9952287078 x1 0.006326913834 s-0.200000003}
+   size {}
+   mass {}}
+ name ParticleCurve2
+ selected true
+ xpos 5790
+ ypos 15
+}
+ParticleTurbulence {
+ strength {1 1 1}
+ name ParticleTurbulence2
+ selected true
+ xpos 5790
+ ypos 169
+}
+Group {
+ name ParticleOpacity2
+ help "Change the transparency of the particles."
+ knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\n\nclassList = \['NoOp', 'Group', 'Dot','Gizmo']\ndeniedList = \[]\n\nif k.name() == 'inputChange':\n    in_class = n.input(0).Class()\n    if in_class is not None:\n        if 'Particle' not in in_class and in_class not in classList:\n            n.setInput(0, None)\n        elif in_class in deniedList:\n            n.setInput(0, None)"
+ selected true
+ xpos 5790
+ ypos 217
+ addUserKnob {20 particleOpacity l "Particle Opacity"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION ParticleOpacity
+ addUserKnob {41 opacity t "Change the transparency of the particles." T ParticleExpression1.opacity}
+ addUserKnob {41 axis T ParticleExpression1.axis}
+ addUserKnob {20 "" l Conditions}
+ addUserKnob {41 probability T ParticleExpression1.probability}
+ addUserKnob {41 min_age l "min age" T ParticleExpression1.min_age}
+ addUserKnob {41 max_age l "max age" T ParticleExpression1.max_age}
+ addUserKnob {41 seed l "random seed" T ParticleExpression1.seed}
+ addUserKnob {41 channels T ParticleExpression1.channels}
+ addUserKnob {20 "" l Region}
+ addUserKnob {41 region T ParticleExpression1.region}
+ addUserKnob {41 region_invert l "invert region" T ParticleExpression1.region_invert}
+ addUserKnob {41 file_menu l @FolderIcon T ParticleExpression1.file_menu}
+ addUserKnob {41 snap_menu l @AxisIcon T ParticleExpression1.snap_menu}
+ addUserKnob {41 xform_order l "transform order" T ParticleExpression1.xform_order}
+ addUserKnob {41 rot_order l "rotation order" T ParticleExpression1.rot_order}
+ addUserKnob {41 translate T ParticleExpression1.translate}
+ addUserKnob {41 rotate T ParticleExpression1.rotate}
+ addUserKnob {41 scaling l scale T ParticleExpression1.scaling}
+ addUserKnob {41 uniform_scale l "uniform scale" T ParticleExpression1.uniform_scale}
+ addUserKnob {41 skew T ParticleExpression1.skew}
+ addUserKnob {41 pivot_translate l "pivot translate" T ParticleExpression1.pivot_translate}
+ addUserKnob {41 pivot_rotate l "pivot rotate" T ParticleExpression1.pivot_rotate}
+ addUserKnob {20 localMatrix l "local matrix" n 1}
+ localMatrix 0
+ addUserKnob {41 useMatrix l "specify matrix" T ParticleExpression1.useMatrix}
+ addUserKnob {41 matrix l "" +STARTLINE T ParticleExpression1.matrix}
+ addUserKnob {20 endGroup n -1}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Particle Opacity</font><font color=#BBBBBB> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br> \n<b>Particle Opacity</b>  controls the transparency<br>of the particles.\n</i>\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#BBBBBB;\">John Toth <b>© 2024 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#BBBBBB\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#BBBBBB\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.0.1\"\ncontext = \"Particles\"\n\ndate = \"14th February\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- transparency of particles can be altered\n\"\"\"\n\n\n\nthankyou = \"\"\"\n\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + UPPER + site + developer + \"</a>\") \n"}
+}
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 519
+  ypos 224
+ }
+ ParticleExpression {
+  temp_name0 opacity
+  temp_expr0 "\[value opacity]"
+  temp_expr1_pp false
+  temp_expr2_pp false
+  temp_expr3_pp false
+  opacityexpr opacity
+  name ParticleExpression1
+  xpos 519
+  ypos 320
+  addUserKnob {20 User}
+  addUserKnob {1 CLASSIFICATION +INVISIBLE}
+  CLASSIFICATION ParticleOpacity
+  addUserKnob {7 opacity R 0 2}
+  opacity 0.05
+ }
+ Output {
+  name Output1
+  xpos 519
+  ypos 446
+ }
+end_group
+push 0
+ScanlineRender {
+ inputs 3
+ conservative_shader_sampling false
+ shutteroffset centred
+ motion_vectors_type distance
+ name ScanlineRender1
+ selected true
+ xpos 5790
+ ypos 483
+}
+Group {
+ name DeepSoften2
+ help "Softens the deep front/back based on the alpha channels black and white map. White gets pushed in z less.\n\n<b>Example:</b>\nThis is perfect for wrapping atmospherics which is on a card around deep renders."
+ knobChanged "import re\n\nn = nuke.thisNode()\nk = nuke.thisKnob()\n\nclassList = \['NoOp', 'Group', 'Dot', 'Gizmo']\ndeniedList = \['DeepToImage']\n\nacceptedClass_compile = \[re.compile(r'ScanlineRender\\d*'), re.compile(r'DeepToImage\\d*')]\n\nif k.name() == 'inputChange':\n    inp = n.input(0)\n    if inp:\n        in_class = inp.Class()\n        if in_class is not None:\n            if not any(pattern.match(in_class) for pattern in acceptedClass_compile) and 'Deep' not in in_class and in_class not in classList:\n                n.setInput(0, None)\n            elif any(pattern.match(in_class) for pattern in acceptedClass_compile if pattern.pattern.startswith('DeepToImage')):\n                n.setInput(0, None)\n"
+ tile_color 0x6000
+ selected true
+ xpos 5790
+ ypos 769
+ addUserKnob {20 DeepSoftenTab l "Deep Soften"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION DeepSoften
+ addUserKnob {1 output +INVISIBLE}
+ output "\[expr \{\[value front] +\[value soften]\}],\[expr \{\[value back] +\[value soften]\}]"
+ addUserKnob {7 soften t "Adds volume to the deep front and back evenly.\n\nThe volume is added based on the alpha channel. Consider it as a black and white map of transparency that gets pushed in the front/back.\nWhite gets pushed less." R 0 100}
+ soften 40
+ addUserKnob {26 ""}
+ addUserKnob {7 front t "Adds volume to the deep front only.\n\nThe volume is added based on the alpha channel. Consider it as a black and white map of transparency that gets pushed in the front.\nWhite gets pushed less." R 0 100}
+ addUserKnob {7 back t "Adds volume to the deep back only.\n\nThe volume is added based on the alpha channel. Consider it as a black and white map of transparency that gets pushed in the back.\nWhite gets pushed less." R 0 100}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Deep Soften</font><font color=#000060> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br> \n<b>Deep Soften</b> adds volume to the front and<br>back of the deep.\n<br>\n</b><i>\n<br><strong>•</br> usually this is used on atmospheric elements <br>after the  scanlineRender node and then merged<br>with deeprender to create fake atmospherics with <br>correct intersections.\n</i>\n<br>\n<br>\n<b><a href=\"https://johntothvfx.com\" style=\"color:#000060;\">John Toth <b>© 2020 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#000060\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#000060\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nversion_number = \"1.0.3\"\ncontext = \"Deep\"\nmodified_date = \"30th July 2024\"\ndeveloper = \"John Toth © 2020\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- add volume to the deep front/back\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos -590
+  ypos 440
+ }
+ DeepExpression {
+  chans0 deep
+  chans1 alpha
+  rgba.alpha "alpha * 0.9999999"
+  deep.front "deep.front -( \[value parent.front]  + \[value parent.soften] )"
+  deep.back "deep.back + (\[value parent.back] +  \[value parent.soften] )"
+  name DeepExpression1
+  selected true
+  xpos -590
+  ypos 495
+ }
+ Output {
+  name Output1
+  xpos -590
+  ypos 542
+ }
+end_group
+DeepExpression {
+ chans1 deep
+ rgba.red rgba.red*(1-(-deep.front/deep.back))
+ rgba.green rgba.green*(1-(-deep.front/deep.back))
+ rgba.blue rgba.blue*(1-(-deep.front/deep.back))
+ rgba.alpha rgba.alpha*(1-(-deep.front/deep.back))
+ name DeepExpression2
+ selected true
+ xpos 5790
+ ypos 965
+}
+DeepMerge2 {
+ inputs 2
+ operation holdout
+ name DeepMerge2
+ selected true
+ xpos 5790
+ ypos 1085
+}
+DeepToImage2 {
+ name DeepToImage2
+ selected true
+ xpos 5790
+ ypos 1157
+}
+StickyNote {
+ inputs 0
+ name StickyNote10
+ label "<center><b>Emitter</center></b>\n<center><br>•</br> This to change in the Particle Emitter </center>\n\n\n<br>•</br> Make sure to set the <b>particles start frame</b>. (recommend to start it at least 50 frames before the shot starts.\n<br>•</br> Adjust the <b>max lifetime</b> range so they live longer if you need. <br><i>(if you see them disappearing before they go past camera)</i>\n\n<br>•</br> Adjust the <b>veccity</b> which represents the speed of which they come towards the camera\n<i>(you can also invert the particles to go away from camera by making the velcoity a negative value <b>eg. -25</b>)\n\n\n<br>•</br> Make sure to adjust the<b> size</b> of the particles to cover the full frame of image\n<i>(this value is usually big to get nice soft air flying)</i>\n"
+ selected true
+ xpos 5174
+ ypos -347
+}

@@ -1,0 +1,247 @@
+Group {
+ inputs 2
+ name LensFlareFromImage13
+ tile_color 0x5d48a1ff
+ selected true
+ addUserKnob {20 lensFlareFromImage l "Lens Flare From Image"}
+ addUserKnob {7 z R 0 4}
+ z 1.74
+ addUserKnob {26 ""}
+ addUserKnob {7 rotate R -180 180}
+ rotate 82
+ addUserKnob {7 scale}
+ scale 1
+ addUserKnob {20 tab}
+ addUserKnob {7 range}
+ range 2000
+ addUserKnob {7 dynamicScale l "dynamic scale"}
+ dynamicScale 0.495
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x23232301
+  label "<center>Don't Touch\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 24
+  note_font_color 0xee453cff
+  xpos -64
+  ypos 179
+  bdwidth 209
+  bdheight 266
+ }
+ Transform {
+  inputs 0
+  rotate {{-66.96272988/Input.pixel_aspect}}
+  center {{width/2} {height/2}}
+  name Transform12
+  label Rotate
+  xpos -743
+  ypos 224
+ }
+ Reformat {
+  type "to box"
+  box_width {{Controller.width}}
+  box_height {{Controller.height}}
+  box_pixel_aspect {{Input.pixel_aspect}}
+  resize none
+  name Reformat1
+  label "\[expr \{\[numvalue type] ? \"(\[value filter])\" : \"(\[lindex \[split \[value format] \" \"] end]\n(\[value filter])\" \}]"
+  xpos -743
+  ypos 296
+ }
+ Transform {
+  translate {{(parent.Controller.z*(cos(radians(29.35775354))))*parent.z} {"((parent.Controller.z * ( cos ( radians (29.35775354)))) * ( \[lindex \[metadata lensflare/center] 1 ]  / \[lindex \[metadata lensflare/center] 0 ] )) * parent.z"}}
+  center {{"\[lindex \[metadata lensflare/center] 0 ] "} {"\[lindex \[metadata lensflare/center] 1 ] "}}
+  name Transform2
+  label depth
+  xpos -743
+  ypos 368
+ }
+ Transform {
+  rotate {{parent.Controller.angleOutput*-1}}
+  center {{"\[lindex \[metadata lensflare/center] 0 ] "} {"\[lindex \[metadata lensflare/center] 1 ] "}}
+  name Transform3
+  label rotate
+  xpos -743
+  ypos 440
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 0
+  ypos -376
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 34
+  ypos -198
+ }
+set N1e15bba0 [stack 0]
+ Input {
+  inputs 0
+  name img
+  label "\[value number]"
+  xpos -260
+  ypos -400
+  number 1
+ }
+ CopyMetaData {
+  inputs 2
+  mergeMode "Meta only"
+  metadatafilter lensflare/
+  name CopyMetaData1
+  xpos -260
+  ypos -202
+ }
+ Reformat {
+  type "to box"
+  box_width {{"max(input.width, input.height)"}}
+  box_height {{"max(input.width, input.height)"}}
+  box_fixed true
+  box_pixel_aspect {{Input.pixel_aspect}}
+  pbb true
+  name Reformat2
+  label "square format"
+  xpos -260
+  ypos -160
+ }
+ Transform {
+  rotate {{parent.rotate}}
+  scale {{parent.scale}}
+  center {{input.width/2} {input.height/2}}
+  name Transform5
+  label "img scale/rotate"
+  xpos -260
+  ypos -88
+ }
+ Transform {
+  scale {{"parent.Controller.z/hypot(\[lindex \[metadata lensflare/center] 0 ] , \[lindex \[metadata lensflare/center] 1 ])*2"}}
+  center {250 250}
+  name Transform8
+  label "Dynamic scaling"
+  xpos -260
+  ypos -16
+  disable true
+ }
+set N1e18e820 [stack 0]
+ Reformat {
+  resize none
+  pbb true
+  name Reformat3
+  label "input format"
+  xpos -260
+  ypos 194
+ }
+ Transform {
+  translate {{(width/2)*-1} {(height/2)*-1}}
+  center {500 500}
+  name Transform4
+  label "normalize to 0,0"
+  xpos -260
+  ypos 232
+ }
+ Transform {
+  translate {{"((\[lindex \[metadata lensflare/position] 0 ]  - \[lindex \[metadata lensflare/center] 0 ] ) * (( - parent.z + 1) )) + \[lindex \[metadata lensflare/center] 0 ] "} {"((\[lindex \[metadata lensflare/position] 1 ]  - \[lindex \[metadata lensflare/center] 1 ] ) * (( - parent.z + 1) )) + \[lindex \[metadata lensflare/center] 1 ] "}}
+  center {500 500}
+  name Transform1
+  label depth
+  xpos -260
+  ypos 416
+ }
+ Transform {
+  rotate {{"degrees((atan2(center.x+translate.x-\[lindex \[metadata lensflare/position] 0 ] ,center.y+translate.y-\[lindex \[metadata lensflare/position] 1 ] )*-1))+180"}}
+  center {{parent.Transform1.translate} {parent.Transform1.translate}}
+  name Transform6
+  label "rotate point"
+  xpos -260
+  ypos 512
+ }
+ Clamp {
+  maximum_enable false
+  name Clamp3
+  xpos -260
+  ypos 824
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -226
+  ypos 954
+ }
+push $N1e15bba0
+ NoOp {
+  name Controller
+  knobChanged "#John Toth\n\nnode = nuke.thisNode()\ngrp = nuke.thisGroup()\ntk = nuke.thisKnob()\n\n\n#############################################################\n#presets reveal knobs\n#############################################################\n\n#presets\nspherical = \['spherical']\nanamorphic = \['anamorphic']\n\n#presets     \nif tk.name() in ('presets', 'showPanel'):\n    CONTROLS_type = grp\['presets'].value()\n    if CONTROLS_type == 'spherical':\n        for i in spherical:\n            grp\[i].setVisible(True)\n        for i in anamorphic:\n            grp\[i].setVisible(False)\n                        \n    elif CONTROLS_type == 'anamorphic':\n        for i in spherical:\n            grp\[i].setVisible(False)\n        for i in anamorphic:\n            grp\[i].setVisible(True)\n\n\n\n\n#############################################################\n#list of knobs to reveal based on the mode\n#############################################################\n\nScreenSpace = \['position']\nWorldSpace = \[]\n\n\nif tk.name() in ('mode', 'showPanel'):\n    CONTROLS_type = grp\['mode'].value()\n    if CONTROLS_type == '2D':\n        for i in ScreenSpace:\n            grp\[i].setVisible(True)\n        for i in WorldSpace:\n            grp\[i].setVisible(False)\n            \n    elif CONTROLS_type == '3D':\n        for i in ScreenSpace:\n            grp\[i].setVisible(False)\n        for i in WorldSpace:\n            grp\[i].setVisible(True)\n\n\n#############################################################\n# Switch between modes and setup inputs/parents\n#############################################################\n\n\n# Check if the mode is set to 3D\nif node\['mode'].value() == '3D':\n\n    #disable undo\n    nuke.Undo.disabled()\n    \n    #list of knobs to disable\n    knobs = \['worldScale', 'cameraName', 'axisName']\n       \n    \n    if node\['node'].value() == 'input':\n\n        #safety making sure input 1 & 2 is disconnected before being deleted\n        grp.setInput(1, None)\n        grp.setInput(2, None)\n\n        #list of knobs to enable\n        for x in knobs:\n            nuke.thisGroup().knob(x).setEnabled(False)\n\n\n        # Loop through all Input nodes and delete those not named 'Input'\n        parent_group = nuke.thisNode().parent()\n        for node in parent_group.nodes():\n            if node.Class() == 'Input' and node.name() != 'Input':\n                nuke.delete(node)\n\n\n        #get camera placeholder connect\n        cameraPlaceHolder = nuke.toNode(\"CameraPlaceHolder\")\n    \n\n        # creating camera input\n        cameraInput = nuke.nodes.Input()\n        cameraInput.setName(\"Cam\")\n        cameraInput\['number'].setValue(1)\n        cameraInput.knob(\"label\").setValue(\"\[value number]\")\n        cameraInput.knob(\"xpos\").setValue(cameraPlaceHolder.knob(\"xpos\").value() + 0)\n        cameraInput.knob(\"ypos\").setValue(cameraPlaceHolder.knob(\"ypos\").value() - 95)\n \n        #connected camera placeholder to camera input      \n        cameraPlaceHolder.setInput(0, cameraInput)\n        #get axis placeholder connect\n        axisPlaceHolder = nuke.toNode(\"AxisPlaceHolder\")\n\n        # creating camera input\n        axisInput = nuke.nodes.Input()\n        axisInput.setName(\"axis\")\n        axisInput\['number'].setValue(2)\n        axisInput.knob(\"label\").setValue(\"\[value number]\")\n        axisInput.knob(\"xpos\").setValue(axisPlaceHolder.knob(\"xpos\").value() + 0)\n        axisInput.knob(\"ypos\").setValue(axisPlaceHolder.knob(\"ypos\").value() - 95)\n \n        #connected camera placeholder to camera input      \n        axisPlaceHolder.setInput(0, axisInput)\n\n        # Set input 1 and 2 of Reconcile3D1\n        reconcile = nuke.toNode('Reconcile3D1')\n        reconcile.setInput(1, cameraPlaceHolder)\n        reconcile.setInput(2, axisPlaceHolder)\n\n    else:\n\n        #list of knobs to enable\n        for x in knobs:\n            nuke.thisGroup().knob(x).setEnabled(True)\n        \n        #safety making sure input 1 & 2 is disconnected before being deleted\n        grp.setInput(1, None)\n        grp.setInput(2, None)         \n     \n        # Loop through all Input nodes and delete those not named 'Input'\n        parent_group = nuke.thisNode().parent()\n        for node in parent_group.nodes():\n            if node.Class() == 'Input' and node.name() != 'Input':\n                nuke.delete(node)\n\n        # Set input 1 and 2 of Reconcile3D1\n        reconcile = nuke.toNode('Reconcile3D1')\n        cameraTag = nuke.toNode('CameraTag1')\n        axisTag = nuke.toNode('AxisTag1')\n        reconcile.setInput(1, cameraTag)\n        reconcile.setInput(2, axisTag)\n\nelif node\['mode'].value() == '2D':\n \n        #safety making sure input 1 & 2 is disconnected before being deleted\n        grp.setInput(1, None)\n        grp.setInput(2, None) \n        \n        # Loop through all Input nodes and delete those not named 'Input'\n        parent_group = nuke.thisNode().parent()\n        for node in parent_group.nodes():\n            if node.Class() == 'Input' and node.name() != 'Input':\n                nuke.delete(node)\n\n        #list of knobs to enable\n        for x in knobs:\n            nuke.thisGroup().knob(x).setEnabled(False)                \n            \n    #enable undo\nnuke.Undo.enable()"
+  xpos 0
+  ypos 302
+  addUserKnob {20 index_1 l index}
+  addUserKnob {26 FlareOffsetTitle l <b>Flare</b>}
+  addUserKnob {12 position}
+  position {{"\[lindex \[metadata lensflare/position] 0 ] "} {"\[lindex \[metadata lensflare/position] 1 ] "}}
+  addUserKnob {12 center}
+  center {{"\[lindex \[metadata lensflare/center] 0 ] "} {"\[lindex \[metadata lensflare/center] 1 ] "}}
+  addUserKnob {20 math}
+  addUserKnob {26 mathTitle l <b>Math</b>}
+  addUserKnob {12 distance}
+  distance {{"fabs(\[lindex \[metadata lensflare/position] 0 ] - \[lindex \[metadata lensflare/center] 0 ] )"} {"fabs(\[lindex \[metadata lensflare/position] 1 ] - \[lindex \[metadata lensflare/center] 1 ] )"}}
+  addUserKnob {7 z}
+  z {{"hypot(distance.x, distance.y)"}}
+  addUserKnob {26 ""}
+  addUserKnob {7 angleOffset l "angle offset"}
+  angleOffset {{"degrees(atan2(input.width, input.height))*-1"}}
+  addUserKnob {7 angle}
+  angle {{"(degrees(atan2(distance.x, distance.y)))+angleOffset"}}
+  addUserKnob {7 shift}
+  shift {{"(\[lindex \[metadata lensflare/position] 1 ]  >= (\[lindex \[metadata lensflare/center] 1 ] )) && (\[lindex \[metadata lensflare/position] 0 ] >=( \[lindex \[metadata lensflare/center] 0 ]  )) ? 1 : (\[lindex \[metadata lensflare/position] 1 ]  <= (\[lindex \[metadata lensflare/center] 1 ] )) && (\[lindex \[metadata lensflare/position] 0 ]  >= (\[lindex \[metadata lensflare/center] 0 ] )) ? 2 : (\[lindex \[metadata lensflare/position] 1 ]  <= (\[lindex \[metadata lensflare/center] 1 ] )) && (\[lindex \[metadata lensflare/position] 0 ]  <= (\[lindex \[metadata lensflare/center] 0 ] )) ? 3 : 0"}}
+  addUserKnob {7 angleOutput l "angle output"}
+  angleOutput {{"shift==1?angle:\n\nshift==2?(((90-(abs(angleOffset)))-angle)+(90-(abs(angleOffset)))):\n\nshift==3?(angle+180):\n\n(((90-(abs(angleOffset)))-angle)+(270-(abs(angleOffset))))"}}
+ }
+ Merge2 {
+  inputs 2
+  operation plus
+  bbox B
+  name Plus
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 0
+  ypos 944
+ }
+ Output {
+  name Output1
+  xpos 0
+  ypos 1070
+ }
+push $N1e18e820
+ Defocus {
+  channels rgb
+  defocus {{parent.Transform8.scale}}
+  ratio {{aspect}}
+  name Defocus1
+  xpos -451
+  ypos -10
+ }
+ Transform {
+  inputs 0
+  scale {{"max(0, 1 - (parent.dynamicScale * max(clamp(1 - (abs(\[lindex \[metadata lensflare/position] 1] - height) / parent.range)), clamp(1 - (abs(\[lindex \[metadata lensflare/position] 0] - width) / parent.range)), clamp(1 - (abs(\[lindex \[metadata lensflare/position] 1] - 0) / parent.dynamicScale)), clamp(1 - (abs(\[lindex \[metadata lensflare/position] 0] - 0) / parent.range)))))\n"}}
+  center {1063 739.5}
+  invert_matrix true
+  name Transform10
+  label "0 -1 inverse scale"
+  xpos -672
+  ypos 656
+  disable true
+ }
+ Transform {
+  inputs 0
+  scale {{"max(0, 1 - (parent.dynamicScale * max(clamp(1 - (abs(\[lindex \[metadata lensflare/position] 1] - height) / parent.range)), clamp(1 - (abs(\[lindex \[metadata lensflare/position] 0] - width) / parent.range)), clamp(1 - (abs(\[lindex \[metadata lensflare/position] 1] - 0) / parent.dynamicScale)), clamp(1 - (abs(\[lindex \[metadata lensflare/position] 0] - 0) / parent.range)))))\n"}}
+  center {1063 739.5}
+  name Transform7
+  xpos -810
+  ypos 638
+  disable true
+ }
+end_group

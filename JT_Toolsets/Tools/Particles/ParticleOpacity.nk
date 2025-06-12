@@ -1,0 +1,72 @@
+Group {
+ name ParticleOpacity1
+ help "Change the transparency of the particles."
+ knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\n\nclassList = \['NoOp', 'Group', 'Dot','Gizmo']\ndeniedList = \[]\n\nif k.name() == 'inputChange':\n    in_class = n.input(0).Class()\n    if in_class is not None:\n        if 'Particle' not in in_class and in_class not in classList:\n            n.setInput(0, None)\n        elif in_class in deniedList:\n            n.setInput(0, None)"
+ selected true
+ addUserKnob {20 particleOpacity l "Particle Opacity"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION ParticleOpacity
+ addUserKnob {41 opacity t "Change the transparency of the particles." T ParticleExpression1.opacity}
+ addUserKnob {41 axis T ParticleExpression1.axis}
+ addUserKnob {20 "" l Conditions}
+ addUserKnob {41 probability T ParticleExpression1.probability}
+ addUserKnob {41 min_age l "min age" T ParticleExpression1.min_age}
+ addUserKnob {41 max_age l "max age" T ParticleExpression1.max_age}
+ addUserKnob {41 seed l "random seed" T ParticleExpression1.seed}
+ addUserKnob {41 channels T ParticleExpression1.channels}
+ addUserKnob {20 "" l Region}
+ addUserKnob {41 region T ParticleExpression1.region}
+ addUserKnob {41 region_invert l "invert region" T ParticleExpression1.region_invert}
+ addUserKnob {41 file_menu l @FolderIcon T ParticleExpression1.file_menu}
+ addUserKnob {41 snap_menu l @AxisIcon T ParticleExpression1.snap_menu}
+ addUserKnob {41 xform_order l "transform order" T ParticleExpression1.xform_order}
+ addUserKnob {41 rot_order l "rotation order" T ParticleExpression1.rot_order}
+ addUserKnob {41 translate T ParticleExpression1.translate}
+ addUserKnob {41 rotate T ParticleExpression1.rotate}
+ addUserKnob {41 scaling l scale T ParticleExpression1.scaling}
+ addUserKnob {41 uniform_scale l "uniform scale" T ParticleExpression1.uniform_scale}
+ addUserKnob {41 skew T ParticleExpression1.skew}
+ addUserKnob {41 pivot_translate l "pivot translate" T ParticleExpression1.pivot_translate}
+ addUserKnob {41 pivot_rotate l "pivot rotate" T ParticleExpression1.pivot_rotate}
+ addUserKnob {20 localMatrix l "local matrix" n 1}
+ localMatrix 0
+ addUserKnob {41 useMatrix l "specify matrix" T ParticleExpression1.useMatrix}
+ addUserKnob {41 matrix l "" +STARTLINE T ParticleExpression1.matrix}
+ addUserKnob {20 endGroup n -1}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Particle Opacity</font><font color=#BBBBBB> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br> \n<b>Particle Opacity</b>  controls the transparency<br>of the particles.\n</i>\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#BBBBBB;\">John Toth <b>© 2024 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#BBBBBB\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#BBBBBB\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.0.1\"\ncontext = \"Particles\"\n\ndate = \"14th February\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- transparency of particles can be altered\n\"\"\"\n\n\n\nthankyou = \"\"\"\n\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + UPPER + site + developer + \"</a>\") \n"}
+}
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 519
+  ypos 224
+ }
+ ParticleExpression {
+  temp_name0 opacity
+  temp_expr0 "\[value opacity]"
+  temp_expr1_pp false
+  temp_expr2_pp false
+  temp_expr3_pp false
+  opacityexpr opacity
+  name ParticleExpression1
+  xpos 519
+  ypos 320
+  addUserKnob {20 User}
+  addUserKnob {1 CLASSIFICATION +INVISIBLE}
+  CLASSIFICATION ParticleOpacity
+  addUserKnob {7 opacity R 0 2}
+  opacity 0.5
+ }
+ Output {
+  name Output1
+  xpos 519
+  ypos 446
+ }
+end_group

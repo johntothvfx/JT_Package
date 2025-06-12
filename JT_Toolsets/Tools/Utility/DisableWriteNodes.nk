@@ -1,0 +1,20 @@
+NoOp {
+ name DisableWriteNodes1
+ help "Disable certain class Write Nodes within the compositing script."
+ tile_color 0x288264ff
+ label "(\[value disableWrites])"
+ selected true
+ hide_input true
+ addUserKnob {20 disableWriteNodes l "Disable Write Nodes"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION DisableWriteNodes
+ addUserKnob {4 disableWrites l disable M {"Write Nodes" "Deep Write Nodes" "All Write Nodes" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""}}
+ addUserKnob {22 DisableWriteNode l "Disable Write nodes" T "n = nuke.thisNode()\ndisable = nuke.thisNode().knob('disableWrites').value()\n\n\n\nif disable == 'Write Nodes' or disable == 'All Write Nodes':\n    for i in nuke.allNodes('Write'):\n        try:\n            i\['disable'].setValue(True)\n        except:pass\n        \nif disable == 'Deep Write Nodes' or disable == 'All Write Nodes':\n    for i in nuke.allNodes('DeepWrite'):\n        try:\n            i\['disable'].setValue(True)\n        except:pass" +STARTLINE}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Disable Write Nodes</font><font color=#288264> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br> \n<b>Disable Write nodes</b> will disable all write<br>nodes in the script.\n<br></b><i>\n<br><strong>•</br> Please Note this does not work on Write<br>nodes inside a group/gizmo.\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#288264;\">John Toth <b>© 2023 <br>"}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#288264\">Tool Demo" t "Opens a web page that will take you to a demo video about this nuke tool." T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#288264\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "version_number = \"1.0.0\"\ncontext = \"Utility\"\nmodified_date = \"13th September 2024\"\ndeveloper = \"John Toth © 2023\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- disables write nodes in the script\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}

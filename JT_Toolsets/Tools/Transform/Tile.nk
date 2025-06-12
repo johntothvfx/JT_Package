@@ -1,0 +1,127 @@
+set cut_paste_input [stack 0]
+push $cut_paste_input
+Group {
+ name Tile
+ help http://intranet/depts/Compositing:Tools:Nuke:Gizmos:Tile_FS
+ tile_color 0xa57aaaff
+ note_font_color 0xffffffff
+ selected true
+ addUserKnob {20 Settings}
+ addUserKnob {26 ""}
+ addUserKnob {41 channels1 l Channels T STMap1.channels}
+ addUserKnob {26 space l "" +STARTLINE T <br>}
+ addUserKnob {83 Resolution1 l Resolution M {Source Tiled}}
+ Resolution1 Tiled
+ addUserKnob {26 space00 l "" +STARTLINE T "\t"}
+ addUserKnob {3 rows l Rows}
+ rows 2
+ addUserKnob {6 mirrorRows l mirror -STARTLINE}
+ addUserKnob {3 columns l Columns}
+ columns 2
+ addUserKnob {6 mirrorCols l mirror -STARTLINE}
+ addUserKnob {41 filter l Filter T STMap1.filter}
+ addUserKnob {26 Title l "" +STARTLINE T "<br><br><font size='5'>Tile</font><span style=\"color:rgb(144,106,148)\"> v1.0\n"}
+ addUserKnob {20 Settings_1 l Settings -STARTLINE}
+ addUserKnob {26 Guide l "" +STARTLINE T "<br><font size='5'>Basic Setup</font>"}
+ addUserKnob {26 ""}
+ addUserKnob {26 Steps l "" +STARTLINE T "<br><strong>1. </br> \nA quick tool to tile the input a X number of times.\n\n\n<br><br><b>John Toth © 2020<br>"}
+ addUserKnob {26 link l "" +STARTLINE T "<a href=\"https://johntothvfx.com\"><span style=\"color:rgb(144,106,148)\">johntothvfx.com</a>\n"}
+ addUserKnob {26 space_1 l "" -STARTLINE T " \t\t"}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:rgb(144,106,148)\">Version Log</a>\n" -STARTLINE}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos -390
+  ypos -225
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -356
+  ypos -78
+ }
+set Nc3d7c010 [stack 0]
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -500
+  ypos -78
+ }
+ Remove {
+  channels {{{parent.STMap1.channels}}}
+  name Remove1
+  xpos -534
+  ypos -9
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -500
+  ypos 114
+ }
+ Reformat {
+  inputs 0
+  type "to box"
+  box_width {{Input.width*parent.columns}}
+  box_height {{Input.height*parent.rows}}
+  box_fixed true
+  box_pixel_aspect {{input.pixel_aspect}}
+  name ReformatAuto
+  xpos -206
+  ypos -105
+ }
+ Expression {
+  temp_name2 bla
+  temp_expr2 width/parent.columns
+  temp_name3 blo
+  temp_expr3 height/parent.rows
+  expr0 "parent.mirrorCols==1?(((x/2 %bla*2 ) / bla)<1?((x %bla ) / bla):1-((x %bla ) / bla)):(x %bla ) / bla"
+  expr1 "parent.mirrorRows==1?(((y/2 %blo*2 ) / blo)<1?((y %blo ) / blo):1-((y %blo ) / blo)):(y %blo ) / blo"
+  channel2 {rgba.red -rgba.green -rgba.blue none}
+  name Expression1
+  xpos -206
+  ypos -9
+ }
+push $Nc3d7c010
+ STMap {
+  inputs 2
+  uv rgb
+  blur_scale 0
+  maskChannel -rgba.alpha
+  name STMap1
+  xpos -390
+  ypos -15
+ }
+ Reformat {
+  type "to box"
+  box_width {{Input.width}}
+  box_height {{Input.height}}
+  box_fixed true
+  box_pixel_aspect {{input.pixel_aspect}}
+  pbb true
+  name ReformatAuto1
+  selected true
+  xpos -390
+  ypos 63
+  disable {{Resolution1}}
+ }
+ Copy {
+  inputs 2
+  from0 -rgba.alpha
+  to0 -rgba.alpha
+  channels all
+  name Copy1
+  xpos -390
+  ypos 98
+  disable {{Resolution1}}
+ }
+ Output {
+  name Output1
+  xpos -390
+  ypos 222
+ }
+end_group

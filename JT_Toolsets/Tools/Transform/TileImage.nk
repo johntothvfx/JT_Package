@@ -1,0 +1,34 @@
+NoOp {
+name TileImage1
+tile_color 0xa57aaaff
+selected true
+xpos 180
+ypos -81
+addUserKnob {20 tileImage l "Tile Image"}
+addUserKnob {1 CLASSIFICATION +INVISIBLE}
+CLASSIFICATION TileImage
+addUserKnob {4 type l "crop to" M {format bbox "" "" "" "" "" "" "" "" "" ""}}
+addUserKnob {3 u}
+u 3
+addUserKnob {3 v -STARTLINE}
+v 3
+addUserKnob {6 reformat_crops l "reformat crops" +STARTLINE}
+addUserKnob {26 "" +STARTLINE}
+addUserKnob {4 side M {left right}}
+side right
+addUserKnob {22 execute l "     execute     " -STARTLINE T "import nuke\n\n# Get the selected node\nnode = nuke.thisNode()\nwidth = node.format().width()\nheight = node.format().height()\ntiles = \[int(node\['u'].value()), int(node\['v'].value())]\ndefault_spacing = int(node\['default_spacing'].getValue())\nx_spacing = int(node\['x'].getValue())\ny_spacing = int(node\['y'].getValue())\ndirection = 1 if node\['side'].value() == 'right' else -1\nreformat = int(node\['reformat_crops'].value())\n\n\n# Generate a sanitized name from the selected node\nname = node\['name'].value()\nname = \"\".join(c if c.isalnum() else \"_\" for c in name)\n\n# Initialize variables\ncount_u = 0\nx_position = node.xpos() + node.screenWidth() // 2  # Centered X position of the first Dot node\ny_position = node.ypos() + default_spacing  # First Dot node is 200 pixels below the current node\n\n# Initialize previous_dot to the selected node for chaining\nprevious_dot = node\n\n# Iterate over the tile grid\nfor iu in range(tiles\[0]):\n    count_u += 1\n    count_v = 0\n    for iv in range(tiles\[1]):\n        count_v += 1\n\n        # Create a Dot node and connect it to the previous Dot (or thisNode for the first Dot)\n        dot = nuke.nodes.Dot()\n        dot.setInput(0, previous_dot)\n        dot.setXpos(x_position - dot.screenWidth() // 2)  # Center Dot node horizontally\n        dot.setYpos(y_position + y_spacing)\n\n        \n        # Create a Crop node at the same position as the Dot node\n        crop_name = f\"crop_\{name\}_tile_\{count_u\}_\{count_v\}\"\n        print(f\"Creating Crop Node: \{crop_name\}\")\n        crop = nuke.nodes.Crop(name=crop_name)\n        crop.setInput(0, dot)  # Connect Crop directly to its respective Dot node\n        \n\n        # Set crop box values or expressions\n        if node\['type'].value() == 'bbox':\n            crop\['box'].setExpression(f\"(\{count_u\}-1)*input.bbox.w/\{tiles\[0]\}+input.bbox.x\", 0)\n            crop\['box'].setExpression(f\"(\{count_v\}-1)*input.bbox.h/\{tiles\[1]\}+input.bbox.y\", 1)\n            crop\['box'].setExpression(f\"(\{count_u\})*input.bbox.w/\{tiles\[0]\}+input.bbox.x\", 2)\n            crop\['box'].setExpression(f\"(\{count_v\})*input.bbox.h/\{tiles\[1]\}+input.bbox.y\", 3)\n            crop\['reformat'].setValue(bool(reformat))\n        else:\n            crop\['box'].setValue(\[\n                (count_u - 1) * width / tiles\[0],\n                (count_v - 1) * height / tiles\[1],\n                count_u * width / tiles\[0],\n                count_v * height / tiles\[1],\n            ])\n            crop\['reformat'].setValue(bool(reformat))\n\n\n        # Move Crop node down in the Y direction only\n        crop.setYpos(crop.ypos() + y_spacing + default_spacing )  # Move Crop vertically down by 350 pixels\n        \n        # Update previous_dot to the current Dot for the next iteration\n        previous_dot = dot\n\n        # Increment X position for spacing between Dot nodes, taking direction into account\n        x_position += direction * (x_spacing + default_spacing)  # Add horizontal spacing based on direction\n"}
+addUserKnob {20 spacing l Spacing}
+addUserKnob {3 default_spacing l default +INVISIBLE}
+default_spacing 100
+addUserKnob {3 x}
+x 100
+addUserKnob {3 y l " y" -STARTLINE}
+y 10
+addUserKnob {20 info l Info}
+addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>\nTile Image\n</font><font color=#a57aaa> v1.0\n"}
+addUserKnob {26 "" +STARTLINE}
+addUserKnob {26 bulletpoints l "" +STARTLINE T "<b> • Tile Image </b> crops the input image<br>into tiled chunks.\n\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#a57aaa;\">John Toth <b>© 2024 <br>"}
+addUserKnob {26 "" +STARTLINE}
+addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#a57aaa\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#a57aaa\">Version Log</a>\n" -STARTLINE T "\nversion_number = \"1.0.1\"\ncontext = \"Transform\"\nmodified_date = \"15th December 2024\"\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- Splits the input image into tiles using crop nodes\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}

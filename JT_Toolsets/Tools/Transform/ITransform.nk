@@ -1,0 +1,404 @@
+Group {
+ inputs 2
+ name ITransform1
+ help "Warps the image based on another channel selected in the controller selection.\n\n"
+ onCreate "def onCreate_center():\n    n = nuke.thisGroup()\n    knob_name = 'center'\n    if n.knob(knob_name):\n        n\[knob_name].setValue((n.width() * 0.5, n.height() * 0.5))\n\n# Execute the centering function\nonCreate_center()\n\n# Clean up the onCreate script\ndef clean_up_onCreate_knob():\n    node = nuke.thisNode()\n    on_create_knob = node.knob('onCreate')\n    script = on_create_knob.value()\n    lines = script.split('\\n')\n    cleaned_lines = \[]\n\n    for line in lines:\n        if 'def onCreate_center()' in line:\n            break\n        cleaned_lines.append(line)\n\n    on_create_knob.setValue('\\n'.join(cleaned_lines))\n\nclean_up_onCreate_knob()\n"
+ tile_color 0xa57aaaff
+ selected true
+ addUserKnob {20 ITransform}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION ITransform
+ addUserKnob {41 channels t "The effect is only applied to these channels. \nIf you set this to something other than all or none, you can use the checkboxes on the right to select individual channels." T IDistort1.channels}
+ addUserKnob {41 controller t "Enables the associated controller channel to the right. Disabling this checkbox is the same as setting the channel to none. \n\nThe channel to use as the controller to evaluate the transformation the image will recieve.\nBy default, the effect is limited to the non-black areas of this channel. (Brighter the pixel the stronger the softeness)" T Copy1.from0}
+ addUserKnob {26 space000 l "" +STARTLINE T "\t"}
+ addUserKnob {41 matrix T Transform1.matrix}
+ addUserKnob {41 translate t "Transforms the image within the controller channel." T Transform1.translate}
+ addUserKnob {41 rotate t "Rotate the image within the controller channel." T Transform1.rotate}
+ addUserKnob {41 scale t "scales the image within the controller channel." T Transform1.scale}
+ addUserKnob {41 skewX l "skew X" t "Skews the image in X within the controller channel." T Transform1.skewX}
+ addUserKnob {41 skewY l "skew Y" t "Skews the image in Y within the controller channel." T Transform1.skewY}
+ addUserKnob {41 skew_order l "skew order" t "Specifies which order the skew values should be applied in. Either skew in the X direction first, then skew the result of this in Y, or vice-versa." T Transform1.skew_order}
+ addUserKnob {41 center T Transform1.center}
+ addUserKnob {41 invert_matrix l invert t "Inverts the transform matrix" T Transform1.invert_matrix}
+ addUserKnob {41 filter t "impulse: no filtering - each output pixel equals some input pixel cubic: smooth interpolation between pixels\nKeys: cubic a=.50, approximates sinc (*)\nSimon: cubic a=.75, continuous 2nd derivative (*)\nRifman: cubic a=1.0, lots of sharpening (*)\nMitchell: mix of sharpening and smoothing (*+)\nParzen: approximating B-spline (+)\nnotch: hides moiré patterns (+)\nLanczos4: good for scaling down (*)\nLanczos6: good for scaling down with some sharpening () sinc4: good for scaling down with a lot of sharpening ()\n(*) has negative lobes, can produce values that are outside the range of the input pixels.\n(+) not interpolatory, changes pixels even when no movement." T Transform1.filter}
+ addUserKnob {41 clamp -STARTLINE T Transform1.clamp}
+ addUserKnob {6 crop l "crop to format" -STARTLINE}
+ crop true
+ addUserKnob {14 numPixels l "add pixels" t "adds additional pixels." R 0 100}
+ addUserKnob {41 motionblur +INVISIBLE T Transform1.motionblur}
+ addUserKnob {41 shutter l Shutter +INVISIBLE T Transform1.shutter}
+ addUserKnob {41 shutteroffset l "Shutter Offset" +INVISIBLE T Transform1.shutteroffset}
+ addUserKnob {41 shuttercustomoffset l "" -STARTLINE +INVISIBLE T Transform1.shuttercustomoffset}
+ addUserKnob {26 ""}
+ addUserKnob {41 maskChannelMask l mask t "Enables the associated mask channel to the right. Disabling this checkbox is the same as setting the channel to none. \n\nThe channel to use as a mask. By default, the filter effect is limited to the non-black areas of this channel." -STARTLINE T Copy1.maskChannelMask}
+ addUserKnob {41 inject -STARTLINE T Copy1.inject}
+ addUserKnob {41 invert_mask l invert -STARTLINE T Copy1.invert_mask}
+ addUserKnob {41 fringe -STARTLINE T Copy1.fringe}
+ addUserKnob {7 mix t "Dissolves between the original image at 0 and the full effect at 1."}
+ mix 1
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>ITransform</font><font color=#a57aaa> v1.2"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>ITransform</b> allows the user to warp<br>the incoming image by a certain channel<br>and transform.\n\n<br></b><i>\n<br><strong>•</br> Try blurring the incoming controller/mask<br>mattes for softer warping.\n\n</b></i>\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#a57aaa;\">John Toth <b>© 2019 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#a57aaa\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#a57aaa\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.2.6\"\ncontext = \"Transform\"\n\n\ndate = \"21th June\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2019\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- warps the image based on a controller channel\n<br></i><b> v 1.1 </b><i>\n- transform on anamorphic plates now display the user interface correctly and not squeezed\n- controller input was added for channel selection\n- user interface update\n<br></i><b> v 1.2 </b><i>\n- add pixels was added\n\"\"\"\n\n\n\nthankyou = \"\"\"\n\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + UPPER + site + developer + \"</a>\") \n\n\n"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x23232301
+  label "<center>Don't Touch\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 40
+  note_font_color 0xee453cff
+  xpos 198
+  ypos -420
+  bdwidth 258
+  bdheight 265
+ }
+ Input {
+  inputs 0
+  name Mask
+  label "\[value number]"
+  xpos 516
+  ypos 169
+  number 2
+ }
+ Dot {
+  name Dot15
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 550
+  ypos 258
+ }
+ Input {
+  inputs 0
+  name controller
+  label "\[value number]"
+  xpos 950
+  ypos -421
+  number 1
+ }
+ AddChannels {
+  channels rgba
+  name AddChannels1
+  xpos 950
+  ypos -105
+ }
+ Multiply {
+  value {{clamp(parent.mix)}}
+  name Multiply1
+  label "value: \[value value]"
+  xpos 950
+  ypos -66
+ }
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 984
+  ypos 258
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 0
+  ypos -421
+ }
+ Dot {
+  name Dot14
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 34
+  ypos -318
+ }
+set Nd358a800 [stack 0]
+ AdjBBox {
+  numpixels {{parent.numPixels} {parent.numPixels}}
+  name AdjBBox1
+  xpos 0
+  ypos -105
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 34
+  ypos -30
+ }
+set Ncfc8a000 [stack 0]
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 364
+  ypos -30
+ }
+ Remove {
+  name Remove1
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 330
+  ypos 35
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 364
+  ypos 114
+ }
+set Ncfd43800 [stack 0]
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 694
+  ypos 114
+ }
+ Copy {
+  inputs 2+1
+  from0 rgba.alpha
+  to0 rgba.alpha
+  bbox A
+  name Copy1
+  xpos 660
+  ypos 251
+ }
+ Shuffle {
+  red alpha
+  green alpha
+  blue alpha
+  alpha black
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 660
+  ypos 341
+ }
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 694
+  ypos 450
+ }
+push $Ncfd43800
+ Expression {
+  expr0 x
+  expr1 y
+  name Expression1
+  xpos 330
+  ypos 183
+ }
+set Ncfe9fe00 [stack 0]
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 254
+  ypos 186
+ }
+ Transform {
+  translate {{Transform1.translate} {Transform1.translate}}
+  rotate {{Transform1.rotate}}
+  scale {{Transform1.scale} {Transform1.scale}}
+  skewX {{Transform1.skewX}}
+  skewY {{Transform1.skewY}}
+  skew_order {{Transform1.skew_order}}
+  center {{Transform1.center} {Transform1.center}}
+  invert_matrix {{Transform1.invert_matrix}}
+  filter {{Transform1.filter}}
+  clamp {{Transform1.clamp}}
+  black_outside {{Transform1.black_outside}}
+  motionblur {{Transform1.motionblur}}
+  shutter {{Transform1.shutter}}
+  shutteroffset {{Transform1.shutteroffset}}
+  shuttercustomoffset {{Transform1.shuttercustomoffset}}
+  name Transform2
+  label Child
+  xpos 220
+  ypos 227
+ }
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 254
+  ypos 282
+ }
+push $Ncfe9fe00
+ Merge2 {
+  inputs 2
+  operation minus
+  name Merge2
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 330
+  ypos 275
+ }
+ Merge2 {
+  inputs 2
+  operation multiply
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 330
+  ypos 443
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 364
+  ypos 570
+ }
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 214
+  ypos 570
+ }
+set Nf8e4d000 [stack 0]
+ Dot {
+  name Dot16
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -116
+  ypos 570
+ }
+push $Ncfc8a000
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 34
+  ypos 450
+ }
+set Ncfde6000 [stack 0]
+ Dot {
+  name Dot17
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -261
+  ypos 450
+ }
+ Shuffle {
+  in forward
+  name Shuffle2
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -295
+  ypos 509
+ }
+ Copy {
+  inputs 2
+  from0 rgba.red
+  to0 forward.u
+  from1 rgba.green
+  to1 forward.v
+  name Copy4
+  xpos -295
+  ypos 654
+ }
+ IDistort {
+  channels rgba
+  uv forward
+  uv_offset 0.5
+  name IDistort3
+  xpos -295
+  ypos 711
+ }
+ Dot {
+  name Dot18
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -261
+  ypos 935
+ }
+push $Nf8e4d000
+push $Ncfde6000
+ Copy {
+  inputs 2
+  from0 rgba.red
+  to0 forward.u
+  from1 rgba.green
+  to1 forward.v
+  name Copy2
+  xpos 0
+  ypos 654
+ }
+ IDistort {
+  uv forward
+  name IDistort1
+  xpos 0
+  ypos 707
+ }
+ Dot {
+  name Dot23
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 34
+  ypos 838
+ }
+set Nee824200 [stack 0]
+ Dot {
+  name Dot22
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos -115
+  ypos 838
+ }
+ ShuffleCopy {
+  inputs 2
+  red red
+  green green
+  blue blue
+  out {{{parent.Shuffle2.in}}}
+  name ShuffleCopy1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos -149
+  ypos 922
+ }
+ Dot {
+  name Dot21
+  note_font_size 35
+  note_font_color 0x3f7f3fff
+  xpos -115
+  ypos 1054
+ }
+push $Nee824200
+ Switch {
+  inputs 2
+  which {{"\[if \{ \[lsearch \"all forward backward motion\"  \[value IDistort1.channels]] != -1 \} \{ return \"1\n\" \} else \{ return \"0\"\}]"}}
+  name Switch1
+  xpos 0
+  ypos 1051
+ }
+ Crop {
+  box {0 0 {Input.width} {Input.height}}
+  name Crop1
+  xpos 0
+  ypos 1191
+  disable {{!parent.crop}}
+ }
+ Output {
+  name Output1
+  xpos 0
+  ypos 1287
+ }
+push $Nd358a800
+ Dot {
+  name Dot13
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 324
+  ypos -318
+ }
+ Transform {
+  center {1024 778}
+  black_outside false
+  name Transform1
+  label "Parent (UI Reasons)"
+  xpos 290
+  ypos -253
+ }
+end_group

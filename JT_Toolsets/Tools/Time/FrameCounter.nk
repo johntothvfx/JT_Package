@@ -1,0 +1,263 @@
+Group {
+ name FrameCounter
+ help "Displays the timeline of the current frame over the input image.\n\nThis is mostly for presentation/retime purpose for visual guide or reference."
+ knobChanged "import nuke\n\n# Access the current group and knob\ngrp = nuke.thisGroup()\nk = nuke.thisKnob()\n\n# Quality control: making slider only int values\nqualityLow = 0\nqualityValue = int(nuke.thisNode().knob('padding').getValue())\n\n# Ensure the knob name is 'padding'\nif k.name() == 'padding':\n    # Clamp the value to ensure it is not below qualityLow\n    qualityValue = max(qualityValue, qualityLow)\n    \n    # Set the clamped value to the 'padding' knob\n    grp\['padding'].setValue(qualityValue)\n"
+ tile_color 0xb0a45dff
+ selected true
+ addUserKnob {20 frameCounter l "Frame Counter"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION TextOverlay
+ addUserKnob {1 output l INVISIBLE +INVISIBLE}
+ output "\[format %0\[value padding]d \[expr \[frame] + \[value offset]]]"
+ addUserKnob {3 padding t "Determines the number of digits to use when formatting the frame number (e.g., 0001, 0010)."}
+ addUserKnob {6 replace t "• When enabled the frame number will replace (rgba).\n\n• If disabled the message will overlay input image." -STARTLINE}
+ addUserKnob {3 offset l "offset frame" t "Adds or subtracts from the current frame number based on user input."}
+ addUserKnob {6 displayOffset l "display offset" t "When enabled it will display in brackets the number of frame offsets in the calculations." -STARTLINE}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {4 xjustify l justify t "Sets how to align the text vertically: \n\n<b>• left</b> - align the text against the left edge of the margin.\n\n<b>• center</b> - align the text from the center of the margin.\n\n<b>• right</b> - align the text against the right edge of the margin." M {Left Center Right "" "" "" "" "" "" "" "" ""}}
+ addUserKnob {4 yjustify l "" t "Sets how to align the text Horizontally: \n\n<b>• top</b> - align the text against the top edge of the margin.\n\n<b>• center</b> - align the text from the center of the margin.\n\n<b>• bottom</b> - align the text against the bottom edge of the margin." -STARTLINE M {Top Center Bottom "" "" "" "" "" "" "" "" ""}}
+ yjustify Bottom
+ addUserKnob {4 safeZone l "safe zone" t "Overlay safe zones guidelines based on the image input.\n\n<b>• title safe</b> - any text intended for the audience should reside within this zone.\n\n<b>• action safe</b> - any visual elements intended for the audience should reside within this zone." M {"title safe" "action safe" "" "" "" "" "" "" "" "" "" "" "" ""}}
+ safeZone "action safe"
+ addUserKnob {3 margin t "The margin represents the padding from the edge of frame.\n\nThe higher the value more the paddiing will shrink in size." +DISABLED}
+ margin 100
+ addUserKnob {41 autoMargin l "auto margin" t "When this is enabled, the manual margin knob will be disabled.\n\nThis will automatically calculated the margin to the safe zone, based on the input image root format." -STARTLINE T Warning.autoMargin}
+ addUserKnob {3 fontSize l size t "Multiply the font size for all characters by this value." +DISABLED}
+ fontSize 200
+ addUserKnob {41 autoFontSize l "auto size" t "When this is enabled, the manual font size knob will be disabled.\n\nThis will calculate the font size based on the input with/height." -STARTLINE T Warning.autoFontSize}
+ addUserKnob {3 border t "Creates a black border around the text." +DISABLED}
+ border 3
+ addUserKnob {41 autoBorder l "auto border" t "When this is enabled, the manual border knob will be disabled.\n\nThis will calculate the font size based on the input with/height." -STARTLINE T Warning.autoBorder}
+ addUserKnob {26 "" +STARTLINE}
+ addUserKnob {7 mix t "Dissolves between the original image at 0 and the full effect at 1.\n\n<b>Note:</b>\nThis is only for the frame number."}
+ mix 1
+ addUserKnob {20 visualize l Visualize}
+ addUserKnob {2 font t "Sets the font style to use for the text. "}
+ font "\[python nuke.defaultFontPathname()]"
+ addUserKnob {18 color}
+ color {1 1 0}
+ addUserKnob {6 color_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {6 color_rgb_panelDropped l "panel dropped state" -STARTLINE +HIDDEN}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" t "Node version info, for more information look at version log" +STARTLINE T "<br><font size='5'>Frame Counter</font><font color=#B0A45D> v1.1"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "Overview of the node" +STARTLINE T "<br><strong>•</br><b> Frame Counter</b> will display the current frame<br>the viewer is on.\n<br></b><i>\n<br><strong>•</br> This is most useful for retimes to see retime frame<br>value.\n<br>\n<br><strong>Tip:</br> plug it this node in before the retime happens\n</i><br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#B0A45D;\">John Toth <b>© 2021 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#B0A45D\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message(\"Coming Soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#B0A45D\">Version Log</a>\n" t "Contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nversion_number = \"1.1.0\"\ncontext = \"Time\"\nmodified_date = \"27th August 2024\"\ndeveloper = \"John Toth © 2021\"\nsite = \"<a href='website linke here'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- displays current timelines frame values over image\n<br></i><b> v 1.1 </b><i>\n- padding was clamped so not go below 0\n- offset frame was added\n- new user interface\n\"\"\"\nthank_you = \"thanks message here\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"</i>\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x22222201
+  label "<center>DO NOT TOUCH"
+  note_font "Source Code Pro Light"
+  note_font_size 35
+  note_font_color 0xee453cff
+  xpos 4395
+  ypos -2683
+  border_width 15
+  bookmark false
+  bdwidth 230
+  bdheight 230
+  addUserKnob {20 "Backdrop Settings"}
+  addUserKnob {3 padding l Padding}
+  padding 75
+  addUserKnob {22 snap l "Snap to selected nodes" -STARTLINE T "this = nuke.thisNode()\nselNodes = nuke.selectedNodes()\npadding = this.knob('padding').value()\nif len(selNodes)== 0:\n\tpass\nelse:\n\tbdX = min(\[node.xpos() for node in selNodes]) - padding\n\tbdY = min(\[node.ypos() for node in selNodes]) - padding - 60\n\tbdW = max(\[node.xpos() + node.screenWidth() for node in selNodes]) + padding\n\tbdH = max(\[node.ypos() + node.screenHeight() for node in selNodes]) + padding\n\tthis.knob('xpos').setValue(bdX)\n\tthis.knob('ypos').setValue(bdY)\n\tthis.knob('bdwidth').setValue(bdW-bdX)\n\tthis.knob('bdheight').setValue(bdH-bdY)"}
+ }
+ NoOp {
+  inputs 0
+  name Warning
+  knobChanged "grp = nuke.thisGroup()\ntk = nuke.thisKnob()\n\n\nif tk.name() == \"autoFontSize\":\n    grp.knob('fontSize').setEnabled(not grp.knob('fontSize'). enabled())\n\nif tk.name() == \"autoMargin\":\n    grp.knob('margin').setEnabled(not grp.knob('margin'). enabled())\n    grp.knob('safeZone').setEnabled(not grp.knob('safeZone'). enabled())\n    \nif tk.name() == \"autoBorder\":\n    grp.knob('border').setEnabled(not grp.knob('border'). enabled())"
+  label callback
+  xpos 4470
+  ypos -2560
+  addUserKnob {20 warning}
+  addUserKnob {6 autoMargin l "auto margin" +STARTLINE}
+  autoMargin true
+  addUserKnob {6 autoFontSize l "auto size" +STARTLINE}
+  autoFontSize true
+  addUserKnob {6 autoBorder l "auto border" +STARTLINE}
+  autoBorder true
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 4672
+  ypos -2680
+ }
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4706
+  ypos -2124
+ }
+set N18b2dc00 [stack 0]
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4394
+  ypos -2124
+ }
+ Remove {
+  name Remove10
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 4360
+  ypos -2056
+ }
+ CopyBBox {
+  name CopyBBox1
+  xpos 4360
+  ypos -1978
+ }
+ Dot {
+  name Dot42
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4394
+  ypos -1860
+ }
+set N18b8a400 [stack 0]
+ Dot {
+  name Dot43
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4192
+  ypos -1860
+ }
+ Text {
+  message "\[format %0\[value parent.padding]d \[expr \[frame] + \[value parent.offset]]] \[expr \{\[numvalue parent.displayOffset] ? \"(frame offset  \[expr \{ \[value parent.offset] > 0 ? \"+\" : (\[value parent.offset] < 0 ? \"\" : \"\") \}]\[value parent.offset])\" : \"\"\}]\n"
+  Font 0
+  font "\[value parent.font]"
+  size {{"parent.autoFontSize == 0 ? parent.fontSize : Input.width / 50"}}
+  xjustify {{parent.xjustify}}
+  yjustify {{parent.yjustify+1}}
+  box {{"parent.autoMargin == 1 ? ((Input.width * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : parent.margin\n"} {"parent.autoMargin == 1 ? ((Input.height * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : parent.margin\n"} {"parent.autoMargin == 1 ? Input.width - ((Input.width * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : Input.width - (parent.margin)\n"} {"parent.autoMargin == 1 ? Input.height - ((Input.height * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : Input.height - (parent.margin)\n"}}
+  color {1 1 1 1}
+  name Text6
+  label "\[basename \[value font]]"
+  xpos 4158
+  ypos -1717
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4192
+  ypos -1590
+ }
+push $N18b8a400
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha white
+  name Shuffle1
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 4360
+  ypos -1796
+ }
+ Add {
+  channels rgba
+  value {{parent.color.r} {parent.color.g} {parent.color.b} 1}
+  name Add1
+  xpos 4360
+  ypos -1714
+ }
+ ChannelMerge {
+  inputs 2
+  operation multiply
+  name ChannelMerge2
+  xpos 4360
+  ypos -1602
+ }
+ Premult {
+  name Premult39
+  xpos 4360
+  ypos -1504
+ }
+ FilterErode {
+  channels alpha
+  size {{"- (parent.autoBorder == 0 ? parent.border : (Input.width * 0.1) / 100)"}}
+  name FilterErode1
+  xpos 4360
+  ypos -1453
+ }
+ Multiply {
+  value {{clamp(parent.mix)}}
+  name Multiply1
+  label "value: \[value value]"
+  xpos 4360
+  ypos -1390
+ }
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4394
+  ypos -1278
+ }
+set N1850b200 [stack 0]
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4394
+  ypos -984
+ }
+push $N1850b200
+push $N18b2dc00
+ Merge2 {
+  inputs 2
+  name Merge4
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 4672
+  ypos -1288
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4706
+  ypos -1086
+ }
+set N1860cc00 [stack 0]
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4596
+  ypos -1086
+ }
+ Copy {
+  inputs 2
+  channels rgba
+  name Copy1
+  xpos 4562
+  ypos -1000
+ }
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4596
+  ypos -870
+ }
+push $N1860cc00
+ Switch {
+  inputs 2
+  which {{parent.replace}}
+  name Switch1
+  label "\[value which]/\[expr \{\[value inputs] - 1\}]\n"
+  xpos 4672
+  ypos -880
+ }
+ Output {
+  name Output
+  xpos 4672
+  ypos -634
+ }
+end_group

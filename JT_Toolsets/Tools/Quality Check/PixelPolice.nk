@@ -1,0 +1,1031 @@
+Group {
+ name PixelPolice1
+ help "Will detect & display unwanted pixels such as nan, inf & negative values."
+ knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\n\nif k.name() == 'inputChange':\n    if n.input(0) is not None:\n        input_class = n.input(0).Class()\n        if input_class.startswith(( 'Deep', 'Particle', 'Axis', 'Camera', 'Light', 'Scene', 'Environment', 'Cube', 'Cylinder', 'ModelBuilder', 'PointCloudGenerator', 'PoissonMesh', 'MergeGeo', 'CrosstalkGeo', 'DisplaceGeo', 'EditGeo', 'LogGeo', 'Normals', 'ProcGeo', 'RadialDistort', 'Trilinear', 'UVProject', 'ModifyRIB', 'ApplyMaterial', 'Geo')):\n            n.setInput(0, None)"
+ tile_color 0x7f7f7fff
+ label "\[expr \{ \[value nanCheck] && \[value infCheck] && \[value negCheck] ? \"(nan & inf & neg)\" : \[expr \{ \[value nanCheck] && \[value infCheck] ? \"(nan & inf)\" : \[expr \{ \[value infCheck] && \[value negCheck] ? \"(inf & neg)\" : \[expr \{ \[value nanCheck] && \[value negCheck] ? \"(nan & neg)\" : \[expr \{ \[value nanCheck] ? \"(nan)\" :  \[expr \{ \[value infCheck] ? \"(inf)\" : \[expr \{ \[value negCheck] ? \"(neg)\" : \"\"\}]\}] \}] \}] \}]  \}]  \}]\n\n"
+ selected true
+ addUserKnob {20 pixelPolice l "Pixel Police"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION PixelPolice
+ addUserKnob {41 channels t "The effect is only applied to this channel. " T Channel_selection.in}
+ addUserKnob {26 ""}
+ addUserKnob {6 boost t "Boosting the visibility of unwanted pixels." +STARTLINE}
+ boost true
+ addUserKnob {3 boostValue l "       " t "when <b>Boost</b> is enabled, this will erode the unwanted pixel by this amount to make it more visibile to see."}
+ boostValue 10
+ addUserKnob {26 ""}
+ addUserKnob {6 nanCheck l nan t "Display nan value pixels" +STARTLINE}
+ nanCheck true
+ addUserKnob {6 infCheck l inf t "Display inf value pixels" +STARTLINE}
+ infCheck true
+ addUserKnob {6 negCheck l negative t "Display negative value pixels" +STARTLINE}
+ negCheck true
+ addUserKnob {26 ""}
+ addUserKnob {22 export l "nan/inf to black (0)" t "Exports two expression nodes.\n\n1. Expression that makes any nan pixels go to black (value of 0).\n\n2. Expression that makes any infinity pixels go to black (value of 0)." T "#############################\n\n#creates nodes outside of group\n\ngrp = nuke.thisNode()\nwith nuke.thisParent():\n\n#############################\n\n# nan to black (0)\n\n nan = nuke.nodes.Expression()\n\n#############################\n\n# Creating Expression\n\n nan\['channel0'].setValue(\"r\")\n nan\['expr0'].setValue(\"isnan(r)?0:r\")\n\n nan\['channel1'].setValue(\"g\")\n nan\['expr1'].setValue(\"isnan(g)?0:g\")\n\n nan\['channel2'].setValue(\"b\")\n nan\['expr2'].setValue(\"isnan(b)?0:b\")\n\n nan\['channel3'].setValue(\"a\")\n nan\['expr3'].setValue(\"isnan(a)?0:a\")\n\n nan\['label'].setValue(\"nan to black (0)\")\n\n#############################\n\n# Position of the node placement when created\n\n nan.setXpos(grp.xpos() + 100)\n nan.setYpos(grp.ypos() + 100)\n\n#############################\n#############################\n\n# inf to black (0)\n\n inf = nuke.nodes.Expression()\n\n#############################\n\n# Creating Expression\n\n inf\['channel0'].setValue(\"r\")\n inf\['expr0'].setValue(\"isinf(r)?0:r\")\n\n inf\['channel1'].setValue(\"g\")\n inf\['expr1'].setValue(\"isinf(g)?0:g\")\n\n inf\['channel2'].setValue(\"b\")\n inf\['expr2'].setValue(\"isinf(b)?0:b\")\n\n inf\['channel3'].setValue(\"a\")\n inf\['expr3'].setValue(\"isinf(a)?0:a\")\n\n inf\['label'].setValue(\"inf to black (0)\")\n\n#############################\n\n# Position of the node placement when created\n\n inf.setXpos(grp.xpos() + 200)\n inf.setYpos(grp.ypos() + 100)\n\n\n\n" +STARTLINE}
+ addUserKnob {20 warning l Warning}
+ addUserKnob {26 warningTitle l "<b> Warning </b>" +INVISIBLE}
+ addUserKnob {2 font t "Sets the font style to use for the text. "}
+ font "\[python nuke.defaultFontPathname()]"
+ addUserKnob {4 xjustify l justify t "Sets how to align the text vertically: \n\n<b>• left</b> - align the text against the left edge of the margin.\n\n<b>• center</b> - align the text from the center of the margin.\n\n<b>• right</b> - align the text against the right edge of the margin." M {Left Center Right "" "" "" "" "" "" ""}}
+ addUserKnob {4 yjustify l "" t "Sets how to align the text Horizontally: \n\n<b>• top</b> - align the text against the top edge of the margin.\n\n<b>• center</b> - align the text from the center of the margin.\n\n<b>• bottom</b> - align the text against the bottom edge of the margin." -STARTLINE M {Top Center Bottom "" "" "" "" "" "" ""}}
+ yjustify Center
+ addUserKnob {4 safeZone l "safe zone" t "Overlay safe zones guidelines based on the image input.\n\n<b>• title safe</b> - any text intended for the audience should reside within this zone.\n\n<b>• action safe</b> - any visual elements intended for the audience should reside within this zone." M {"title safe" "action safe" "" "" "" "" "" "" "" "" ""}}
+ safeZone "action safe"
+ addUserKnob {3 margin t "The margin represents the padding from the edge of frame.\n\nThe higher the value more the paddiing will shrink in size." +DISABLED}
+ margin 100
+ addUserKnob {41 autoMargin l "auto margin" t "When this is enabled, the manual margin knob will be disabled.\n\nThis will automatically calculated the margin to the safe zone, based on the input image root format." -STARTLINE T Warning.autoMargin}
+ addUserKnob {3 fontSize l size t "Multiply the font size for all characters by this value." +DISABLED}
+ fontSize 100
+ addUserKnob {41 autoFontSize l "auto size" t "When this is enabled, the manual font size knob will be disabled.\n\nThis will calculate the font size based on the input with/height." -STARTLINE T Warning.autoFontSize}
+ addUserKnob {3 border t "Creates a black border around the text." +DISABLED}
+ border 5
+ addUserKnob {41 autoBorder l "auto border" t "When this is enabled, the manual border knob will be disabled.\n\nThis will calculate the font size based on the input with/height." -STARTLINE T Warning.autoBorder}
+ addUserKnob {7 labelMix l mix t "Dissolves between the original image at 0 and the full effect at 1.\n\n<b>Note:</b>\nThis is only for the text"}
+ labelMix 1
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Pixel Police</font><font color=#747474> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" +STARTLINE T "<br><strong>•</br><b> Pixel Police</b> will display unwanted pixels<br>like nan,inf and negative values.\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#777;\">John Toth <b>© 2023 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#747474\">Tool Demo</a>\n" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message(\"Coming Soon\")" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#747474\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "version_number = \"1.0.7\"\ncontext = \"Quality Check\"\nmodified_date = \"30th July 2024\"\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'><span style='color:#BBBBBB'>\"\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- displays unwanted pixels values (nan,inf & negative)\n\"\"\"\nthank_you = \"\"\n\n# Retrieve node name\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\n\n# Message components\nheader = \"Version Log:\"\ndlm = \"<b>Date Last Modified: </b>\" + modified_date\nspace = \" \"\nenter = \"<br><br>\"\nupper = \"<b>\"\nlower = \"</b>\"\n\n# Formatted message\nmessage = (\n    f\"\{upper\}\{header\}\{enter\}\"\n    f\"Name: \{lower\}\{name\}<br>\"\n    f\"\{upper\}Version Number: \{lower\}\{version_number\}<br>\"\n    f\"\{upper\}Context: \{lower\}\{context\}\{enter\}\"\n    f\"\{dlm\}\{log\}<br>\"\n    #f\"<b>Thank You:</b><br>\{thank_you\}<br>\{enter\}\"\n    f\"\{upper\}\{site\}\{developer\}\{lower\}</span></a>\"\n)\n\n# Display the message\nnuke.message(message)"}
+}
+ BackdropNode {
+  inputs 0
+  name BackdropNode1
+  tile_color 0xbc396aff
+  label "<center>if channel is set to rgb\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 20
+  note_font_color 0xee453cff
+  xpos 4570
+  ypos -1511
+  bdwidth 287
+  bdheight 334
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode2
+  tile_color 0x22222201
+  label "<center>DO NOT TOUCH"
+  note_font "Source Code Pro Light"
+  note_font_size 35
+  note_font_color 0xee453cff
+  xpos 4175
+  ypos -2083
+  border_width 15
+  bookmark false
+  bdwidth 230
+  bdheight 230
+  addUserKnob {20 "Backdrop Settings"}
+  addUserKnob {3 padding l Padding}
+  padding 75
+  addUserKnob {22 snap l "Snap to selected nodes" -STARTLINE T "this = nuke.thisNode()\nselNodes = nuke.selectedNodes()\npadding = this.knob('padding').value()\nif len(selNodes)== 0:\n\tpass\nelse:\n\tbdX = min(\[node.xpos() for node in selNodes]) - padding\n\tbdY = min(\[node.ypos() for node in selNodes]) - padding - 60\n\tbdW = max(\[node.xpos() + node.screenWidth() for node in selNodes]) + padding\n\tbdH = max(\[node.ypos() + node.screenHeight() for node in selNodes]) + padding\n\tthis.knob('xpos').setValue(bdX)\n\tthis.knob('ypos').setValue(bdY)\n\tthis.knob('bdwidth').setValue(bdW-bdX)\n\tthis.knob('bdheight').setValue(bdH-bdY)"}
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode3
+  tile_color 0xf4589ff
+  label "<center>negative values"
+  note_font "Source Code Pro Light"
+  note_font_size 35
+  note_font_color 0xee453cff
+  xpos 1240
+  ypos 329
+  border_width 15
+  bookmark false
+  bdwidth 888
+  bdheight 1922
+  addUserKnob {20 "Backdrop Settings"}
+  addUserKnob {3 padding l Padding}
+  padding 75
+  addUserKnob {22 snap l "Snap to selected nodes" -STARTLINE T "this = nuke.thisNode()\nselNodes = nuke.selectedNodes()\npadding = this.knob('padding').value()\nif len(selNodes)== 0:\n\tpass\nelse:\n\tbdX = min(\[node.xpos() for node in selNodes]) - padding\n\tbdY = min(\[node.ypos() for node in selNodes]) - padding - 60\n\tbdW = max(\[node.xpos() + node.screenWidth() for node in selNodes]) + padding\n\tbdH = max(\[node.ypos() + node.screenHeight() for node in selNodes]) + padding\n\tthis.knob('xpos').setValue(bdX)\n\tthis.knob('ypos').setValue(bdY)\n\tthis.knob('bdwidth').setValue(bdW-bdX)\n\tthis.knob('bdheight').setValue(bdH-bdY)"}
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode4
+  tile_color 0xe8912ff
+  label "<center>infinity values"
+  note_font "Source Code Pro Light"
+  note_font_size 35
+  note_font_color 0xee453cff
+  xpos 2196
+  ypos 329
+  border_width 15
+  bookmark false
+  bdwidth 888
+  bdheight 1922
+  addUserKnob {20 "Backdrop Settings"}
+  addUserKnob {3 padding l Padding}
+  padding 75
+  addUserKnob {22 snap l "Snap to selected nodes" -STARTLINE T "this = nuke.thisNode()\nselNodes = nuke.selectedNodes()\npadding = this.knob('padding').value()\nif len(selNodes)== 0:\n\tpass\nelse:\n\tbdX = min(\[node.xpos() for node in selNodes]) - padding\n\tbdY = min(\[node.ypos() for node in selNodes]) - padding - 60\n\tbdW = max(\[node.xpos() + node.screenWidth() for node in selNodes]) + padding\n\tbdH = max(\[node.ypos() + node.screenHeight() for node in selNodes]) + padding\n\tthis.knob('xpos').setValue(bdX)\n\tthis.knob('ypos').setValue(bdY)\n\tthis.knob('bdwidth').setValue(bdW-bdX)\n\tthis.knob('bdheight').setValue(bdH-bdY)"}
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode5
+  tile_color 0x890e33ff
+  label "<center>nan values"
+  note_font "Source Code Pro Light"
+  note_font_size 35
+  note_font_color 0xee453cff
+  xpos 3153
+  ypos 329
+  border_width 15
+  bookmark false
+  bdwidth 888
+  bdheight 1922
+  addUserKnob {20 "Backdrop Settings"}
+  addUserKnob {3 padding l Padding}
+  padding 75
+  addUserKnob {22 snap l "Snap to selected nodes" -STARTLINE T "this = nuke.thisNode()\nselNodes = nuke.selectedNodes()\npadding = this.knob('padding').value()\nif len(selNodes)== 0:\n\tpass\nelse:\n\tbdX = min(\[node.xpos() for node in selNodes]) - padding\n\tbdY = min(\[node.ypos() for node in selNodes]) - padding - 60\n\tbdW = max(\[node.xpos() + node.screenWidth() for node in selNodes]) + padding\n\tbdH = max(\[node.ypos() + node.screenHeight() for node in selNodes]) + padding\n\tthis.knob('xpos').setValue(bdX)\n\tthis.knob('ypos').setValue(bdY)\n\tthis.knob('bdwidth').setValue(bdW-bdX)\n\tthis.knob('bdheight').setValue(bdH-bdY)"}
+ }
+ BackdropNode {
+  inputs 0
+  name BackdropNode6
+  tile_color 0xbc396aff
+  label "<center>if channel is set to rgb\n\n"
+  note_font "Source Code Pro Light"
+  note_font_size 20
+  note_font_color 0xee453cff
+  xpos 4613
+  ypos -743
+  bdwidth 287
+  bdheight 334
+ }
+ Input {
+  inputs 0
+  name Input
+  label "\[value number]"
+  xpos 4674
+  ypos -2080
+ }
+ Dot {
+  name Dot54
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4708
+  ypos -1686
+ }
+set N47735800 [stack 0]
+ Shuffle {
+  in rgb
+  name Channel_selection
+  label "<b>\[value in]</b> &rarr; \[value out]"
+  xpos 4674
+  ypos -1604
+ }
+ Dot {
+  name Dot27
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4708
+  ypos -1446
+ }
+set N476cde00 [stack 0]
+ Dot {
+  name Dot28
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4598
+  ypos -1446
+ }
+ Remove {
+  channels alpha
+  name Remove8
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 4564
+  ypos -1360
+ }
+ Dot {
+  name Dot26
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4598
+  ypos -1254
+ }
+push $N476cde00
+ Switch {
+  inputs 2
+  which {{"\[expr \{\[string match -nocase \"rgb\" \[value parent.channels]  ] ? \"1\" : \"0\" \}]"}}
+  name Switch2
+  xpos 4674
+  ypos -1258
+ }
+ Dot {
+  name Dot19
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4708
+  ypos -942
+ }
+set N476cee00 [stack 0]
+ Dot {
+  name Dot35
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3917
+  ypos -942
+ }
+ Expression {
+  expr0 "isnan(r) || isnan(g) || isnan(b) || isnan(a)"
+  expr1 "isinf(r) || isinf(g) || isinf(b) || isinf(a)"
+  expr2 "r<0?1:0 || g<0?1:0 || b<0?1:0"
+  expr3 0
+  name Expression1
+  label detect
+  xpos 3883
+  ypos -784
+ }
+ Dot {
+  name Dot34
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3917
+  ypos -510
+ }
+set N476cfa00 [stack 0]
+ Dot {
+  name Dot29
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3917
+  ypos -294
+ }
+set N476cfe00 [stack 0]
+ Dot {
+  name Dot23
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4087
+  ypos -294
+ }
+ Remove {
+  name Remove9
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 4053
+  ypos -232
+ }
+ Crop {
+  box {0 0 {Input.width} {Input.height}}
+  name Crop4
+  xpos 4053
+  ypos -178
+ }
+ Dot {
+  name Dot32
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4084
+  ypos -102
+ }
+push $N476cfe00
+ Dilate {
+  inputs 1+1
+  channels rgb
+  size {{input.width} {input.height}}
+  name Dilate1
+  xpos 3883
+  ypos -106
+ }
+ Dot {
+  name Dot36
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3917
+  ypos 186
+ }
+set N360e2600 [stack 0]
+ Dot {
+  name Dot1
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2963
+  ypos 186
+ }
+set N364e9a00 [stack 0]
+ Dot {
+  name Dot51
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2007
+  ypos 186
+ }
+ Shuffle {
+  red black
+  green black
+  alpha blue
+  name Shuffle5
+  tile_color 0xffff
+  label negative
+  xpos 1973
+  ypos 464
+ }
+ Dot {
+  name Dot52
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2007
+  ypos 738
+ }
+set Nb8a6da00 [stack 0]
+ Dot {
+  name Dot53
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1551
+  ypos 738
+ }
+set Nb8973800 [stack 0]
+ Dot {
+  name Dot55
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1349
+  ypos 738
+ }
+ Remove {
+  name Remove7
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 1315
+  ypos 800
+ }
+ Text {
+  message "neg values detected"
+  Font 0
+  font "\[value parent.font]"
+  size {{"parent.autoFontSize == 0 ? parent.fontSize : Input.width / 50"}}
+  xjustify {{parent.xjustify}}
+  yjustify {{parent.yjustify+1}}
+  Transform 1
+  box {{"parent.autoMargin == 1 ? ((Input.width * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : parent.margin\n"} {"parent.autoMargin == 1 ? ((Input.height * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : parent.margin\n"} {"parent.autoMargin == 1 ? Input.width - ((Input.width * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : Input.width - (parent.margin)\n"} {"parent.autoMargin == 1 ? Input.height - ((Input.height * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : Input.height - (parent.margin)\n"}}
+  translate {0 {"parent.nanCheck && parent.infCheck  && parent.negCheck == 1 ? \nparent.yjustify == 0 ? - (size * 2) : \nparent.yjustify == 1 ? - (size) : \n0 : \n\nparent.negCheck && parent.infCheck == 1 ?\nparent.yjustify == 0 ? -size  : \nparent.yjustify == 1 ? -((size) / 2) : \n0 : \n\nparent.negCheck && parent.nanCheck == 1 ?\nparent.yjustify == 0 ? - size  : \nparent.yjustify == 1 ? -((size) / 2)  : \n0: \n\nparent.negCheck == 1 ? 0  : 0\n"}}
+  color {1 1 1 1}
+  name Text1
+  label "\[basename \[value font]]"
+  xpos 1315
+  ypos 872
+ }
+ Dot {
+  name Dot56
+  xpos 1349
+  ypos 1208
+ }
+push $Nb8973800
+ ChannelMerge {
+  inputs 2
+  operation multiply
+  name ChannelMerge1
+  xpos 1517
+  ypos 1192
+ }
+ Premult {
+  name Premult3
+  xpos 1517
+  ypos 1286
+ }
+ FilterErode {
+  channels alpha
+  size {{"- (parent.autoBorder == 0 ? parent.border : (Input.width * 0.1) / 100)"}}
+  name FilterErode2
+  xpos 1517
+  ypos 1400
+ }
+ Remove {
+  name Remove1
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 1517
+  ypos 1520
+  disable {{parent.negCheck}}
+ }
+ Dot {
+  name Dot57
+  xpos 1551
+  ypos 2586
+ }
+push $N364e9a00
+ Shuffle {
+  red black
+  blue black
+  alpha green
+  name Shuffle1
+  tile_color 0xff00ff
+  label infinity
+  xpos 2929
+  ypos 464
+ }
+ Dot {
+  name Dot20
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2963
+  ypos 738
+ }
+set N475eba00 [stack 0]
+ Dot {
+  name Dot17
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2507
+  ypos 738
+ }
+set N475ebe00 [stack 0]
+ Dot {
+  name Dot21
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2305
+  ypos 738
+ }
+ Remove {
+  name Remove2
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 2271
+  ypos 800
+ }
+ Text {
+  message "inf values detected"
+  font "\[value parent.font]"
+  size {{"parent.autoFontSize == 0 ? parent.fontSize : Input.width / 50"}}
+  xjustify {{parent.xjustify}}
+  yjustify {{parent.yjustify+1}}
+  Transform 1
+  box {{"parent.autoMargin == 1 ? ((Input.width * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : parent.margin\n"} {"parent.autoMargin == 1 ? ((Input.height * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : parent.margin\n"} {"parent.autoMargin == 1 ? Input.width - ((Input.width * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : Input.width - (parent.margin)\n"} {"parent.autoMargin == 1 ? Input.height - ((Input.height * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : Input.height - (parent.margin)\n"}}
+  translate {0 {"parent.nanCheck && parent.infCheck  && parent.negCheck == 1 ? \nparent.yjustify == 0 ? - (size) : \nparent.yjustify == 1 ? 0 : \n(size) :  \n\nparent.nanCheck && parent.infCheck == 1 ?\nparent.yjustify == 0 ? - (size)   : \nparent.yjustify == 1 ? -((size) / 2) : \n0 : \n\nparent.infCheck && parent.negCheck == 1 ?\nparent.yjustify == 0 ? 0  : \nparent.yjustify == 1 ? ((size) / 2)  : \n(size)  : \n\nparent.infCheck == 1 ? 0  : 0\n\n\n"}}
+  color {1 1 1 1}
+  name Text2
+  label "\[basename \[value font]]"
+  xpos 2271
+  ypos 872
+ }
+ Dot {
+  name Dot606
+  xpos 2304
+  ypos 1208
+ }
+push $N475ebe00
+ ChannelMerge {
+  inputs 2
+  operation multiply
+  name ChannelMerge2
+  xpos 2473
+  ypos 1192
+ }
+ Premult {
+  name Premult39
+  xpos 2473
+  ypos 1286
+ }
+ FilterErode {
+  channels alpha
+  size {{"- (parent.autoBorder == 0 ? parent.border : (Input.width * 0.1) / 100)"}}
+  name FilterErode4
+  xpos 2473
+  ypos 1400
+ }
+ Remove {
+  name Remove5
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 2473
+  ypos 1520
+  disable {{parent.infCheck}}
+ }
+ Dot {
+  name Dot615
+  xpos 2507
+  ypos 2456
+ }
+push $N360e2600
+ Shuffle {
+  green black
+  blue black
+  alpha red
+  name Shuffle3
+  tile_color 0xff0000ff
+  label nan
+  xpos 3883
+  ypos 464
+ }
+ Dot {
+  name Dot41
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3917
+  ypos 738
+ }
+set N476b7e00 [stack 0]
+ Dot {
+  name Dot42
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3464
+  ypos 738
+ }
+set N476b8200 [stack 0]
+ Dot {
+  name Dot43
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3262
+  ypos 738
+ }
+ Remove {
+  name Remove10
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 3228
+  ypos 800
+ }
+ Text {
+  message "nan values detected"
+  Font 0
+  font "\[value parent.font]"
+  size {{"parent.autoFontSize == 0 ? parent.fontSize : Input.width / 50"}}
+  xjustify {{parent.xjustify}}
+  yjustify {{parent.yjustify+1}}
+  box {{"parent.autoMargin == 1 ? ((Input.width * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : parent.margin\n"} {"parent.autoMargin == 1 ? ((Input.height * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : parent.margin\n"} {"parent.autoMargin == 1 ? Input.width - ((Input.width * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : Input.width - (parent.margin)\n"} {"parent.autoMargin == 1 ? Input.height - ((Input.height * (parent.safeZone == 0 ? 11 :  6)) / 100 ) : Input.height - (parent.margin)\n"}}
+  translate {0 {"parent.nanCheck && parent.infCheck  && parent.negCheck == 1 ? \nparent.yjustify == 0 ? 0   : \nparent.yjustify == 1 ? (size) : \n(size * 2) : \n\nparent.nanCheck && parent.infCheck == 1 ?\nparent.yjustify == 0 ? 0   : \nparent.yjustify == 1 ? (size) / 2 : \n(parent.fontSize * 2) / 2 : \n\nparent.nanCheck && parent.negCheck == 1 ?\nparent.yjustify == 0 ? 0   : \nparent.yjustify == 1 ? (size) / 2 : \n(size * 2) / 2 : \n\nparent.nanCheck == 1 ? 0  : 0\n\n\n"}}
+  color {1 1 1 1}
+  name Text6
+  label "\[basename \[value font]]"
+  xpos 3228
+  ypos 896
+ }
+ Dot {
+  name Dot44
+  xpos 3262
+  ypos 1208
+ }
+push $N476b8200
+ ChannelMerge {
+  inputs 2
+  operation multiply
+  name ChannelMerge3
+  xpos 3430
+  ypos 1192
+ }
+ Premult {
+  name Premult1
+  xpos 3430
+  ypos 1286
+ }
+ FilterErode {
+  channels alpha
+  size {{"- (parent.autoBorder == 0 ? parent.border : (Input.width * 0.1) / 100)"}}
+  name FilterErode1
+  xpos 3430
+  ypos 1400
+ }
+ Remove {
+  name Remove6
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 3430
+  ypos 1520
+  disable {{parent.nanCheck}}
+ }
+ Merge2 {
+  inputs 2
+  mix {{parent.labelMix}}
+  name Merge4
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 3430
+  ypos 2446
+ }
+ Merge2 {
+  inputs 2
+  mix {{parent.labelMix}}
+  name Merge6
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 3430
+  ypos 2576
+ }
+ Dot {
+  name Dot12
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3464
+  ypos 2778
+ }
+push $N476cfa00
+ Dot {
+  name Dot48
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3702
+  ypos -510
+ }
+set N4770c800 [stack 0]
+ Dot {
+  name Dot33
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2745
+  ypos -510
+ }
+set N4770cc00 [stack 0]
+ Dot {
+  name Dot58
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1789
+  ypos -510
+ }
+ Shuffle {
+  red black
+  green black
+  alpha blue
+  name Shuffle6
+  tile_color 0xffff
+  label negative
+  xpos 1755
+  ypos 464
+ }
+ Dot {
+  name Dot6
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1789
+  ypos 848
+ }
+set N4770f800 [stack 0]
+ Dot {
+  name Dot7
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1899
+  ypos 848
+ }
+ Blur {
+  channels rgba
+  size {{parent.boostValue}}
+  name Blur3
+  label "size: \[value size]"
+  xpos 1865
+  ypos 896
+ }
+ Unpremult {
+  channels all
+  name Unpremult3
+  xpos 1865
+  ypos 934
+ }
+ Expression {
+  expr3 a==0?0:1
+  name Expression3
+  xpos 1865
+  ypos 974
+ }
+ Dot {
+  name Dot8
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1899
+  ypos 1040
+ }
+push $N4770f800
+ Switch {
+  inputs 2
+  which {{parent.boost}}
+  name Switch3
+  xpos 1755
+  ypos 1036
+ }
+ Dot {
+  name Dot59
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 1789
+  ypos 1208
+ }
+push $Nb8a6da00
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy5
+  xpos 1972
+  ypos 1198
+ }
+ Premult {
+  name Premult4
+  xpos 1972
+  ypos 1286
+ }
+ Remove {
+  name Remove4
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 1972
+  ypos 1520
+  disable {{parent.negCheck}}
+ }
+ Dot {
+  name Dot60
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2006
+  ypos 1938
+ }
+push $N4770cc00
+ Shuffle {
+  red black
+  blue black
+  alpha green
+  name Shuffle2
+  tile_color 0xff00ff
+  label infinity
+  xpos 2711
+  ypos 464
+ }
+ Dot {
+  name Dot2
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2745
+  ypos 848
+ }
+set N475b8800 [stack 0]
+ Dot {
+  name Dot4
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2855
+  ypos 848
+ }
+ Blur {
+  channels rgba
+  size {{parent.boostValue}}
+  name Blur1
+  label "size: \[value size]"
+  xpos 2821
+  ypos 896
+ }
+ Unpremult {
+  channels all
+  name Unpremult2
+  xpos 2821
+  ypos 934
+ }
+ Expression {
+  expr3 a==0?0:1
+  name Expression2
+  xpos 2821
+  ypos 972
+ }
+ Dot {
+  name Dot5
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2855
+  ypos 1024
+ }
+push $N475b8800
+ Switch {
+  inputs 2
+  which {{parent.boost}}
+  name Switch1
+  xpos 2711
+  ypos 1020
+ }
+ Dot {
+  name Dot31
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 2745
+  ypos 1208
+ }
+push $N475eba00
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy13
+  xpos 2929
+  ypos 1198
+ }
+ Premult {
+  name Premult40
+  xpos 2929
+  ypos 1286
+ }
+ Remove {
+  name Remove3
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 2929
+  ypos 1520
+  disable {{parent.infCheck}}
+ }
+ Merge2 {
+  inputs 2
+  operation max
+  name Merge7
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 2929
+  ypos 1928
+ }
+push $N4770c800
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha red
+  name Shuffle4
+  tile_color 0xff0000ff
+  label nan
+  xpos 3668
+  ypos 464
+ }
+ Dot {
+  name Dot3
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3702
+  ypos 848
+ }
+set Nb5850a00 [stack 0]
+ Dot {
+  name Dot10
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3812
+  ypos 848
+ }
+ Blur {
+  channels rgba
+  size {{parent.boostValue}}
+  name Blur2
+  label "size: \[value size]"
+  xpos 3778
+  ypos 896
+ }
+ Unpremult {
+  channels all
+  name Unpremult1
+  xpos 3778
+  ypos 934
+ }
+ Expression {
+  expr3 a==0?0:1
+  name Expression4
+  xpos 3778
+  ypos 972
+ }
+ Dot {
+  name Dot11
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3812
+  ypos 1024
+ }
+push $Nb5850a00
+ Switch {
+  inputs 2
+  which {{parent.boost}}
+  name Switch4
+  xpos 3668
+  ypos 1020
+ }
+ Dot {
+  name Dot47
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3702
+  ypos 1208
+ }
+push $N476b7e00
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy3
+  xpos 3883
+  ypos 1198
+ }
+ Premult {
+  name Premult5
+  xpos 3883
+  ypos 1286
+ }
+ Remove {
+  name Remove11
+  label "\[if \{ \[lsearch \"rgb rgba\"  \[value channels]] != -1 \} \{ return \"(\[value channels])\n\" \} else \{ return \"\"\}]\[if \{ \[value channels2] != \"none\"\} \{return \"(\[value channels2])\"\} else \{return \" \"\}]\[if \{ \[value channels3] != \"none\"\} \{return \"\n(\[value channels3])\"\} else \{return \" \"\}]\[if \{ \[value channels4] != \"none\"\} \{return \"\n(\[value channels4])\"\} else \{return \" \"\}]"
+  xpos 3883
+  ypos 1520
+  disable {{parent.nanCheck}}
+ }
+ Merge2 {
+  inputs 2
+  operation max
+  name Merge5
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 3883
+  ypos 1928
+ }
+ Merge2 {
+  inputs 2
+  name Merge1
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 3883
+  ypos 2768
+ }
+ Crop {
+  box {{"min(Input.bbox.x, 0)"} {"min(Input.bbox.y, y)"} {max(Input.bbox.r,width)} {max(Input.bbox.t,height)}}
+  intersect true
+  crop false
+  name crop1
+  xpos 3883
+  ypos 2870
+ }
+ Dot {
+  name Dot9
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 3917
+  ypos 3186
+ }
+push $N47735800
+ Dot {
+  name Dot30
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 5106
+  ypos -1686
+ }
+ AddChannels {
+  channels alpha
+  name AddChannels1
+  xpos 5072
+  ypos -1600
+ }
+ Dot {
+  name Dot37
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 5106
+  ypos -558
+ }
+push $N476cee00
+ Dot {
+  name Dot38
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4708
+  ypos -654
+ }
+set Nb5859000 [stack 0]
+ Dot {
+  name Dot39
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4818
+  ypos -654
+ }
+ Copy {
+  inputs 2
+  from0 rgba.alpha
+  to0 rgba.alpha
+  name Copy1
+  xpos 4784
+  ypos -568
+ }
+ Dot {
+  name Dot40
+  note_font_size 35
+  note_font_color 0xffffff
+  xpos 4818
+  ypos -462
+ }
+push $Nb5859000
+ Switch {
+  inputs 2
+  which {{"\[expr \{\[string match -nocase \"rgb\" \[value parent.channels]  ] ? \"1\" : \"0\" \}]"}}
+  name Switch8
+  xpos 4674
+  ypos -466
+ }
+ Merge2 {
+  inputs 2
+  name Merge3
+  label "mix: \[value mix] (\[value bbox])"
+  xpos 4674
+  ypos 3176
+ }
+ Output {
+  name Output
+  xpos 4674
+  ypos 3662
+ }
+ NoOp {
+  inputs 0
+  name Warning
+  knobChanged "grp = nuke.thisGroup()\ntk = nuke.thisKnob()\n\n\nif tk.name() == \"autoFontSize\":\n    grp.knob('fontSize').setEnabled(not grp.knob('fontSize'). enabled())\n\nif tk.name() == \"autoMargin\":\n    grp.knob('margin').setEnabled(not grp.knob('margin'). enabled())\n    grp.knob('safeZone').setEnabled(not grp.knob('safeZone'). enabled())\n    \nif tk.name() == \"autoBorder\":\n    grp.knob('border').setEnabled(not grp.knob('border'). enabled())"
+  label callback
+  xpos 4250
+  ypos -1960
+  addUserKnob {20 warning}
+  addUserKnob {6 autoMargin l "auto margin" +STARTLINE}
+  autoMargin true
+  addUserKnob {6 autoFontSize l "auto size" +STARTLINE}
+  autoFontSize true
+  addUserKnob {6 autoBorder l "auto border" +STARTLINE}
+  autoBorder true
+ }
+end_group

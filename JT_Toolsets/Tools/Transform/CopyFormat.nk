@@ -1,0 +1,60 @@
+Group {
+ inputs 2
+ name CopyFormat1
+ help "Copies the format information from A to B pipe by distorting the image."
+ tile_color 0xa57aaaff
+ selected true
+ addUserKnob {20 cropFormat l "Crop Format"}
+ addUserKnob {1 CLASSIFICATION +INVISIBLE}
+ CLASSIFICATION CopyFormat
+ addUserKnob {41 resize l "resize type" t "Choose which direction controls the scaling factor:\n- none don't change the pixels\n- width scale so it fills the output width\n- height scale so it fills the output height\n- fit smaller of width or height\n- fill larger of width or height\n- distort non-uniform scale to match both scale && height" T Reformat1.resize}
+ addUserKnob {41 center t "Translate the image to center it in the output. If off, it is translated so the lower-left corners are lined up." -STARTLINE T Reformat1.center}
+ addUserKnob {41 flip t "Upside -down (swap top and bottom)" -STARTLINE T Reformat1.flip}
+ addUserKnob {41 flop t "Mirror image (swap left and right)" -STARTLINE T Reformat1.flop}
+ addUserKnob {41 turn t "Rotate image 90 degrees" -STARTLINE T Reformat1.turn}
+ addUserKnob {6 copy_pixel_aspect l "copy pixel aspect" t "Copy pixel aspect ratio from A to B" -STARTLINE}
+ addUserKnob {41 filter t "<b>Impulse:</b> no filtering - each output pixel equals some input pixel\n<b>Cubic:</b> smooth interpolation between pixels\n<b>Keys:</b> cubic a=50, approximate sinc (*)\n<b>Simon:</b> cubic a=75, continuous 2nd derivative (*)\n<b>Riftman:</b> cubic a=1.0, lots of sharpening (*)\n<b>Mitchell</b>: mix sharpening and smoothing (*+)\n<b>Parzen</b>: approximating B-Spline (+)\n<b>Notch</b>:  hides moiré patterns (+)\n<b>Lanczos4</b>: good for scaling down (*)\n<b>Lanczos6</b>: good for scaling down with some sharpening (*)\n<b>sinc4</b>: good for scaling down with a lot of sharpening (*)\n(*) has negative lobes, can produce values that are outside the range of input pixels.\n(+) not interpolatory, changes pixels even when no movement\n" T Reformat1.filter}
+ addUserKnob {41 clamp t "Set negative intermediate and final results to zero. This will remove ringing around mattes when using a filter that has negative lobes." -STARTLINE T Reformat1.clamp}
+ addUserKnob {41 black_outside l "black outside" t "Pixels outside the input format is set to black." -STARTLINE T Reformat1.black_outside}
+ addUserKnob {41 pbb l "preserve bounding box" t "pbb\nNormally any pixels outside the output format are clipped off, as this matches what will be written to most image files. Turn this on to preserve them." -STARTLINE T Reformat1.pbb}
+ addUserKnob {20 info l Info}
+ addUserKnob {26 version l "" +STARTLINE T "<br><font size='5'>Copy Format</font><font color=#a57aaa> v1.0"}
+ addUserKnob {26 ""}
+ addUserKnob {26 bulletpoints l "" t "overview of the node" +STARTLINE T "<br><strong>•</br> \n<b>Copy Format</b> transfers the format <br>information from A to B input.\n<br></b><i>\n<br><strong>•</br> This is done by distorting the B image<br>into A format.\n</b></i>\n<br><br><b><a href=\"https://johntothvfx.com\" style=\"color:#a57aaa;\">John Toth <b>© 2024 <br>"}
+ addUserKnob {26 ""}
+ addUserKnob {22 demo l "<a href=\"https://johntothvfx.com\"><span style=\"color:#a57aaa\">Tool Demo" t "Launches the web page where it will have more documentation or a video about the node." +INVISIBLE T "nuke.message('coming soon')" +STARTLINE}
+ addUserKnob {22 log l "<a href=\"https://johntothvfx.com\"><span style=\"color:#a57aaa\">Version Log</a>\n" t "contains information about this node.\n\n- classification\n- context\n- date last modified\n- developer notes\n- version number\n- version log\n- year made" -STARTLINE T "\nname = nuke.thisNode()\['CLASSIFICATION'].getValue()\nversion_number = \"1.0.1\"\ncontext = \"Transform\"\n\n\ndate = \"20th January\"\nyear = \" 2024\"\n\ndeveloper = \"John Toth © 2024\"\nsite = \"<a href='https://johntothvfx.com'> <span style='color:#BBBBBB'>\"\n\n\n\nlog = \"\"\"\n<br></i><b> v 1.0 </b><i>\n- copies the format information from A to B pipe by distorting the image.\n\"\"\"\n\n\n\nthankyou = \"\"\"\n\n\"\"\"\n\n\n\"\"\"Do not touch section below\"\"\"\nheader = \"Version Log:\"\nDLM = \"<b>Date Last Modified: </b>\" + date + year\n\nSPACE = \" \"\nENTER = \"<br><br>\"\nUPPER = \"<b>\"\nLOWER = \"</b>\"\n\n\n\nnuke.message(UPPER + header + ENTER + \"Name: \" + LOWER + name + \"<br>\" + UPPER + \"Version Number: \" + LOWER + version_number + \"<br>\" + UPPER + \"Context: \" + LOWER + context + ENTER + DLM + log + \"</i>\" + \"<br>\" + UPPER + site + developer + \"</a>\") \n\n\n"}
+}
+ Input {
+  inputs 0
+  name B
+  label "\[value number]"
+  xpos -55
+  ypos 80
+ }
+ Reformat {
+  type "to box"
+  box_width {{A.format.width}}
+  box_height {{A.format.height}}
+  box_fixed true
+  box_pixel_aspect {{"copy_pixel_aspect == 0 ? pixel_aspect : A.pixel_aspect"}}
+  resize distort
+  name Reformat1
+  label "\[expr \{\[numvalue type] ? \"(\[value filter])\" : \"(\[lindex \[split \[value format] \" \"] end]\n(\[value filter])\" \}]"
+  xpos -55
+  ypos 176
+ }
+ Output {
+  name Output1
+  xpos -55
+  ypos 278
+ }
+ Input {
+  inputs 0
+  name A
+  label "\[value number]"
+  xpos 104
+  ypos 80
+  number 1
+ }
+end_group
