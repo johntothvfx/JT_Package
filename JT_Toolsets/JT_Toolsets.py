@@ -1,14 +1,19 @@
 """==========================================================================
 
+JT TOOLSETS - NUKE COMPOSITING TOOLKIT
 
 DEVELOPER: John Toth
 https://www.linkedin.com/in/johntothvfx/
 contact: Johntothvfx@gmail.com
 Site: johntothvfx.com
 IMDb: www.imdb.com/name/nm7230091/
+
+Copyright (c) 2021-2025 John Toth. MIT License.
+
 =========================================================================="""
 
-VERSION = 'v2.0.9'
+
+VERSION = 'v2.1.0'
 UPDATE = 'Last Updated: 25th May, 2025'
 
 
@@ -24,6 +29,7 @@ import sys
 import os
 import time
 import datetime
+
 
 
 current_date = datetime.datetime.now().date()
@@ -58,20 +64,25 @@ def addmenuItem(MenuItem, menu_text, function_to_execute=None, icon=None, tag=No
 #filter_classics.addCommand("Directional Blur", "nuke.createNode(\"DirectionalBlur.nk\")", icon="DirectionalBlur.png", tag=2, tagTarget=3)
 
 
+
 ###########################################################################
 """========================================================================
 DISABLING GROUP VIEWS
 ========================================================================"""
 ###########################################################################
+'''
+- disabling group views for nuke.createNode and nuke.nodePaste to set disable_group_view = 1 in Nuke 16+
+- disabling for this node only
+'''
 
-# disabling group views for nuke.createNode and nuke.nodePaste to set disable_group_view = 1 in Nuke 16+
+def _set_disable_group_view(node):
+    if node.Class() == "Group":
+        knob = node.knob("disable_group_view")
+        if knob:
+            knob.setValue(1)
+
+# Then apply the patching only for Nuke 16+
 if nuke.NUKE_VERSION_MAJOR >= 16:
-    def _set_disable_group_view(node):
-        if node.Class() == "Group":
-            knob = node.knob("disable_group_view")
-            if knob:
-                knob.setValue(1)
-
     _original_createNode = nuke.createNode
     def createNode_patched(*args, **kwargs):
         node = _original_createNode(*args, **kwargs)
@@ -79,16 +90,54 @@ if nuke.NUKE_VERSION_MAJOR >= 16:
         return node
     nuke.createNode = createNode_patched
 
-    _original_nodePaste = nuke.nodePaste
-    def nodePaste_patched(*args, **kwargs):
-        before_nodes = set(nuke.allNodes())
-        result = _original_nodePaste(*args, **kwargs)
-        after_nodes = set(nuke.allNodes())
-        new_nodes = after_nodes - before_nodes
-        for node in new_nodes:
-            _set_disable_group_view(node)
-        return result
-    nuke.nodePaste = nodePaste_patched
+
+
+###########################################################################
+"""========================================================================
+NODEPASTE WRAPPER
+========================================================================"""
+###########################################################################
+'''
+- Done to make sure this works on all os on nodePaste operation
+- This allows us to add onCreate functions to work as intented on execution timing
+'''
+
+# Cache the currentPath check since it's used frequently
+CURRENT_PATH_NORMALIZED = currentPath.replace("\\", "/")
+
+def nodePaste_wrapper(*path_parts):
+    """Cross-platform wrapper for nuke.nodePaste()"""
+    full_path = os.path.join(*path_parts)
+    
+    # Add error handling
+    if not os.path.isfile(full_path):
+        nuke.message(f"File not found:\n{full_path}")
+        return
+    
+    try:
+        if nuke.NUKE_VERSION_MAJOR >= 16:
+            nodes_before = set(nuke.allNodes())
+            nuke.nodePaste(full_path)
+            nodes_after = set(nuke.allNodes())
+            new_nodes = nodes_after - nodes_before
+            for node in new_nodes:
+                if CURRENT_PATH_NORMALIZED in full_path.replace("\\", "/"):
+                    _set_disable_group_view(node)
+        else:
+            nuke.nodePaste(full_path)
+    except Exception as e:
+        nuke.message(f"Error loading tool:\n{str(e)}")
+
+def create_nodepaste_command(*path_parts):
+    """Create command string for menu items"""
+    quoted_parts = ['currentPath'] + [f'"{part}"' for part in path_parts]
+    return f'nodePaste_wrapper({", ".join(quoted_parts)})'
+
+# Make globally accessible (AFTER functions are defined)
+import __main__
+__main__.nodePaste_wrapper = nodePaste_wrapper
+__main__.currentPath = currentPath
+__main__._set_disable_group_view = _set_disable_group_view
 
 
 
@@ -202,20 +251,6 @@ def plugin_update():
 
 ###########################################################################
 """========================================================================
-PYTHON SCRIPTS
-========================================================================"""
-###########################################################################
-
-import axis_to_tracker
-import keyframe_animator
-import marker_and_connect_manager
-import set_label
-
-
-
-
-###########################################################################
-"""========================================================================
 SETTING HOLIDAY ICONS ON DATE/TIME
 ========================================================================"""
 ###########################################################################
@@ -230,6 +265,18 @@ elif current_date.month == 12 and 1 <= current_date.day <= 25:
 else:
     icon = "JT_Orange.png"
 
+
+
+###########################################################################
+"""========================================================================
+PYTHON SCRIPTS
+========================================================================"""
+###########################################################################
+
+import axis_to_tracker
+import keyframe_animator
+import marker_and_connect_manager
+import set_label
 
 
 
@@ -283,6 +330,7 @@ sub_menu = menu.addMenu("AOV", icon="AOV.png")
 
 sub_menu.addCommand("AOV Grade", "nuke.createNode(\"AOVGrade.nk\")", icon="AOVGrade.png")
 
+
 sub_menu.addSeparator()
 
 sub_menu.addCommand("AOV Noise", "nuke.createNode(\"AOVNoise.nk\")", icon="AOVNoise.png")
@@ -308,7 +356,7 @@ sub_menu.addCommand("Depth to Position", "nuke.createNode(\"DepthToPosition.nk\"
 
 sub_menu.addSeparator()
 
-#sub_menu.addCommand("Normals Convert", "nuke.createNode(\"NormalsConvert.nk\")", icon="Shader.png")
+sub_menu.addCommand("Normals Convert", "nuke.createNode(\"NormalsConvert.nk\")", icon="Shader.png")
 sub_menu.addCommand("Normals Relight", "nuke.createNode(\"NormalsRelight.nk\")", icon="NormalsRelight.png")
 sub_menu.addCommand("Normals To UV", "nuke.createNode(\"NormalsToUV.nk\")", icon="NormalsToUV.png")
 
@@ -332,7 +380,7 @@ shufflepresets = sub_menu.addMenu("Shuffle Presets", icon="Shuffle.png")
 addmenuItem(shufflepresets, "Shuffle - Alpha", "nuke.createNode('Shuffle - Alpha (classic).nk')", icon="ShuffleAlpha.png", tag=2)
 addmenuItem(shufflepresets, "Shuffle - Black", "nuke.createNode('Shuffle - Black (classic).nk')", icon="ShuffleBlack.png", tag=2)
 addmenuItem(shufflepresets, "Shuffle - Depth", "nuke.createNode('Shuffle - Depth (classic).nk')", icon="ShuffleDepth.png", tag=2)
-addmenuItem(shufflepresets, "Shuffle - RGB", 'nuke.nodePaste("{}/Tools/Channel/Shuffles/Shuffle - RGB (classic).nk")'.format(currentPath), icon="Shuffle.png", tag=2)
+addmenuItem(shufflepresets, "Shuffle - RGB", create_nodepaste_command("Tools", "Channel", "Shuffles", "Shuffle - RGB (classic).nk"), icon="Shuffle.png", tag=2)
 addmenuItem(shufflepresets, "Shuffle - White", "nuke.createNode('Shuffle - White (classic).nk')", icon="ShuffleWhite.png", tag=2)
 
 shufflepresets.addSeparator()
@@ -424,6 +472,7 @@ sub_menu.addCommand("Atmos Magic", "nuke.createNode(\"AtmosMagic.nk\")", icon="A
 sub_menu.addCommand("Light Wrap", "nuke.createNode(\"LightWrap.nk\")", icon="LightWrap.png")
 sub_menu.addCommand("Spherical Noise", "nuke.createNode(\"SphericalNoise.nk\")", icon="SphericalNoise.png")
 sub_menu.addCommand("Stripes", "nuke.createNode(\"Stripes.nk\")", icon="Stripes.png")
+sub_menu.addCommand("Ripple", create_nodepaste_command("Tools", "Draw", "Ripple.nk"), icon="Ripple.png")
 sub_menu.addCommand("Rainbow", "nuke.createNode(\"Rainbow.nk\")", icon="Rainbow.png")
 sub_menu.addCommand("Text Overlay", "nuke.createNode(\"TextOverlay.nk\")", icon="TextOverlay.png")
 sub_menu.addCommand("UV map", "nuke.createNode(\"UVmap.nk\")", icon="UV.png")
@@ -437,25 +486,24 @@ sub_menu = menu.addMenu("Filter", icon="Filter.png")
 
 
 filter_classics = addmenuItem(sub_menu, "classics", is_menu=True, icon="Classic.png", tag=2)
-addmenuItem(filter_classics, "Directional Blur", "nuke.createNode('DirectionalBlur.nk')", icon="DirectionalBlur.png", tag=2)
-addmenuItem(filter_classics, "Radial Blur", f'nuke.nodePaste("{currentPath}/Tools/Filter/Classic/RadialBlur.nk")', icon="RadialBlur.png", tag=2)
-addmenuItem(filter_classics, "Zoom Blur", f'nuke.nodePaste("{currentPath}/Tools/Filter/Classic/ZoomBlur.nk")', icon="ZoomBlur.png", tag=2)
-
+addmenuItem(filter_classics, "Directional Blur", create_nodepaste_command("Tools", "Filter", "Classic", "DirectionalBlur.nk"), icon="DirectionalBlur.png", tag=2)
+addmenuItem(filter_classics, "Radial Blur", create_nodepaste_command("Tools", "Filter", "Classic", "RadialBlur.nk"), icon="RadialBlur.png", tag=2)
+addmenuItem(filter_classics, "Zoom Blur", create_nodepaste_command("Tools", "Filter", "Classic", "ZoomBlur.nk"), icon="ZoomBlur.png", tag=2)
 
 sub_menu.addSeparator()
 
 sub_menu.addCommand("ColorDilate", "nuke.createNode(\"ColorDilate.nk\")", icon="ColorDilate.png")
 sub_menu.addCommand("Diffuser", "nuke.createNode(\"Diffuser.nk\")", icon="Diffuser.png")
-sub_menu.addCommand("Distant Edge", "nuke.createNode(\"DistantEdge.nk\")", icon="DistantEdge.png")
+sub_menu.addCommand("Distant Edge", "nuke.createNode(\"Distant Edge.nk\")", icon="DistantEdge.png")
 sub_menu.addCommand("Erode (Sub Pixel)", "nuke.createNode(\"SubErode.nk\")", icon="SubErode.png")
 sub_menu.addCommand("Exponential Glow", "nuke.createNode(\"ExponentialGlow.nk\")", icon="ExponentialGlow.png")
-sub_menu.addCommand("Flexi Blur", "nuke.createNode(\"FlexiBlur.nk\")", icon="FlexiBlur.png")
-sub_menu.addCommand("Fractal Blur", 'nuke.nodePaste("{}/Tools/Filter/FractalBlur.nk")'.format(currentPath), icon="FractalBlur.png")
+sub_menu.addCommand("Flexi Blur", create_nodepaste_command("Tools", "Filter", "FlexiBlur.nk"), icon="FlexiBlur.png")
+sub_menu.addCommand("Fractal Blur", create_nodepaste_command("Tools", "Filter", "FractalBlur.nk"), icon="FractalBlur.png")
 sub_menu.addCommand("IBlur", "nuke.createNode(\"IBlur.nk\")", icon="IBlur.png")
 sub_menu.addCommand("IErode", "nuke.createNode(\"IErode.nk\")", icon="IErode.png")
-sub_menu.addCommand("Multi Blur", 'nuke.nodePaste("{}/Tools/Filter/MultiBlur.nk")'.format(currentPath), icon="MultiBlur.png")
+sub_menu.addCommand("Multi Blur", create_nodepaste_command("Tools", "Filter", "MultiBlur.nk"), icon="MultiBlur.png")
 sub_menu.addCommand("Pixelate", "nuke.createNode(\"Pixelate.nk\")", icon="Pixelate.png")
-sub_menu.addCommand("Vector Denoise", "nuke.createNode(\"VectorDenoise.nk\")", icon="VectorDenoise.png")
+sub_menu.addCommand("Vector Denoise", "nuke.createNode(\"Vector Denoise.nk\")", icon="VectorDenoise.png")
 
 
 # ------------------------------------------------------------------------
@@ -508,6 +556,16 @@ addmenuItem(flare_subMnu, "Lens Flare Sun", "nuke.createNode('LensFlareSun.nk')"
 addmenuItem(flare_subMnu, "Lens Flare From Image", "nuke.createNode('LensFlareFromImage.nk')", icon="LensFlareSun.png", tag=1)
 
 
+sub_menu.addSeparator()
+
+menu_LTP = sub_menu.addMenu("LTP", icon="LTP.png")
+menu_LTP.addCommand("LTP Diffuser", "nuke.createNode(\"LTP Diffuser.nk\")", icon="LTP.png")
+menu_LTP.addCommand("LTP Highlight_Boost", "nuke.createNode(\"LTP Highlight Boost.nk\")", icon="LTP.png")
+menu_LTP.addCommand("LTP Lens Smudge", "nuke.createNode(\"LTP Lens Smudge.nk\")", icon="LTP.png")
+menu_LTP.addCommand("LTP Hot Point", "nuke.createNode(\"LTP Hot Point.nk\")", icon="LTP.png")
+menu_LTP.addCommand("LTP Sharpen", "nuke.createNode(\"LTP Sharpen.nk\")", icon="LTP.png")
+menu_LTP.addCommand("LTP Vignette", "nuke.createNode(\"LTP Vignette.nk\")", icon="LTP.png")
+
 
 sub_menu.addCommand("Depth of Field", "nuke.createNode(\"DepthofField.nk\")", icon="DepthofField.png")
 sub_menu.addCommand("Depth Visualizer", "nuke.createNode(\"DepthVisualizer.nk\")", icon="DepthVisualizer.png")
@@ -523,18 +581,19 @@ sub_menu = menu.addMenu("Other", icon="Other.png")
 
 
 
-#breakdown_subMenu = sub_menu.addMenu("Breakdowns", icon="ToolbarToolsets.png")
-#breakdown_2D = breakdown_subMenu.addMenu("2D", icon="2D.png")
-#breakdown_2D.addCommand("Jt Breakdown Grid", "nuke.createNode(\"Jt Breakdown Grid.nk\")", icon="Breakdown Grid.png")
+breakdown_subMenu = sub_menu.addMenu("Breakdowns", icon="ToolbarToolsets.png")
+breakdown_2D = breakdown_subMenu.addMenu("2D", icon="2D.png")
+breakdown_2D.addCommand("Jt Breakdown Grid", "nuke.createNode(\"Jt Breakdown Grid.nk\")", icon="Breakdown Grid.png")
 
-#breakdown_3D = breakdown_subMenu.addMenu("3D", icon="3D.png")
-#breakdown_3D.addCommand("test", "nuke.createNode(\"Jt Breakdown Grid.nk\")", icon="Breakdown Grid.png")
+breakdown_3D = breakdown_subMenu.addMenu("3D", icon="3D.png")
+breakdown_3D.addCommand("test", "nuke.createNode(\"Jt Breakdown Grid.nk\")", icon="Breakdown Grid.png")
 
 sub_menu.addSeparator()
 
 input_process = sub_menu.addMenu("Connect", icon="Connect.png")
-input_process.addCommand("Connect", "nuke.createNode(\"Connect.nk\")", icon="Connect.png")
 input_process.addCommand("Marker", "nuke.createNode(\"Marker.nk\")", icon="Marker.png")
+input_process.addCommand("Connect", "nuke.createNode(\"Connect.nk\")", icon="Connect.png")
+
 
 
 #BackdropPreset
@@ -542,12 +601,11 @@ sub_menu.addSeparator()
 #sub_menu.addCommand("Backdrop Presets", "nuke.createNode(\"BackdropPresets.nk\")", icon="BackdropPresets.png", tag=1, tagTarget=3)
 
 # Define the file path
-preset_path = os.path.expanduser('~/.nuke/JT_Toolsets/Tools/Other/BackdropPresets/BackdropPresetsTemp.nk')
-
-# Function to create Backdrop Preset node
 def create_backdrop_preset_node():
+    preset_path = os.path.expanduser('~/.nuke/JT_Toolsets/Tools/Other/BackdropPresets/BackdropPresetsTemp.nk')
     if os.path.isfile(preset_path):
-        nuke.nodePaste(preset_path)
+        # Use your wrapper for consistency
+        nodePaste_wrapper('Tools', 'Other', 'BackdropPresets', 'BackdropPresetsTemp.nk')
     else:
         nuke.createNode("BackdropPresets.nk")
 
@@ -586,10 +644,10 @@ input_process.addCommand("Set Input Process Group (VIEWER INPUT)", "nuke.createN
 
 sub_menu.addSeparator()
 
-#python_subMenu = sub_menu.addMenu("Python", icon="Python.png")
-#python_examples = python_subMenu.addMenu("Examples", icon="Python.png")
-#python_examples.addCommand("Python (Callback) Example - Disable Knob", "nuke.createNode(\"Python (Callback)  Example - Disable Knob.nk\")", icon="Python.png")
-#python_examples.addCommand("Python Example - lock and unlock toggle", "nuke.createNode(\"Python Example - lock and unlock toggle.nk\")", icon="Python.png")
+python_subMenu = sub_menu.addMenu("Python", icon="Python.png")
+python_examples = python_subMenu.addMenu("Examples", icon="Python.png")
+python_examples.addCommand("Python (Callback) Example - Disable Knob", "nuke.createNode(\"Python (Callback)  Example - Disable Knob.nk\")", icon="Python.png")
+python_examples.addCommand("Python Example - lock and unlock toggle", "nuke.createNode(\"Python Example - lock and unlock toggle.nk\")", icon="Python.png")
 
 sub_menu.addSeparator()
 
@@ -597,10 +655,10 @@ sub_menu.addCommand("Configure Knobs", "nuke.createNode(\"ConfigureKnobs.nk\")",
 sub_menu.addCommand("Disable Write Nodes", "nuke.createNode(\"DisableWriteNodes.nk\")", icon="DisableWriteNodes.png")
 sub_menu.addCommand("Get Render", "nuke.createNode(\"GetRender.nk\")", icon="GetRender.png")
 sub_menu.addCommand("Kill All Viewers", "nuke.createNode(\"KillAllViewers.nk\")", icon="KillAllViewers.png")
-sub_menu.addCommand("Plot Scanline", "nuke.createNode(\"PlotScanline.nk\")", icon="miscellaneous.png")
+sub_menu.addCommand("Plot Scanline", "nuke.createNode(\"Plot Scanline.nk\")", icon="miscellaneous.png")
 sub_menu.addCommand("Save Node Selection", "nuke.createNode(\"SaveNodeSelection.nk\")", icon="SaveNodeSelection.png")
 sub_menu.addCommand("Script Manager", "nuke.createNode(\"ScriptManager.nk\")", icon="ScriptManager.png")
-#sub_menu.addCommand("Script Runner", "nuke.createNode(\"ScriptRunner.nk\")", icon="miscellaneous.png")
+sub_menu.addCommand("Script Runner", "nuke.createNode(\"ScriptRunner.nk\")", icon="miscellaneous.png")
 
 
 # ------------------------------------------------------------------------
@@ -609,60 +667,51 @@ sub_menu.addCommand("Script Manager", "nuke.createNode(\"ScriptManager.nk\")", i
 
 sub_menu = menu.addMenu("Template", icon="Templates.png")
 
-
-
 template_3D_subMenu = sub_menu.addMenu("3D Templates", icon="Template3D.png")
-addmenuItem(template_3D_subMenu, "Template - Projection 3D", lambda: nuke.nodePaste("{}/Tools/Template/3D/Template - Project3D (classic).nk".format(currentPath)), icon="Template3D.png", tag=2)
+addmenuItem(template_3D_subMenu, "Template - Projection 3D", create_nodepaste_command("Tools", "Template", "3D", "Template - Project3D (classic).nk"), icon="Template3D.png", tag=2)
 
 
-#template_CG_subMenu = sub_menu.addMenu("CG Templates", icon="TemplateAOV.png")
-#template_CG_subMenu.addCommand("Template - CG Template", 'nuke.nodePaste("{}/Tools/Template/Template - CG Template.nk")'.format(currentPath), icon="TemplateAOV.png")
-
+template_CG_subMenu = sub_menu.addMenu("CG Templates", icon="TemplateAOV.png")
+template_CG_subMenu.addCommand("Template - CG Template", create_nodepaste_command("Tools", "Template", "Template - CG Template.nk"), icon="TemplateAOV.png")
 
 
 template_channel_subMenu = sub_menu.addMenu("Channel Template", icon="TemplateChannel.png")
-template_channel_subMenu.addCommand("Template - Restore Plate.nk", 'nuke.nodePaste("{}/Tools/Template/Channel/Template - Restore Plate.nk")'.format(currentPath), icon="TemplateChannel.png")
-
+template_channel_subMenu.addCommand("Template - Restore Plate.nk", create_nodepaste_command("Tools", "Template", "Channel", "Template - Restore Plate.nk"), icon="TemplateChannel.png")
 
 
 template_draw_subMenu = sub_menu.addMenu("Draw Template", icon="TemplateDraw.png")
-template_draw_subMenu.addCommand("Template - UV map", 'nuke.nodePaste("{}/Tools/Template/Draw/Template - UV map.nk")'.format(currentPath), icon="TemplateTransform.png")
-template_draw_subMenu.addCommand("Template - Rainbow Ramp", 'nuke.nodePaste("{}/Tools/Template/Draw/Template - Rainbow Ramp.nk")'.format(currentPath), icon="TemplateTransform.png")
-
+template_draw_subMenu.addCommand("Template - UV map", create_nodepaste_command("Tools", "Template", "Draw", "Template - UV map.nk"), icon="TemplateTransform.png")
+template_draw_subMenu.addCommand("Template - Rainbow Ramp", create_nodepaste_command("Tools", "Template", "Draw", "Template - Rainbow Ramp.nk"), icon="TemplateTransform.png")
 
 
 template_image_subMenu = sub_menu.addMenu("Image Template", icon="TemplateImage.png")
-template_image_subMenu.addCommand("Template - Precomp", 'nuke.nodePaste("{}/Tools/Template/Image/Template - Precomp.nk")'.format(currentPath), icon="TemplateImage.png")
-
+template_image_subMenu.addCommand("Template - Precomp", create_nodepaste_command("Tools", "Template", "Image", "Template - Precomp.nk"), icon="TemplateImage.png")
 
 
 template_keyer_subMenu = sub_menu.addMenu("Keying Template", icon="TemplateKeyer.png")
-#template_keyer_subMenu.addCommand("Template - AdditiveKeyer", 'nuke.nodePaste("{}/Tools/Template/Keyer/Template - AdditiveKeyer.nk")'.format(currentPath), icon="TemplateKeyer.png")
-template_keyer_subMenu.addCommand("Template - Log Keyer", 'nuke.nodePaste("{}/Tools/Template/Keyer/Template - Log Keyer.nk")'.format(currentPath), icon="TemplateKeyer.png")
-
+template_keyer_subMenu.addCommand("Template - AdditiveKeyer", create_nodepaste_command("Tools", "Template", "Keyer", "Template - AdditiveKeyer.nk"), icon="TemplateKeyer.png")
+template_keyer_subMenu.addCommand("Template - Log Keyer", create_nodepaste_command("Tools", "Template", "Keyer", "Template - Log Keyer.nk"), icon="TemplateKeyer.png")
 
 
 template_merge_subMenu = sub_menu.addMenu("Merge Template", icon="TemplateMerge.png")
-template_merge_subMenu.addCommand("Template - OCIO Log Merge", 'nuke.nodePaste("{}/Tools/Template/Merge/Template - OCIO Log Merge.nk")'.format(currentPath), icon="TemplateMerge.png")
-
+template_merge_subMenu.addCommand("Template - OCIO Log Merge", create_nodepaste_command("Tools", "Template", "Merge", "Template - OCIO Log Merge.nk"), icon="TemplateMerge.png")
 
 
 template_optical_subMenu = sub_menu.addMenu("Optical Template", icon="TemplateOptical.png")
-template_optical_subMenu.addCommand("Template - Chromatic Aberration", 'nuke.nodePaste("{}/Tools/Template/Optical/Template - Chromatic Aberration (Godrays).nk")'.format(currentPath), icon="TemplateOptical.png")
-template_optical_subMenu.addCommand("Template - Chromatic Aberration Merge", 'nuke.nodePaste("{}/Tools/Template/Optical/Template - Chromatic Aberration Merge.nk")'.format(currentPath), icon="TemplateOptical.png")
-template_optical_subMenu.addCommand("Template - Fringing", 'nuke.nodePaste("{}/Tools/Template/Optical/Template - Fringing.nk")'.format(currentPath), icon="TemplateOptical.png")
-template_optical_subMenu.addCommand("Template - Grain", 'nuke.nodePaste("{}/Tools/Template/Optical/Template - Grain.nk")'.format(currentPath), icon="TemplateOptical.png")
+template_optical_subMenu.addCommand("Template - Chromatic Aberration", create_nodepaste_command("Tools", "Template", "Optical", "Template - Chromatic Aberration (Godrays).nk"), icon="TemplateOptical.png")
+template_optical_subMenu.addCommand("Template - Chromatic Aberration Merge", create_nodepaste_command("Tools", "Template", "Optical", "Template - Chromatic Aberration Merge.nk"), icon="TemplateOptical.png")
+template_optical_subMenu.addCommand("Template - Fringing", create_nodepaste_command("Tools", "Template", "Optical", "Template - Fringing.nk"), icon="TemplateOptical.png")
+template_optical_subMenu.addCommand("Template - Grain", create_nodepaste_command("Tools", "Template", "Optical", "Template - Grain.nk"), icon="TemplateOptical.png")
+
 
 
 
 template_other_subMenu = sub_menu.addMenu("Other Template", icon="TemplateOther.png")
-template_other_subMenu.addCommand("Template - Shot Reference backdrops", 'nuke.nodePaste("{}/Tools/Template/Other/Template - Shot Reference backdrops.nk")'.format(currentPath), icon="TemplateOther.png")
-
+template_other_subMenu.addCommand("Template - Shot Reference backdrops", create_nodepaste_command("Tools", "Template", "Other", "Template - Shot Reference backdrops.nk"), icon="TemplateOther.png")
 
 
 template_particle_subMenu = sub_menu.addMenu("Particle Template", icon="TemplateParticles.png")
-template_particle_subMenu.addCommand("Template - Particle Atmospherics at Camera", 'nuke.nodePaste("{}/Tools/Template/Particles/Template - Particle Atmospherics at Camera.nk")'.format(currentPath), icon="TemplateParticles.png")
-
+template_particle_subMenu.addCommand("Template - Particle Atmospherics at Camera", create_nodepaste_command("Tools", "Template", "Particles", "Template - Particle Atmospherics at Camera.nk"), icon="TemplateParticles.png")
 
 
 template_transform_subMenu = sub_menu.addMenu("Transform Template", icon="TemplateTransform.png")
@@ -670,13 +719,13 @@ template_transform_subMenu = sub_menu.addMenu("Transform Template", icon="Templa
 
 
 
-#template_utility_subMenu = sub_menu.addMenu("Utility Template", icon="ToolbarToolsets.png")
-#template_utility_subMenu.addCommand("Template - Compositing Startup", 'nuke.nodePaste("{}/Tools/Template/Template - Compositing Startup.nk")'.format(currentPath), icon="Backdrop.png")
+template_utility_subMenu = sub_menu.addMenu("Utility Template", icon="ToolbarToolsets.png")
+template_utility_subMenu.addCommand("Template - Compositing Startup", create_nodepaste_command("Tools", "Template", "Template - Compositing Startup.nk"), icon="Backdrop.png")
 
 
 
-##template_QC_subMenu = sub_menu.addMenu("QC Template", icon="QualityCheck.png")
-#template_QC_subMenu.addCommand("Template - Compositing QC", 'nuke.nodePaste("{}/Tools/Template/Template - Compositing QC.nk")'.format(currentPath), icon="Backdrop.png")
+template_QC_subMenu = sub_menu.addMenu("QC Template", icon="QualityCheck.png")
+template_QC_subMenu.addCommand("Template - Compositing QC", create_nodepaste_command("Tools", "Template", "Template - Compositing QC.nk"), icon="Backdrop.png")
 
 
 
@@ -711,18 +760,17 @@ sub_menu.addSeparator()
 
 distortion_subMenu = sub_menu.addMenu("Distortion", icon="STMap.png")
 distortion_subMenu.addCommand( 'Distorter', "nuke.createNode(\"Distorter.nk\")", icon="Distorter.png")
-#distortion_subMenu.addCommand( 'Ripple', lambda: nuke.message('Coming Soon'), icon='Liquid.png')
-#distortion_subMenu.addCommand( 'Heat Distortion', lambda: nuke.message('Coming Soon'), icon='Heat.png')
+distortion_subMenu.addCommand( 'Ripple', lambda: nuke.message('Coming Soon'), icon='Liquid.png')
+distortion_subMenu.addCommand( 'Heat Distortion', lambda: nuke.message('Coming Soon'), icon='Heat.png')
 
 sub_menu.addSeparator()
 
-sub_menu = menu.addMenu("Transform", icon="Transform.png")
 sub_menu.addCommand("AdjBBox Extra", "nuke.createNode(\"AdjBBoxExtra.nk\")", icon="AdjBBoxExtra.png")
 sub_menu.addCommand("AutoCrop", "nuke.createNode(\"AutoCrop.nk\")", icon="AutoCrop.png")
 sub_menu.addCommand("Crop Box", "nuke.createNode(\"CropBox.nk\")", icon="CropBox.png")
 sub_menu.addCommand("Copy Format", "nuke.createNode(\"CopyFormat.nk\")", icon="CopyFormat.png")
 
-sub_menu.addCommand("ITransform", 'nuke.nodePaste("{}/Tools/Transform/ITransform.nk")'.format(currentPath), icon="ITransform.png")
+sub_menu.addCommand("ITransform", create_nodepaste_command("Tools", "Transform", "ITransform.nk"), icon="ITransform.png")
 sub_menu.addCommand("Pixel Offset", "nuke.createNode(\"Pixel Offset.nk\")", icon="PixelOffset.png")
 sub_menu.addCommand("Tile Extra", "nuke.createNode(\"Tile.nk\")", icon="TileExtra.png")
 sub_menu.addCommand("Tile Image", "nuke.createNode(\"TileImage.nk\")", icon="TileImage.png")
@@ -736,7 +784,7 @@ sub_menu = menu.addMenu("Quality Check", icon="QualityCheck.png")
 
 
 sub_menu.addCommand("Pixel Police", "nuke.createNode(\"PixelPolice.nk\")", icon="PixelPoliceColour.png")
-sub_menu.addCommand("Pixel Repair", "nuke.createNode(\"PixelRepair.nk\")", icon="PixelRepair.png")
+sub_menu.addCommand("Pixel Repair", "nuke.createNode(\"Pixel Repair.nk\")", icon="PixelRepair.png")
 sub_menu.addCommand("PixelQC", "nuke.createNode(\"PixelQC.nk\")", icon="PixelQC.png")
 sub_menu.addCommand("RotoCheck", "nuke.createNode(\"RotoCheck.nk\")", icon="RotoCheck.png")
 
@@ -804,7 +852,7 @@ sub_menu.addCommand(f'About Package {VERSION}', show_about_message, icon='Inform
 
 # All Plugins menu
 all_plugins_menu = sub_menu.addMenu("All Plugins", icon="Plug.png")
-all_plugins_menu.addCommand("Update", plugin_update)
+all_plugins_menu.addCommand("Update", plugin_update, icon="Reload.png")
 
 
 
@@ -857,6 +905,16 @@ def show_license_info():
 sub_menu.addCommand("License", show_license_info, icon="License.png")
 
 
+###########################################################################
+"""========================================================================
+PRINTS
+========================================================================"""
+###########################################################################
 
+'''Terminal prints'''
 
-
+print("="*50)
+print("JT Package {}".format(VERSION))
+print("Built: {}".format(UPDATE.replace('Last Updated: ', '')))
+print("Copyright (c) 2021-2025 John Toth - MIT License")
+print("="*50)
