@@ -7,3 +7,4 @@ JT_Toolsets is suite of artist-focused tools, gizmos, and automation scripts dev
 VERSION 2.1.0 Release notes:
 - menu code now prints in terminal for loading package
 - axis to tracker panel has been added
+- Shuffle Toggle manager has been added
