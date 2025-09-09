@@ -495,7 +495,7 @@ sub_menu.addSeparator()
 
 sub_menu.addCommand("ColorDilate", "nuke.createNode(\"ColorDilate.nk\")", icon="ColorDilate.png")
 sub_menu.addCommand("Diffuser", "nuke.createNode(\"Diffuser.nk\")", icon="Diffuser.png")
-sub_menu.addCommand("Distant Edge", "nuke.createNode(\"Distant Edge.nk\")", icon="DistantEdge.png")
+sub_menu.addCommand("Distant Edge", "nuke.createNode(\"DistantEdge.nk\")", icon="DistantEdge.png")
 sub_menu.addCommand("Erode (Sub Pixel)", "nuke.createNode(\"SubErode.nk\")", icon="SubErode.png")
 sub_menu.addCommand("Exponential Glow", "nuke.createNode(\"ExponentialGlow.nk\")", icon="ExponentialGlow.png")
 sub_menu.addCommand("Flexi Blur", create_nodepaste_command("Tools", "Filter", "FlexiBlur.nk"), icon="FlexiBlur.png")
